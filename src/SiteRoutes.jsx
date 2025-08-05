@@ -1,0 +1,50 @@
+import { lazy, Suspense } from 'react'
+import { Routes, Route } from 'react-router-dom'
+import RouteLinks from './RouteLinks'
+
+import UserExist from './authorization/UserExist'
+import PageLoader from './components/PageLoader'
+
+import LoginPage from './pages/LoginPage' // LOGIN PAGE
+import HomePage from './pages/HomePage' // Home PAGE
+import PVsPage from './pages/PVsPage' // ALL PAYMENT VOUCHERS PAGE
+import AddPVPage from './pages/AddPVPage' // ADD PAYMENT VOUCHERS PAGE
+import MDAsPage from './pages/MDAsPage'
+import ErrorPage from './pages/ErrorPage' // ERROR PAGE
+import AddMDAPage from './pages/AddMDAPage' //ADD MDA PAGE
+import UsersPage from './pages/UsersPage' //USERS LIST PAGE
+import AddEconomicItemPage from './pages/AddEconomicItemPage' //ALL ECONOMIC ITEMS PAGE
+import EconomicItemsPage from './pages/EconomicItemsPage' //ADD ECONOMIC ITEM PAGE
+
+
+
+// const Home = lazy(() => import('./pages/Home'));
+
+export default function SiteRoutes() {
+  return (
+    <Routes>
+      <Route path={RouteLinks.loginPage} element={<LoginPage />} /> {`*/LOGIN PAGE*/`}
+
+      <Route element={<UserExist />}>
+        <Route path={RouteLinks.homePage} element={<HomePage />} /> {`*/HOME PAGE*/`}
+        <Route path={RouteLinks.paymentVouchers} element={<PVsPage />} /> {`*/ALL PVs PAGE*/`}
+        <Route path={RouteLinks.addPV} element={<AddPVPage />} /> {`*/ADD PV PAGE*/`}
+        <Route path={RouteLinks.mdaList} element={<MDAsPage />} /> {`*/MDA LIST PAGE*/`}
+        <Route path={RouteLinks.addMDA} element={<AddMDAPage />} /> {`*/ADD MDA PAGE*/`}
+        <Route path={RouteLinks.users} element={<UsersPage />} /> {`*/USERS LIST PAGE*/`}
+        <Route path={RouteLinks.economicLines} element={<EconomicItemsPage />} /> {`*/ALL ECONOMIC ITEMS PAGE*/`}
+        <Route path={RouteLinks.addEconomicLine} element={<AddEconomicItemPage />} /> {`*/ADD ECONOMIC ITEM PAGE*/`}
+      </Route>
+
+      {/* ERROR PAGE */}
+      <Route 
+        path={RouteLinks.errorPage} // error page
+        element={
+          <Suspense fallback={<PageLoader />}>
+            <ErrorPage />
+          </Suspense>
+        } 
+      />
+    </Routes>
+  )
+}

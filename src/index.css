@@ -1,0 +1,169 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-brown: #393536;
+  --color-black: #000;
+  --color-black-aside: #0D0E12;
+  --color-black-body: #0F1014;
+  --color-black-box: #15171C;
+  /* --color-primary: #0284c7; */
+  --color-secondary: #0284c7;
+  --color-secondary-dark: #0284c7;
+  --color-primary: #7008e7;
+  --color-primary-dark: oklch(60.6% 0.25 292.717);
+  --color-orange-light: #ED7747;
+  --color-orange-dark: #9a3412;
+  --color-white: #fff;
+  --color-slate-higher: #62748e;
+  --color-slate-high: #90a1b9;
+  --color-white-light: #f1f5f9;
+  --color-white-body: #f9f9f9;
+  --color-white-aside: #F1F1F4;
+
+  --color-login_gradient: 'linear-gradient(to right, #8e54e9 0, #4776e6 100%)';
+
+  --text-10: 10px;
+  --text-12: 12px;
+  --text-14: 14px;
+  --breakpoint-xxs: 18.75rem;
+  --breakpoint-xs: 25rem;
+  --breakpoint-large: 95.938rem;
+  --breakpoint-max_width: 106.25rem;
+
+  /* --shadow-round_black: '0 0px 1px 0 rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.19)'; */
+  /* --shadow-round_white: '0 0px 1px 0 rgba(255, 255, 255, 0.2), 0 1px 5px 0 rgba(255, 255, 255, 0.19)'; */
+  --shadow-round_black: '0px 3px 4px 0px rgba(0, 0, 0, 0.03)';
+  --shadow-round_white: '0px 3px 4px 0px rgba(255, 255, 255, 0.03)';
+}
+
+/* :root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+} */
+
+/* body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+} */
+
+/* @media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+} */
+
+html{
+  scroll-behavior: smooth;
+}
+
+*{
+  transition: all .2s;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+@layer utilities {
+  .aside-scroll-design {
+    @apply [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:rounded-full
+  }
+  .box {
+    @apply flex flex-col w-full p-8 rounded-lg h-full border-[1px] border-[#F1F1F4] dark:border-[#1E2027] shadow-[0px_3px_4px_0px_rgba(0,_0,_0,_0.03)]
+  }
+}
+
+
+@layer components {
+  .change-text::after{
+    content: '';
+    animation: text-change 5s linear 0s infinite;
+  }
+  .text-slide-in{
+    position: relative;
+    animation: slide-text-in .5s linear 0s forwards;
+  }
+
+  .pop-modal{
+    animation: pop-modal .1s linear 0s forwards;
+  }
+
+  .pop-modal-down{
+    animation: pop-modal-down .1s linear 0s forwards;
+  }
+
+  .dots-loading::after{
+    content: '';
+    animation: append-dots 2s linear 0s infinite;
+    font-size: 20px;
+  }
+
+
+  /* ANIMATIONS */
+  @keyframes text-change {
+    0%{content: 'Boundaries';}
+    100%{content: 'Limitations';}
+  }
+
+  @keyframes slide-text-in {
+    /* 0%{left: -200%;}
+    100%{left: 0%;} */
+    0%{transform: scale(0); opacity: 0;}
+    100%{transform: scale(1); opacity: 1;}
+  }
+
+  @keyframes pop-modal {
+    /* 0%{left: -200%;}
+    100%{left: 0%;} */
+    0%{margin-top: 20px; opacity: 0;}
+    100%{margin-top: 0; opacity: 1;}
+  }
+
+  @keyframes pop-modal-down {
+    /* 0%{left: -200%;}
+    100%{left: 0%;} */
+    0%{margin-bottom: 20px; opacity: 0;}
+    100%{margin-bottom: 0; opacity: 1;}
+  }
+}
+
+
+/* animation to append dots to word */
+@keyframes append-dots {
+  0%{content: '';}
+  33.3%{content: '.';}
+  66.6%{content: '..';}
+  100%{content: '...';}
+}
+
