@@ -1,5 +1,8 @@
 const RouteLinks = {
     loginPage: '/auth/login',
+    userVerifyPage: '/auth/verify/:token',
+
+
     homePage: '/',
     paymentVouchers: '/payment-vouchers',
     addPV: '/add-payment-vouchers',
