@@ -55,9 +55,9 @@ export let addUserFields = {
 export let addUserFieldsValidation = Yup.object().shape({
   firstname: Yup.string().required("Required"),
   lastname: Yup.string().required("Required"),
-  role: Yup.string().required("Required"),
-  status: Yup.string().required("Required"),
   email: Yup.string().required("Required"),
+  // role: Yup.string().required("Required"),
+  // status: Yup.string().required("Required"),
 });
 
 

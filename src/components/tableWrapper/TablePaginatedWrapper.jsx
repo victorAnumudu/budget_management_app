@@ -25,30 +25,32 @@ export default function TablePaginatedWrapper({
           {children({ data })}
         </div>
 
-        <div className='w-full flex flex-col lg:flex-row justify-center items-center gap-3 md:gap-6'>
-            <div className="text-sm text-center lg:text-left font-normal text-gray-500 dark:text-gray-400 block w-full">Showing <span className="font-semibold text-gray-900 dark:text-white">
-              {isFetching ? '----' : `page ${pagination?.current_page}`}</span> of <span className="font-semibold text-gray-900 dark:text-white">{pagination?.total_pages}</span>
-            </div>
-              <div className='flex items-center gap-3 md:gap-6'>
-                  <MainBtn 
-                      onClick={handlePrev}
-                      // text='Prev' 
-                      className={`${!pagination?.has_prev ? 'bg-primary dark:bg-primary-dark/50 pointer-events-none' : 'bg-primary dark:bg-primary-dark'} text-white min-w-10 max-h-8`} 
-                      disabled={isFetching || !pagination?.has_prev}
-                      icon='prev'
-                  />
-                  <MainBtn 
-                      onClick={handleNext}
-                      // text='Next' 
-                      className={`${!pagination?.has_next ? 'bg-primary dark:bg-primary-dark/50 pointer-events-none' : 'bg-primary dark:bg-primary-dark'} text-white min-w-10 max-h-8`} 
-                      disabled={isFetching || !pagination?.has_next}
-                      icon='next'
-                  /> 
+        {data.length > 0 &&
+          <div className='w-full flex flex-col lg:flex-row justify-center items-center gap-3 md:gap-6'>
+              <div className="text-sm text-center lg:text-left font-normal text-gray-500 dark:text-gray-400 block w-full">Showing <span className="font-semibold text-gray-900 dark:text-white">
+                {isFetching ? '----' : `page ${pagination?.current_page}`}</span> of <span className="font-semibold text-gray-900 dark:text-white">{pagination?.total_pages}</span>
               </div>
+                <div className='flex items-center gap-3 md:gap-6'>
+                    <MainBtn 
+                        onClick={handlePrev}
+                        // text='Prev' 
+                        className={`${!pagination?.has_prev ? 'bg-primary dark:bg-primary-dark/50 pointer-events-none' : 'bg-primary dark:bg-primary-dark'} text-white min-w-10 max-h-8`} 
+                        disabled={isFetching || !pagination?.has_prev}
+                        icon='prev'
+                    />
+                    <MainBtn 
+                        onClick={handleNext}
+                        // text='Next' 
+                        className={`${!pagination?.has_next ? 'bg-primary dark:bg-primary-dark/50 pointer-events-none' : 'bg-primary dark:bg-primary-dark'} text-white min-w-10 max-h-8`} 
+                        disabled={isFetching || !pagination?.has_next}
+                        icon='next'
+                    /> 
+                </div>
           </div>
+        }
       </div>
       
-    {isFetching && <TableIsLoading />}
+      {isFetching && <TableIsLoading />}
     </div>
   );
 }

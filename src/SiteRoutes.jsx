@@ -6,6 +6,8 @@ import UserExist from './authorization/UserExist'
 import PageLoader from './components/PageLoader'
 
 import LoginPage from './pages/LoginPage' // LOGIN PAGE
+import VerifyPage from './pages/VerifyPage' // USER VERIFY PAGE
+
 import HomePage from './pages/HomePage' // Home PAGE
 import PVsPage from './pages/PVsPage' // ALL PAYMENT VOUCHERS PAGE
 import AddPVPage from './pages/AddPVPage' // ADD PAYMENT VOUCHERS PAGE
@@ -24,6 +26,7 @@ export default function SiteRoutes() {
   return (
     <Routes>
       <Route path={RouteLinks.loginPage} element={<LoginPage />} /> {`*/LOGIN PAGE*/`}
+      <Route path={RouteLinks.userVerifyPage} element={<VerifyPage />} /> {`*/USER VERIFY PAGE*/`}
 
       <Route element={<UserExist />}>
         <Route path={RouteLinks.homePage} element={<HomePage />} /> {`*/HOME PAGE*/`}

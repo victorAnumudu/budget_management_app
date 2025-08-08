@@ -1,10 +1,12 @@
 import { memo, useEffect, useState } from 'react'
 import {useNavigate} from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
+import { useSelector } from 'react-redux'
 
 import BreadcrumbCom from '../breadcrumb/BreadcrumbCom'
 import TablePaginatedWrapper from '../tableWrapper/TablePaginatedWrapper'
 import Icons from '../Icons'
-import { getTransactions } from '../../services/siteServices'
+import { getALlUsersData } from '../../services/siteServices'
 import formatNumber from '../../helpers/formatNumber'
 import localImgLoader from '../../helpers/localImageLoader';
 import RouteLinks from '../../RouteLinks';
@@ -17,9 +19,13 @@ import EditCom from './EditCom'
 import VerifyModal from '../modals/VerifyModal'
 import StatusModal from '../modals/StatusModal'
 import AddUserCom from './AddUserCom'
+import queryKeys from '../../services/queryKeys'
+import DeleteUser from './DeleteUser'
 
 
 const UsersListCom = memo(() => {
+
+    const {userDetails:{email, role}} = useSelector((state) => state.userDetails)
 
     const navigate = useNavigate()
 
@@ -71,11 +77,19 @@ const UsersListCom = memo(() => {
     const closeActionModal = () => setActionModal({data:{}, name:''})
 
 
-    useEffect(()=>{
-        setTimeout(()=>{
-            setUsersDB({loading:false, error:'', data:UsersDB})
-        }, 1000)
-    },[])
+    // useEffect(()=>{
+    //     setTimeout(()=>{
+    //         setUsersDB({loading:false, error:'', data:UsersDB})
+    //     }, 1000)
+    // },[])
+
+    const {data:allUsersData, isFetching, isError, error} = useQuery({
+        queryKey: queryKeys.getAllUsers,
+        queryFn: () => {
+            const reqData = {}
+            return getALlUsersData(reqData)
+        },
+    })
 
     return (
         <>
@@ -90,7 +104,9 @@ const UsersListCom = memo(() => {
                     />
                 </div>
                 <div className='box bg-white dark:bg-black-box text-black-body dark:text-white-body'>
-
+                    {isError ?
+                    <p>{error.message}</p>
+                    :
                     <>
                         {/* filter section */}
                         <div className='px-2 py-2 mb-4 flex flex-col sm:flex-row flex-wrap sm:items-center gap-2'>
@@ -128,7 +144,7 @@ const UsersListCom = memo(() => {
                         </div>
                         {/* end of filter section */}
 
-                        <TablePaginatedWrapper data={usersDB?.data?.data} isFetching={usersDB?.loading} setPage={setPage} itemsPerPage={usersDB?.data?.pagination?.limit} pagination={usersDB?.data?.pagination}>
+                        <TablePaginatedWrapper data={allUsersData?.data?.data?.users} isFetching={isFetching} setPage={setPage} itemsPerPage={allUsersData?.data?.data?.pagination?.limit} pagination={allUsersData?.data?.data?.pagination}>
                         {({ data }) => (
                             <>
                                 <table className="table-auto py-2 w-full text-sm">
@@ -149,7 +165,7 @@ const UsersListCom = memo(() => {
                                         </tr>
                                     </thead>
                                     <tbody className='text-black-aside dark:text-slate-high'>
-                                        {(data && data.length > 0) ? data?.map((item, index) => (
+                                        {(data && data.length > 0) ? data?.filter(item => item.email != email).map((item, index) => (
                                             <tr key={item.id || index} className="border-t border-dashed border-slate-high">
                                                 <td className="p-2">
                                                     <div className='w-full flex items-center gap-2 whitespace-nowra'>
@@ -167,7 +183,7 @@ const UsersListCom = memo(() => {
                                                 </td>
                                                 <td className="p-2">
                                                     <div className="text-left">
-                                                        <div className={`text-sm font-semibold line-clamp-2 ${item?.status == 'pending' ? 'text-red-500': 'text-emerald-800'}`}>{formatNumber(item?.status)}</div>
+                                                        <div className={`text-sm font-semibold line-clamp-2 ${item?.status == 'active' ? 'text-emerald-500': 'text-red-800'}`}>{item?.status || 'null'}</div>
                                                     </div> 
                                                 </td>
                                                 <td className="group relative p-2 text-right">
@@ -202,6 +218,7 @@ const UsersListCom = memo(() => {
                         )}
                         </TablePaginatedWrapper>
                     </>
+                    }
                     
                 </div>
             </div>
@@ -209,11 +226,9 @@ const UsersListCom = memo(() => {
             {actionModal.name == 'edit' && <EditCom data={actionModal} closeModal={closeActionModal} />}
             {actionModal.name == 'add' && <AddUserCom data={actionModal} closeModal={closeActionModal} />}
             {actionModal.name == 'delete' && 
-                <VerifyModal 
-                    text='Are you sure you want to delete this User?' 
-                    proceedFunc={()=>{
-                        showActionModal(actionModal.data, 'status')
-                    }} 
+                <DeleteUser 
+                    text={ `Are you sure you want to delete`} 
+                    data={actionModal.data}
                     cLoseModal={closeActionModal}
                 />
             }

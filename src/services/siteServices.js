@@ -26,8 +26,14 @@ const postAuxEnd = (path, postData, media=false) => {
     return axios.post(`${basePath}${path}`, postData).then(res => {
         return res
     }).catch(err => {
-        let message = err?.response?.data?.message || err 
-        throw new Error(message);
+        let status = err?.response?.data?.status
+        if(status == -1000){
+            localStorage.clear();
+            window.location.href = `${RouteLinks.loginPage}?sessionExpired=true`;
+            return
+        }
+        return err?.response
+        // throw new Error(message);
     })
 }
 
@@ -36,14 +42,22 @@ const getAuxEnd = (path, reqData= null) => {
     return axios.get(`${basePath}${path}`,{ params: reqData }).then(res => {
         return res
     }).catch(err => {
-        let message = err?.response?.data?.message || err 
-        if(message.toLowerCase() == 'token error'){
+        let status = err?.response?.data?.status
+        if(status == -1000){
             localStorage.clear();
             window.location.href = `${RouteLinks.loginPage}?sessionExpired=true`;
             return
         }
-        throw new Error(message);
+        return err?.response
     })
+}
+
+// FUNCTION TO VERIFY USER
+export const userVerify = (reqData) => {
+    let postData = {
+        ...reqData
+    }
+    return postAuxEnd('/users/verify', postData, false)
 }
 
 // FUNCTION TO LOGIN USER IN
@@ -54,13 +68,52 @@ export const loginUser = (reqData) => {
     return postAuxEnd('/users/login', postData, false)
 }
 
-// FUNCTION TO LOGGED USER PROFILE
+// FUNCTION TO GET LOGGED IN USER PROFILE
 export const userProfile = (reqData) => {
     let postData = {
         ...reqData
     }
     return getAuxEnd('/users/profile', postData, false)
 }
+
+// FUNCTION TO GET ALL USERS
+export const getALlUsersData = (reqData) => {
+    let postData = {
+        ...reqData
+    }
+    return getAuxEnd('/users/all', postData, false)
+}
+
+// FUNCTION TO ADD USER
+export const addUser = (reqData) => {
+    let postData = {
+        ...reqData
+    }
+    return postAuxEnd('/users/add', postData, false)
+}
+
+// FUNCTION TO ADD USER BY AN ADMIN
+export const addUserByAdmin = (reqData) => {
+    let postData = {
+        ...reqData
+    }
+    return postAuxEnd('/users/add/admin', postData, false)
+}
+
+// FUNCTION TO DELETE USER BY AN ADMIN
+export const deleteUserByAdmin = (reqData) => {
+    let postData = {
+        ...reqData
+    }
+    return postAuxEnd('/users/delete', postData, false)
+}
+
+
+
+
+
+
+
 
 
 

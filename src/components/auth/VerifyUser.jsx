@@ -1,66 +1,69 @@
 import React, { memo, useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
-import { useLocation, useNavigate, Link } from 'react-router-dom'
+import { useNavigate, Link, useParams } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
 import {Formik, Form} from 'formik'
 import * as Yup from "yup";
 
 import InputText from '../inputs/InputText'
-import { updateUserDetails } from "../../store/UserDetails";
-import { loginUser } from '../../services/siteServices'
+import { userVerify } from '../../services/siteServices'
 
 import RouteLinks from '../../RouteLinks'
 
 import localImgLoader from '../../helpers/localImageLoader';
 import MainBtn from '../btn/MainBtn'
+import AlertStatus from '../alert/AlertStatus'
 
 
 const initialValues = {
-  email: "",
-  password: "",
+    password: "",
+    confirm_password: "",
+    email: ''
 };
 
 // To get the validation schema
 const validationSchema = Yup.object().shape({
-  email: Yup.string().required("email is required"),
-  password: Yup.string().required("password is required").min(4, 'must be upto 4 characters').max(12, 'must not exceed 12 characters'),
+    password: Yup.string().required("password is required").min(4, 'must be upto 4 characters').max(12, 'must not exceed 12 characters'),
+    confirm_password: Yup.string().required("Confirm Password is required").oneOf([Yup.ref('password')], 'Passwords must match'),
+    email: Yup.string().required("email is required"),
 });
 
-const LoginCom = memo(() => {
+const VerifyUser = memo(() => {
 
-  const dispatch = useDispatch()
+  const {token} = useParams()
   const navigate = useNavigate()
-  
 
-  const login = useMutation({
+  const completeVerification = useMutation({
     mutationFn: (fields) => {
-        if(!fields.email || !fields.password){
+        if(!fields.password){
             throw new Error('Please provide all fields marked *')
         }
-        return loginUser(fields)
+        return userVerify(fields)
     },
     onError: (error) => {
         // console.log(error)
     },
-      onSuccess: (res) => {
+    onSuccess: (res) => {
         if(res?.data?.status != 1){
-          throw new Error(res?.data?.message)
+            throw new Error(res?.data?.message)
         }
-        const {token, user} = res?.data?.data
-        if(token){
-            localStorage.setItem('token', token)
-            // localStorage.setItem('room', room)
-            const data = {token, ...user}
-            dispatch(updateUserDetails({ ...data }));
-          }
-          navigate(RouteLinks.homePage, {state:{proceed:'true'}}) // later add redux to dispatch state
-    }
+        setTimeout(()=>{
+            navigate(RouteLinks.loginPage) // navigate to login page
+        }, import.meta.env.VITE_APP_SETTIMEOUT_TIME)
+    },
   })
 
   //FUNCTION TO HANDLE LOGIN
   const handleSubmit = (values, helper) => {
-    login.mutate(values)
+    delete values.confirm_password
+    completeVerification.mutate(values)
   };
+
+  useEffect(()=>{ // go back to login page if there is no token
+    if(!token){
+        navigate(RouteLinks.loginPage)
+    }
+  },[])
 
 
   return (
@@ -81,24 +84,11 @@ const LoginCom = memo(() => {
                     </div>
 
                     <div className='w-full flex flex-col gap-1 items-center'>
-                      <h1 className='text-2xl md:text-3xl font-bold text-black-body'>Sign In</h1>
-                      <p className='text-sm font-medium text-slate-500'>Welcome back, please login to your account</p>
+                      <h1 className='text-2xl md:text-3xl font-bold text-black-body'>Verify User</h1>
+                      <p className='text-sm font-medium text-slate-500'>Please enter your desired password</p>
                     </div>
-
-                    {/* social login */}
-                    {/* <div className='grid grid-cols-2 gap-4 text-sm'>
-                      <div className='px-4 py-2 flex gap-2 items-center justify-center text-black-body font-medium border border-slate-300/50 rounded-md hover:text-primary  hover:bg-sky-50 cursor-pointer'>
-                        <Icons name='google' />
-                        <span>Sign in with Google</span>
-                      </div>
-                      <div className='px-4 py-2 flex gap-2 items-center justify-center text-black-body font-medium border border-slate-300/50 rounded-md hover:text-primary  hover:bg-sky-50 cursor-pointer'>
-                        <Icons name='apple' />
-                        <span>Sign in with Apple</span>
-                      </div>
-                    </div> */}
-
                     <div className='relative h-[2px] bg-slate-300/50'>
-                      <p className='absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 bg-white p-4 text-12 text-slate-500'>With Email</p>
+                      <p className='absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 bg-white p-4 text-12 text-slate-500'>User mail here: dummymail@dummy.com</p>
                     </div>
 
                     <div className='flex flex-col gap-8'>
@@ -126,39 +116,41 @@ const LoginCom = memo(() => {
                           value={props.values.password}
                           handleChange={props.handleChange}
                         />
+                      </div>
+                      <div className='relative text-input flex flex-col gap-2'>
+                        <p className='absolute left-0 -top-4 text-10'>
+                          Confirm Password <span className='text-red-500'>{(props.errors.confirm_password && props.touched.confirm_password) ? props.errors.confirm_password : ''}</span>
+                        </p>
+                        <InputText 
+                          id='confirm_password' 
+                          placeholder='Confirm Password' 
+                          name='confirm_password' 
+                          type='password' 
+                          value={props.values.confirm_password}
+                          handleChange={props.handleChange}
+                        />
                         {/* <p className='text-sm text-end font-medium text-primary '>Forget password ?</p> */}
                       </div>
-                      <div className=''>
-                        {/* <button 
-                          type='submit' 
-                          disabled={login.isPending} 
-                          className={`${login.isPending && 'dots-loading'} w-full h-full bg-primary dark:bg-primary-dark text-white font-bold rounded-md`}
-                        >
-                          Login
-                        </button> */}
+                      <div className='flex flex-col gap-2'>
                         <MainBtn 
                           type='submit' 
-                          text='Login'
+                          text='Proceed'
                           className='bg-primary dark:bg-primary-dark text-lg text-white font-bold'
-                          loading={login.isPending}
-                          disabled={login.isPending}
+                          loading={completeVerification.isPending}
+                          //   disabled={completeVerification.isPending}
                           shrinkAside={false}
                         />
-                      </div>
-                  
-                      <div className={`${login.error ? 'visible' : 'invisible'} h-5 w-full text-center`}>
-                          <p className='text-red-500 text-sm'>{login?.error?.message}</p>
+                        {(completeVerification.isError || completeVerification.isSuccess) &&
+                        <AlertStatus 
+                            text={completeVerification.isSuccess ? 'User verified successfully, redirecting...' : completeVerification.error.message}
+                            isSuccess={completeVerification.isSuccess}
+                            cLoseAlert={()=>{completeVerification.reset()}}
+                        />
+                        }
                       </div>
                     </div>
 
-                    {/* <p className='text-sm text-center font-medium text-slate-500'>Not yet a member? <span className='text-primary '>Sign Up</span></p> */}
-
-                    <div className='flex justify-end gap-4 text-[13px] font-medium'>
-                      <Link className='text-primary' to=''>FAQs</Link>
-                      <Link className='text-primary' to=''>Contact Us</Link>
-                    </div>
-
-
+                    <p className='text-sm text-center font-medium text-slate-500'>Back to <Link to={RouteLinks.loginPage} className='text-primary '>Login</Link></p>
                   </div>
                 </Form>
               )}
@@ -171,4 +163,4 @@ const LoginCom = memo(() => {
 })
 
 
-export default LoginCom
+export default VerifyUser
