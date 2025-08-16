@@ -146,18 +146,18 @@ const asideNavLinks = [
         // },
         ],
     },
-    {name:'MDAs', title:'', status:1, icon: 'product', notAllowedUsers: ['user'], subLinks: [
+    {name:'MDAs', title:'', status:1, icon: 'product', notAllowedUsers: ['user', 'tpo'], subLinks: [
         {name: 'View MDA', status:1, icon: 'dot', to: RouteLinks.mdaList, notAllowedUsers: [] },
         {name: 'Add MDA', status:1, icon: 'dot', to: RouteLinks.addMDA, notAllowedUsers: [] },
         ]
     },
-    {name:'Economic Line', title:'', status:1, icon: 'economy', notAllowedUsers: ['user'], subLinks: [
+    {name:'Economic Line', title:'', status:1, icon: 'economy', notAllowedUsers: ['user', 'tpo'], subLinks: [
         {name: 'Economic Lines', status:1, icon: 'dot', to: RouteLinks.economicLines, notAllowedUsers: [] },
         {name: 'Add Economic Item', status:1, icon: 'dot', to: RouteLinks.addEconomicLine, notAllowedUsers: [] },
         ]
     },
-     {name:'Users', title:'', status:1, icon: 'people', notAllowedUsers: ['user'], subLinks: [
-        // {name: 'View Users', status:1, icon: 'dot', to: RouteLinks.users, notAllowedUsers: [] },
+     {name:'Users', title:'', status:1, icon: 'people', notAllowedUsers: ['user', 'tpo'], subLinks: [
+        {name: 'View Users', status:1, icon: 'dot', to: RouteLinks.users, notAllowedUsers: [] },
         // {name: 'Add User', status:1, icon: 'dot', to: RouteLinks.addUser },
         ]
     },
