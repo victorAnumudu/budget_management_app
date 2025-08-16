@@ -18,26 +18,12 @@ function App() {
     window.scrollTo(0,0)
   },[pathname])
 
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        refetchOnWindowFocus: false,
-        retry: 3,
-        staleTime: 300000 //5 mins
-        // refetchOnMount: false,
-        // staleTime: Infinity // can also be a number in millisecond
-      },
-    },
-  })
-
   return (
     <>
-    <QueryClientProvider client={queryClient}>
       <SiteRoutes />
 
       {/* LOGOUT MODAL */}
       {logoutModal && <LogoutModal close={()=>setLogoutModal(false)} />}
-    </QueryClientProvider>
     </>
   );
 }

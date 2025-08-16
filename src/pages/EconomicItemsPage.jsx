@@ -13,7 +13,7 @@ export default function EconomicItemsPage() {
   const {userDetails:{role}} = useSelector((state) => state.userDetails)
 
   useEffect(()=>{
-    if(notAuthorizeUser(role, ['user']) != 1){
+    if(notAuthorizeUser(role, ['user', 'tpo']) != 1){
       navigate(RouteLinks.errorPage)
     }
   },[])

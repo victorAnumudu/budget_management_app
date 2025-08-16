@@ -183,7 +183,7 @@ const UsersListCom = memo(() => {
                                                 </td>
                                                 <td className="p-2">
                                                     <div className="text-left">
-                                                        <div className={`text-sm font-semibold line-clamp-2 ${item?.status == 'active' ? 'text-emerald-500': 'text-red-800'}`}>{item?.status || 'null'}</div>
+                                                        <div className={`text-sm font-semibold line-clamp-2 ${item?.status == 'active' ? 'text-emerald-500': 'text-red-800'}`}>{item?.status ? item?.status : 'null'}</div>
                                                     </div> 
                                                 </td>
                                                 <td className="group relative p-2 text-right">
