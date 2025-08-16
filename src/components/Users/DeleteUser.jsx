@@ -36,7 +36,7 @@ const DeleteUser = memo(({cLoseModal, data, text='Are You Sure?'}) => {
 
         //FUNCTION TO HANDLE DELETE USER
         const handleSubmit = () => {
-            const reqData = {id: data?.id}
+            const reqData = {delete_uid: data?.id}
             removeUser.mutate(reqData)
         };
       return (
