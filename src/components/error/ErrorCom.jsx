@@ -1,7 +1,8 @@
 import React, { memo } from 'react'
 import { useNavigate } from 'react-router-dom'
+import localImgLoader from '../../helpers/localImageLoader'
 
-import ErrorLogo from '../../assets/404-error.png'
+// import ErrorLogo from '/assets/404-error.png'
 
 const ErrorCom = memo(() => {
 
@@ -9,7 +10,7 @@ const ErrorCom = memo(() => {
   
   return (
     <>
-      <div className={`h-screen bg-sky-300 flex flex-col items-center justify-center bg-[url('./assets/login-bg.jpg')] bg-cover bg-center bg-no-repeat`}>
+      <div className={`h-screen bg-sky-300 flex flex-col items-center justify-center bg-[url('/assets/login-bg.jpg')] bg-cover bg-center bg-no-repeat`}>
         <div className='p-4 sm:p-8 w-full max-w-7xl mx-auto grid gap-8 place-content-center'>
           <div className='w-4/5 md:w-[650px] h-full'>
                 <div className='flex flex-col gap-8 w-full bg-white rounded-xl p-16 sm:px-20 sm:py-16 shadow'>
@@ -23,7 +24,7 @@ const ErrorCom = memo(() => {
                     </div> */}
 
                     <div className='flex flex-col items-center gap-6'>
-                        <img src={ErrorLogo} className='w-4/5 md:w-80 h-auto' alt='error logo' />
+                        <img src={localImgLoader('404-error.png')} className='w-4/5 md:w-80 h-auto' alt='error logo' />
                         <div className='h-10 mb-10 flex justify-center'>
                             <button onClick={()=>navigate('/', {replace:true})} className='px-2 h-full bg-primary dark:bg-primary-dark text-sm text-white font-medium rounded-md'>Return Home</button>
                         </div>

@@ -13,8 +13,6 @@ import RouteLinks from '../../RouteLinks'
 import localImgLoader from '../../helpers/localImageLoader';
 import MainBtn from '../btn/MainBtn'
 import AlertStatus from '../alert/AlertStatus'
-import Logo from '../../assets/logos/Abia_logo.png'
-
 
 
 const initialValues = {
@@ -70,7 +68,7 @@ const VerifyUser = memo(() => {
 
   return (
     <>
-      <div className={`h-screen bg-sky-300 flex flex-col items-center justify-center bg-[url('./assets/auth_logo.jpeg')] bg-cover bg-center bg-no-repeat overflow-y-auto`}>
+      <div className={`h-screen bg-sky-300 flex flex-col items-center justify-center bg-[url('/assets/auth_logo.jpeg')] bg-cover bg-center bg-no-repeat overflow-y-auto`}>
         <div className='p-4 sm:p-8 w-full max-w-7xl mx-auto grid gap-8 grid-cols-1 md:grid-cols-3 lg:grid-cols-2'>
           <div className='col-span-1 md:col-span-2 lg:col-span-1 h-full'>
             <Formik
@@ -82,7 +80,7 @@ const VerifyUser = memo(() => {
                 <Form>
                   <div className='flex flex-col gap-8 w-full bg-white rounded-xl p-8 xs:p-12 sm:px-20 sm:py-16 shadow'>
                     <div className='w-full flex justify-center items-center'>
-                      <img src={Logo} className='w-28' alt='logo'/>
+                      <img src={localImgLoader('logos/Abia_logo.png')} className='w-28' alt='logo'/>
                     </div>
 
                     <div className='w-full flex flex-col gap-1 items-center'>
