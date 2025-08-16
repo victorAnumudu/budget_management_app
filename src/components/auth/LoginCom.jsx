@@ -13,7 +13,7 @@ import RouteLinks from '../../RouteLinks'
 
 import localImgLoader from '../../helpers/localImageLoader';
 import MainBtn from '../btn/MainBtn'
-
+import Logo from '../../assets/logos/Abia_logo.png'
 
 const initialValues = {
   email: "",
@@ -77,7 +77,7 @@ const LoginCom = memo(() => {
                 <Form>
                   <div className='flex flex-col gap-8 w-full bg-white rounded-xl p-8 xs:p-12 sm:px-20 sm:py-16 shadow'>
                     <div className='w-full flex justify-center items-center'>
-                      <img src={localImgLoader('logos/Abia_logo.png')} className='w-28' alt='logo'/>
+                      <img src={Logo} className='w-28' alt='logo'/>
                     </div>
 
                     <div className='w-full flex flex-col gap-1 items-center'>
