@@ -40,6 +40,9 @@ const LoginCom = memo(() => {
     },
     onError: (error) => {
         // console.log(error)
+        setTimeout(()=>{
+          login.reset()
+        }, import.meta.env.VITE_APP_SETTIMEOUT_TIME)
     },
       onSuccess: (res) => {
         if(res?.data?.status != 1){

@@ -86,7 +86,9 @@ const UsersListCom = memo(() => {
     const {data:allUsersData, isFetching, isError, error} = useQuery({
         queryKey: queryKeys.getAllUsers,
         queryFn: () => {
-            const reqData = {}
+            const reqData = {
+                page,
+            }
             return getALlUsersData(reqData)
         },
     })
@@ -165,7 +167,7 @@ const UsersListCom = memo(() => {
                                         </tr>
                                     </thead>
                                     <tbody className='text-black-aside dark:text-slate-high'>
-                                        {(data && data.length > 0) ? data?.filter(item => item.email != email).map((item, index) => (
+                                        {(data && data.length > 0) ? data?.map((item, index) => (
                                             <tr key={item.id || index} className="border-t border-dashed border-slate-high">
                                                 <td className="p-2">
                                                     <div className='w-full flex items-center gap-2 whitespace-nowra'>
@@ -186,6 +188,7 @@ const UsersListCom = memo(() => {
                                                         <div className={`text-sm font-semibold line-clamp-2 ${item?.status == 'active' ? 'text-emerald-500': 'text-red-800'}`}>{item?.status ? item?.status : 'null'}</div>
                                                     </div> 
                                                 </td>
+                                                {item.email != email && (
                                                 <td className="group relative p-2 text-right">
                                                     <div className='flex items-center justify-end gap-3 md:gap-4'>
                                                         <div className='p-2 flex cursor-pointer justify-center items-center text-slate-500 bg-white-body dark:text-white-body dark:bg-black-body rounded-md'>
@@ -201,6 +204,7 @@ const UsersListCom = memo(() => {
                                                         </div>
                                                     </div>
                                                 </td>
+                                                )}
                                             </tr>
                                         ))
                                         :
