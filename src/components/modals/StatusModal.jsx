@@ -2,12 +2,12 @@ import { useEffect } from "react"
 import Icons from "../Icons"
 import ModalWrapper from "./ModalWrapper"
 
-export default function StatusModal({isSuccess=false, cLoseModal, text='Done Successful'}) {
+export default function StatusModal({isSuccess=false, cLoseModal, isPending, text='Done Successful'}) {
 
     useEffect(()=>{
         const effect = setTimeout(()=>{cLoseModal()},import.meta.env.VITE_APP_SETTIMEOUT_TIME)
         return ()=>clearTimeout(effect)
-    },[])
+    },[isPending])
   return (
     <ModalWrapper maxWidth='max-w-xl'>
         {/* <!-- Modal header --> */}
@@ -25,8 +25,14 @@ export default function StatusModal({isSuccess=false, cLoseModal, text='Done Suc
             </div>
             {/* <!-- Modal body --> */}
             <div className="p-6 flex flex-col gap-6 justify-center items-center">
-                <Icons name={isSuccess ? 'good' : 'bad'} className={`${isSuccess ? 'text-emerald-800' : 'text-red-500'} text-[60px]`} />
-                <p className={`${!isSuccess && 'text-red-500'} text-base leading-relaxed text-black-aside dark:text-slate-high`}>{text}</p>
+                {isPending ?
+                <p className={`text-base leading-relaxed text-black-aside dark:text-slate-high`}>loading...</p>
+                :
+                <>
+                    <Icons name={isSuccess ? 'good' : 'bad'} className={`${isSuccess ? 'text-emerald-800' : 'text-red-500'} text-[60px]`} />
+                    <p className={`${!isSuccess && 'text-red-500'} text-base leading-relaxed text-black-aside dark:text-slate-high`}>{text}</p>
+                </>
+                }
             </div>
         </div>
     </ModalWrapper>

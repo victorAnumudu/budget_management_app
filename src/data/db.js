@@ -37,6 +37,17 @@ const EXPENSES = [
         net_amount: '',
         // bank_to_debit: '',
         budget_type: '',
-        approval_authority: ''
+        approval_authority: '',
+        captured_by: ''
+    }
+]
+
+
+const history = [
+    {
+        id: '',
+        date_captured: '',
+        description: '',
+        done_by: ''
     }
 ]

@@ -3,7 +3,7 @@ export const EconomicItemsRecords = {
   {
     id: Math.random() * 10101010101010 + Math.random() * 10101010101010,
     org_code: '20007001',
-    economic_code: '22020101',
+    economic_code: '20007001/22020101',
     budget_type: 'recurrent',
     economic_description: 'Local Travels and Transport (Training)',
     mda: 'Office of the Accountant General',

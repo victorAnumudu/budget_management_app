@@ -4,7 +4,7 @@ import {Formik, Form} from 'formik'
 import * as Yup from "yup";
 
 import BreadcrumbCom from '../breadcrumb/BreadcrumbCom'
-import { getTransactions } from '../../services/siteServices'
+import { getTransactions, addNewPV } from '../../services/siteServices'
 import getDateFromDateString from '../../helpers/GetDateFromDateString';
 import localImgLoader from '../../helpers/localImageLoader';
 import RouteLinks from '../../RouteLinks';
@@ -22,12 +22,15 @@ import { searchedEconomicCode } from '../../data/PVData'
 import formatNumber from '../../helpers/formatNumber';
 import RecentlyAdded from '../recentlyAdded/RecentlyAdded';
 import CustomCounter from '../CustomCounter';
+import { useMutation } from '@tanstack/react-query';
 
 
 // To get the validation schema
 const validationSchema = Yup.object().shape({}) //addPVFieldsValidation
 
 const AddPVCom = memo(() => {
+
+    const [reqData, setReqData] = useState({})
     
     const [searchCode, setSearchCode] = useState({loading: false, status:null, data:{}})
 
@@ -45,10 +48,38 @@ const AddPVCom = memo(() => {
         },1000)
     }
 
-    //FUNCTION TO HANDLE ADD PV
-    const handleSubmit = (values, helper) => {
-        // login.mutate(values)
+    const addPV = useMutation({
+        mutationFn: (fields) => {
+            return addNewPV(fields)
+        },
+        onSuccess: (res) => {
+            if(res?.data?.status != 1){
+                throw new Error(res?.data?.message)
+            }
+        },
+        onSettled: () => {
+            setTimeout(()=>{
+            addPV.reset()
+            }, import.meta.env.VITE_APP_SETTIMEOUT_TIME)
+        },
+    })
+
+    //FUNCTION TO DISPLAY VERIFY MODAL
+    const handleVerify = (values, helper) => {
+        setReqData(values)
         setVerifyModal(true)
+        console.log('helper', values)
+    };
+
+    //FUNCTION TO HANDLE ADD PV
+    const handleSubmit = () => {
+        delete reqData.approval_authorities
+        delete reqData.id
+        delete reqData.balance
+        delete reqData.total_amount
+        delete reqData.year
+        reqData.captured_by = 'admin@admin.com'
+        addPV.mutate(reqData)
     };
 
     return (
@@ -63,7 +94,7 @@ const AddPVCom = memo(() => {
                             <Formik
                                 initialValues={initialValues}
                                 validationSchema={validationSchema}
-                                onSubmit={handleSubmit}
+                                onSubmit={handleVerify}
                             >
                                 {(props)=>(
                                     <Form>                
@@ -262,10 +293,10 @@ const AddPVCom = memo(() => {
                                                         Gross Amount <span className='text-red-500 text-10'>{(props.errors.total_amount && props.touched.total_amount) ? props.errors.total_amount : ''}</span>
                                                     </p>
                                                     <InputText 
-                                                        id='total_amount' 
+                                                        id='gross_amount' 
                                                         placeholder='0'
-                                                        name='total_amount' 
-                                                        value={props.values.total_amount}
+                                                        name='gross_amount' 
+                                                        value={props.values.gross_amount}
                                                         handleChange={props.handleChange}
                                                     />
                                                 </div>
@@ -274,10 +305,10 @@ const AddPVCom = memo(() => {
                                                         Net Amount <span className='text-red-500 text-10'>{(props.errors.cash_paid && props.touched.cash_paid) ? props.errors.cash_paid : ''}</span>
                                                     </p>
                                                     <InputText 
-                                                        id='cash_paid' 
+                                                        id='net_amount' 
                                                         placeholder='0'
-                                                        name='cash_paid' 
-                                                        value={props.values.cash_paid}
+                                                        name='net_amount' 
+                                                        value={props.values.net_amount}
                                                         handleChange={props.handleChange}
                                                     />
                                                 </div>
@@ -285,7 +316,7 @@ const AddPVCom = memo(() => {
 
                                             <MainBtn 
                                                 type='submit'
-                                                // disabled={props.errors} 
+                                                // disabled={props.errors.length} 
                                                 className={`bg-secondary px-2 py-1 mt-4 rounded-md text-white font-medium sm:self-end`}
                                                 text='Add Payment Voucher'
                                             />
@@ -334,16 +365,17 @@ const AddPVCom = memo(() => {
                     text='Are you sure you want to add this Payment Voucher?' 
                     proceedFunc={()=>{
                         setVerifyModal(false)
-                        setStatus(true)
+                        handleSubmit()
                     }} 
                     cLoseModal={()=>setVerifyModal(false)}
                 />
             }
-            { status &&
+            { (addPV.isError || addPV.isSuccess || addPV.isPending) &&
                 <StatusModal 
                     text='Payment Voucher added successfully' 
-                    isSuccess={true}
-                    cLoseModal={()=>{setSearchCode({loading: false, status:null, data:{}});setStatus(false)}}
+                    isSuccess={addPV.isSuccess}
+                    isPending={addPV.isPending}
+                    cLoseModal={()=>{setSearchCode({loading: false, status:null, data:{}}); addPV.reset()}}
                 />
             }
         </>

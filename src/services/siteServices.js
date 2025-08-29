@@ -108,6 +108,14 @@ export const deleteUserByAdmin = (reqData) => {
     return postAuxEnd('/users/delete', postData, false)
 }
 
+// FUNCTION TO ADD NEW PV
+export const addNewPV = (reqData) => {
+    let postData = {
+        ...reqData
+    }
+    return postAuxEnd('/expenses/add', postData, false)
+}
+
 
 
 

@@ -30,8 +30,9 @@ const UsersListCom = memo(() => {
     const navigate = useNavigate()
 
     const [page, setPage] = useState(1)
-    const [filter, setFilter] = useState({type: '', value: ''})
+    const [usersDB, setUsersDB] = useState({loading:true, error:'', data:{}})
     const [willFilter, setWillFilter] = useState(false)
+    const [filter, setFilter] = useState({type: '', value: ''})
 
     const handleFilter = ({target:{name, value}}) => {
         setFilter(prev => ({...prev, [name]:value}))
@@ -50,24 +51,40 @@ const UsersListCom = memo(() => {
         }
     }
 
+    const allUsers = usersDB?.data?.data?.users // USERS LIST
+    const pagination = usersDB?.data?.data?.pagination
+    const isFetching = usersDB?.loading
+    const isError = usersDB?.error
+
+    useEffect(()=>{
+        setUsersDB(prev => ({...prev, loading:true}))
+        const payload = filter?.type ? {[filter?.type]: filter.value} : {}
+        getALlUsersData({...payload, page}).then(res => {
+            if(!res?.data?.status){
+                setUsersDB(prev => ({...prev, error:'Unable to fetch information', loading:false}))
+                return
+            }
+            setUsersDB({loading:false, error:'', data:res?.data})
+        }).catch(err => {
+            setUsersDB({loading:false, error:'error occurred', data:{}})
+            console.log('ERR', err)
+        })
+    },[page, willFilter])
+
     //FUNCTION TO OPEN EDIT MODAL
     const [actionModal, setActionModal] = useState({data:{}, name:''})
     const showActionModal = (data, name) => setActionModal({data, name})
     const closeActionModal = () => setActionModal({data:{}, name:''})
 
-    const {data:allUsersData, isFetching, isError, error} = useQuery({
-        queryKey: [...queryKeys.getAllUsers, page, willFilter],
-        queryFn: () => {
-            const filterData = filter?.type ? {[filter?.type]: filter.value} : {}
-            const reqData = {
-                page,
-                ...filterData
-            }
-            return getALlUsersData(reqData)
-        },
-    })
-    const allUsers = allUsersData?.data?.data?.users // USERS LIST
-    const pagination = allUsersData?.data?.data?.pagination
+    // const {data:allUsersData, isFetching, isError, error} = useQuery({
+    //     queryKey: queryKeys.getAllUsers,
+    //     queryFn: () => {
+    //         const reqData = {
+    //             page,
+    //         }
+    //         return getALlUsersData(reqData)
+    //     },
+    // })
 
     return (
         <>
@@ -83,7 +100,7 @@ const UsersListCom = memo(() => {
                 </div>
                 <div className='box bg-white dark:bg-black-box text-black-body dark:text-white-body'>
                     {isError ?
-                    <p>{error?.message}</p>
+                    <p>{usersDB?.error}</p>
                     :
                     <>
                         {/* filter section */}
@@ -106,7 +123,7 @@ const UsersListCom = memo(() => {
                             <div className='w-full sm:max-w-48'>
                                 <InputText 
                                     id='id' 
-                                    name='value' 
+                                    name='id' 
                                     value={filter?.value}
                                     disabled={!filter.type}
                                     placeholder={filter.type && `enter ${filter.type}`} 
