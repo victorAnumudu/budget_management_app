@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux'
 import BreadcrumbCom from '../breadcrumb/BreadcrumbCom'
 import TablePaginatedWrapper from '../tableWrapper/TablePaginatedWrapper'
 import Icons from '../Icons'
-import { getALlUsersData } from '../../services/siteServices'
+import { getAllUsersData } from '../../services/siteServices'
 import formatNumber from '../../helpers/formatNumber'
 import localImgLoader from '../../helpers/localImageLoader';
 import RouteLinks from '../../RouteLinks';
@@ -63,7 +63,7 @@ const UsersListCom = memo(() => {
                 page,
                 ...filterData
             }
-            return getALlUsersData(reqData)
+            return getAllUsersData(reqData)
         },
     })
     const allUsers = allUsersData?.data?.data?.users // USERS LIST

@@ -4,8 +4,8 @@ import { deleteUserByAdmin } from '../../services/siteServices'
 import MainBtn from "../btn/MainBtn"
 import Icons from "../Icons"
 import ModalWrapper from "../modals/ModalWrapper"
-import StatusModal from "../modals/StatusModal"
 import queryKeys from "../../services/queryKeys"
+import AlertStatus from '../alert/AlertStatus'
 
 const DeleteUser = memo(({cLoseModal, data, text='Are You Sure?'}) => {
     const queryClient = useQueryClient()
@@ -60,14 +60,16 @@ const DeleteUser = memo(({cLoseModal, data, text='Are You Sure?'}) => {
                         <Icons name='question' className='text-[60px]' />
                         <p className="text-base leading-relaxed text-black-aside dark:text-slate-high">{text}</p>
                         <p className="text-base leading-relaxed text-black-aside dark:text-slate-high font-bold">{data.email}</p>
+                        
+                        {(removeUser.isSuccess || removeUser.isError || removeUser.isPending) &&
+                        <AlertStatus 
+                            isSuccess={removeUser.isSuccess}
+                            isPending={removeUser.isPending}
+                            text= {removeUser.isSuccess ? 'User removed successfully' : removeUser?.error?.message} 
+                            cLoseAlert={() => removeUser.reset()}
+                        />
+                        }
                     </div>
-                    {(removeUser.isSuccess || removeUser.isError) &&
-                    <div className="px-6 flex flex-col gap-6 justify-center items-center">
-                        <p className={`${!removeUser.isSuccess ? 'text-red-500' : 'text-emerald-800'} text-base leading-relaxed text-black-aside dark:text-slate-high`}>
-                            {removeUser.isSuccess ? 'User removed successfully' : removeUser.error.message}
-                        </p>
-                    </div>
-                    }
                     {/* <!-- Modal footer --> */}
                     <div className="flex items-center gap-6 p-6">
                         <MainBtn 
@@ -81,13 +83,6 @@ const DeleteUser = memo(({cLoseModal, data, text='Are You Sure?'}) => {
                     </div>
                 </div>
             </ModalWrapper>
-            {/* { (removeUser.isSuccess || removeUser.isError) &&
-                <StatusModal 
-                    text={removeUser.isSuccess ? 'User removed successfully' : removeUser.error.message}
-                    isSuccess={removeUser.isSuccess}
-                    cLoseModal={()=>{removeUser.reset()}}
-                />
-            } */}
         </>
       )
     }

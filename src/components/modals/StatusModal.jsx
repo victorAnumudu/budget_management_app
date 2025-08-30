@@ -8,6 +8,7 @@ export default function StatusModal({isSuccess=false, cLoseModal, isPending, tex
         const effect = setTimeout(()=>{cLoseModal()},import.meta.env.VITE_APP_SETTIMEOUT_TIME)
         return ()=>clearTimeout(effect)
     },[isPending])
+    
   return (
     <ModalWrapper maxWidth='max-w-xl'>
         {/* <!-- Modal header --> */}

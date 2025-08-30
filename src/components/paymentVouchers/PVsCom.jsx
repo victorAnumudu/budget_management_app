@@ -4,7 +4,7 @@ import {Link, useNavigate} from 'react-router-dom'
 import BreadcrumbCom from '../breadcrumb/BreadcrumbCom'
 import TablePaginatedWrapper from '../tableWrapper/TablePaginatedWrapper'
 import Icons from '../Icons'
-import { getTransactions } from '../../services/siteServices'
+import { getAllPVData } from '../../services/siteServices'
 import getDateFromDateString from '../../helpers/GetDateFromDateString';
 import getTimeFromDateString from '../../helpers/GetTimeFromDateString';
 import localImgLoader from '../../helpers/localImageLoader';
@@ -18,52 +18,33 @@ import EditAddedPV from './EditAddedPV'
 import ViewAddedPV from './ViewAddedPV'
 import VerifyModal from '../modals/VerifyModal'
 import StatusModal from '../modals/StatusModal'
+import { useQuery } from '@tanstack/react-query'
+import queryKeys from '../../services/queryKeys'
 
 const PVsCom = memo(() =>{
 
     const navigate = useNavigate()
 
     const [page, setPage] = useState(1)
-    const [pvRecords, setPVRecords] = useState({loading:true, error:'', data:{}})
-    // const [willFilter, setWillFilter] = useState(false)
+    const [filter, setFilter] = useState({type: '', value: ''})
+    const [willFilter, setWillFilter] = useState(false)
 
-    const [filter, setFilter] = useState({type: '', id: ''})
     const handleFilter = ({target:{name, value}}) => {
         setFilter(prev => ({...prev, [name]:value}))
     }
 
     const handleFilterByParams = () => {
-        // if(filter.type && !filter.id){
-        //     return
-        // }else if(!filter.type){
-        //     setPage(1)
-        //     setWillFilter(prev => !prev)
-        //     setFilter({type: '', id: ''})
-        // }else{
-        //     setPage(1)
-        //     setWillFilter(prev => !prev)
-        // }
+        if(filter.type && !filter.value){
+            return
+        }else if(!filter.type){
+            setPage(1)
+            setWillFilter(prev => !prev)
+            setFilter({type: '', value: ''})
+        }else{
+            setPage(1)
+            setWillFilter(prev => !prev)
+        }
     }
-
-    // const transactions = allTransactions?.data?.transactions // TRANSACTIONS LIST
-    // const pagination = allTransactions?.data?.pagination
-    // const isFetching = allTransactions?.loading
-    // const isError = allTransactions?.error
-
-    // useEffect(()=>{
-    //     setAllTransaction(prev => ({...prev, loading:true}))
-    //     const payload = filter?.type ? {[filter?.type]: filter.id} : {}
-    //     getTransactions({...payload, page}).then(res => {
-    //         if(res?.status != 200){
-    //             setAllTransaction(prev => ({...prev, loading:false}))
-    //             return
-    //         }
-    //         setAllTransaction({loading:false, error:'', data:res?.data})
-    //     }).catch(err => {
-    //         setAllTransaction({loading:false, error:'error occurred', data:{}})
-    //         console.log('ERR', err)
-    //     })
-    // },[page, willFilter])
 
     //FUNCTION TO OPEN EDIT MODAL
     const [actionModal, setActionModal] = useState({data:{}, name:''})
@@ -71,11 +52,19 @@ const PVsCom = memo(() =>{
     const closeActionModal = () => setActionModal({data:{}, name:''})
 
 
-    useEffect(()=>{
-        setTimeout(()=>{
-            setPVRecords({loading:false, error:'', data:PVrecords})
-        }, 1000)
-    },[])
+    const {data:allPVsData, isFetching, isError, error} = useQuery({
+        queryKey: [...queryKeys.getAllPVs, page, willFilter],
+        queryFn: () => {
+            const filterData = filter?.type ? {[filter?.type]: filter.value} : {}
+            const reqData = {
+                page,
+                ...filterData
+            }
+            return getAllPVData(reqData)
+        },
+    })
+    const allPVs = allPVsData?.data?.data?.pvs // PVS LIST
+    const pagination = allPVsData?.data?.data?.pagination
 
     return (
         <>
@@ -102,14 +91,16 @@ const PVsCom = memo(() =>{
                                     onChange={handleFilter}
                                 >
                                     <option value=''>All</option>
-                                    <option value='economic_line'>Economic Line</option>
+                                    <option value='economic_code'>Economic Code</option>
+                                    <option value='beneficiary_name'>Beneficiary Name</option>
+                                    <option value='beneficiary_bank'>Beneficiary Bank</option>
                                 </SelectDropdown>
                             </div>
                             <div className='w-full sm:max-w-48'>
                                 <InputText 
                                     id='id' 
-                                    name='id' 
-                                    value={filter?.id}
+                                    name='value' 
+                                    value={filter?.value}
                                     disabled={!filter.type}
                                     placeholder={filter.type && `enter ${filter.type}`} 
                                     className={`h-10 w-full p-2 rounded-md text-black-aside dark:text-slate-high outline-none border border-black-aside dark:border-slate-high ${!filter.type && 'opacity-30'}`} 
@@ -119,15 +110,15 @@ const PVsCom = memo(() =>{
                             <div className='w-20'>
                                 <MainBtn 
                                     onClick={handleFilterByParams} 
-                                    disabled={filter.type && !filter.id} 
-                                    className={`bg-primary dark:bg-primary-dark px-2 py-1 rounded-md text-white font-medium sm:self-end ${(filter.type && !filter.id) && 'opacity-50'}`}
+                                    disabled={filter.type && !filter.value} 
+                                    className={`bg-primary dark:bg-primary-dark px-2 py-1 rounded-md text-white font-medium sm:self-end ${(filter.type && !filter.value) && 'opacity-50'}`}
                                     text='Submit'
                                 />
                             </div>
                         </div>
                         {/* end of filter section */}
 
-                        <TablePaginatedWrapper data={pvRecords?.data?.data} isFetching={pvRecords?.loading} setPage={setPage} itemsPerPage={pvRecords?.data?.pagination?.limit} pagination={pvRecords?.data?.pagination}>
+                        <TablePaginatedWrapper data={allPVs} isFetching={isFetching} setPage={setPage} itemsPerPage={pagination?.limit} pagination={pagination}>
                         {({ data }) => (
                             <>
                                 <table className="table-auto py-2 w-full text-sm">

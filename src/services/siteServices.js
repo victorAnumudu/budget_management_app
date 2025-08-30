@@ -77,7 +77,7 @@ export const userProfile = (reqData) => {
 }
 
 // FUNCTION TO GET ALL USERS
-export const getALlUsersData = (reqData) => {
+export const getAllUsersData = (reqData) => {
     let postData = {
         ...reqData
     }
@@ -108,12 +108,25 @@ export const deleteUserByAdmin = (reqData) => {
     return postAuxEnd('/users/delete', postData, false)
 }
 
+
+
+
+
+
 // FUNCTION TO ADD NEW PV
 export const addNewPV = (reqData) => {
     let postData = {
         ...reqData
     }
     return postAuxEnd('/expenses/add', postData, false)
+}
+
+// FUNCTION TO GET ALL USERS
+export const getAllPVData = (reqData) => {
+    let postData = {
+        ...reqData
+    }
+    return getAuxEnd('/expenses/all', postData, false)
 }
 
 

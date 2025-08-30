@@ -22,13 +22,16 @@ import { searchedEconomicCode } from '../../data/PVData'
 import formatNumber from '../../helpers/formatNumber';
 import RecentlyAdded from '../recentlyAdded/RecentlyAdded';
 import CustomCounter from '../CustomCounter';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import queryKeys from '../../services/queryKeys';
 
 
 // To get the validation schema
 const validationSchema = Yup.object().shape({}) //addPVFieldsValidation
 
 const AddPVCom = memo(() => {
+
+    const queryClient = useQueryClient()
 
     const [reqData, setReqData] = useState({})
     
@@ -56,6 +59,12 @@ const AddPVCom = memo(() => {
             if(res?.data?.status != 1){
                 throw new Error(res?.data?.message)
             }
+            setSearchCode({loading: false, status:null, data:{}})
+            queryClient.refetchQueries({
+                queryKey: [...queryKeys.getAllPVs],
+                // type: 'active',
+                // exact: true,
+            })
         },
         onSettled: () => {
             setTimeout(()=>{
@@ -136,13 +145,13 @@ const AddPVCom = memo(() => {
                                             <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-8'>
                                                 <div className='relative text-input flex flex-col gap-1'>
                                                     <p className='text-sm font-semibold dark:text-slate-high'>
-                                                        Date <span className='text-red-500 text-10'>{(props.errors.date && props.touched.date) ? props.errors.date : ''}</span>
+                                                        Date Captured <span className='text-red-500 text-10'>{(props.errors.date && props.touched.date) ? props.errors.date : ''}</span>
                                                     </p>
                                                     <InputText 
-                                                        id='date' 
+                                                        id='date_captured' 
                                                         type='date' 
-                                                        name='date' 
-                                                        value={props.values.date}
+                                                        name='date_captured' 
+                                                        value={props.values.date_captured}
                                                         handleChange={props.handleChange}
                                                     />
                                                 </div>

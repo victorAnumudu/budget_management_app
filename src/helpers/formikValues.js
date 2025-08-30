@@ -1,7 +1,7 @@
 import * as Yup from "yup";
 
 export let addPVFields = {
-  date: "",
+  date_captured: "",
   pv_number: "",
   budget_type: '',
   approval_authority: '',
@@ -17,7 +17,7 @@ export let addPVFields = {
 };
 
 export let addPVFieldsValidation = Yup.object().shape({
-  date: Yup.date().required("Select Date"),
+  date_captured: Yup.date().required("Select Date"),
   pv_number: Yup.string().required("Required"),
   budget_type: Yup.string().required("Required"),
   approval_authority: Yup.string().required("Required"),

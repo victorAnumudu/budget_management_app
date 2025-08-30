@@ -21,6 +21,7 @@ import StatusModal from '../modals/StatusModal';
 import { addUserFields, addUserFieldsValidation } from '../../helpers/formikValues'; // FORMIK INITIAL VALUES AND VALIDATION 
 import ModalWrapper from '../modals/ModalWrapper';
 import queryKeys from '../../services/queryKeys';
+import AlertStatus from '../alert/AlertStatus';
 
 
 // To get the validation schema
@@ -158,12 +159,18 @@ const AddUserCom = memo(({closeModal}) =>{
                                             handleChange={props.handleChange}
                                         />
                                     </div>
-                                    {(registerUser.isSuccess || registerUser.isError) &&
-                                    <div className="px-6 flex flex-col gap-6 justify-center items-center">
-                                        <p className={`${!registerUser.isSuccess ? 'text-red-500' : 'text-emerald-800'} text-base leading-relaxed text-black-aside dark:text-slate-high`}>
-                                            {registerUser.isSuccess ? 'User added successfully' : registerUser.error.message}
-                                        </p>
-                                    </div>
+                                    {(registerUser.isSuccess || registerUser.isError || registerUser.isPending) &&
+                                    // <div className="px-6 flex flex-col gap-6 justify-center items-center">
+                                    //     <p className={`${!registerUser.isSuccess ? 'text-red-500' : 'text-emerald-800'} text-base leading-relaxed text-black-aside dark:text-slate-high`}>
+                                    //         {registerUser.isSuccess ? 'User added successfully' : registerUser.error.message}
+                                    //     </p>
+                                    // </div>
+                                    <AlertStatus 
+                                        isSuccess={registerUser.isSuccess}
+                                        isPending={registerUser.isPending}
+                                        text= {registerUser.isSuccess ? 'User added successfully' : registerUser?.error?.message} 
+                                        cLoseAlert={() => registerUser.reset()}
+                                    />
                                     }
                                     <MainBtn 
                                         type='submit'
@@ -178,13 +185,6 @@ const AddUserCom = memo(({closeModal}) =>{
                     </Formik>
                 </div>
             </ModalWrapper>
-            {/* { (registerUser.isSuccess || registerUser.isError) &&
-                <StatusModal 
-                    text={registerUser.isSuccess ? 'User added successfully' : registerUser.error.message}
-                    isSuccess={registerUser.isSuccess}
-                    cLoseModal={()=>{registerUser.reset()}}
-                />
-            } */}
         </>
     )
 })
