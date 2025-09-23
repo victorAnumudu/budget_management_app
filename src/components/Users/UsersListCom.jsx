@@ -65,6 +65,7 @@ const UsersListCom = memo(() => {
             }
             return getAllUsersData(reqData)
         },
+        staleTime: 0 //0 mins
     })
     const allUsers = allUsersData?.data?.data?.users // USERS LIST
     const pagination = allUsersData?.data?.data?.pagination

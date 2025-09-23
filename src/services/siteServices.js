@@ -109,10 +109,6 @@ export const deleteUserByAdmin = (reqData) => {
 }
 
 
-
-
-
-
 // FUNCTION TO ADD NEW PV
 export const addNewPV = (reqData) => {
     let postData = {
@@ -127,6 +123,15 @@ export const getAllPVData = (reqData) => {
         ...reqData
     }
     return getAuxEnd('/expenses/all', postData, false)
+}
+
+
+// FUNCTION TO GET ALL ECONOMIC ITEMS
+export const getAllEconomicItems = (reqData) => {
+    let postData = {
+        ...reqData
+    }
+    return getAuxEnd('/economic-items/all', postData, false)
 }
 
 

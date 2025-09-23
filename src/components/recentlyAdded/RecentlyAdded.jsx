@@ -94,7 +94,7 @@ const RecentlyAdded = memo(() => {
                                         <td className="p-2">
                                             <div className="text-left">
                                                 <div title={item?.economic_description} className="text-sm font-semibold line-clamp-1">{item?.economic_description}</div>
-                                                <div className="font-normal text-slate-higher">{item?.org_code}/{item?.economic_code}</div>
+                                                <div className="font-normal text-slate-higher">{item?.economic_code}</div>
                                             </div> 
                                         </td>
                                         <td className="p-2">

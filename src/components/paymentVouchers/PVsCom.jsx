@@ -62,6 +62,7 @@ const PVsCom = memo(() =>{
             }
             return getAllPVData(reqData)
         },
+        staleTime: 0 //0 mins
     })
     const allPVs = allPVsData?.data?.data?.pvs // PVS LIST
     const pagination = allPVsData?.data?.data?.pagination
@@ -166,7 +167,8 @@ const PVsCom = memo(() =>{
                                                 <td className="p-2">
                                                     <div className="text-left">
                                                         <div title={item?.economic_description} className="text-sm font-semibold line-clamp-1">{item?.economic_description}</div>
-                                                        <div className="font-normal text-slate-higher">{item?.org_code}/{item?.economic_code}</div>
+                                                        <div className="font-normal text-slate-higher">{item?.economic_code}</div>
+                                                        {/* <div className="font-normal text-slate-higher">{item?.org_code}/{item?.economic_code}</div> */}
                                                     </div> 
                                                 </td>
                                                 <td className="p-2">
