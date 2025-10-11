@@ -5,6 +5,8 @@ const queryKeys = {
     dashboardData: ['dashboard_data'],
     dashboardSummaryData: ['dashboard_summary_data'],
     dashboardRightPanelData: ['dashboard_right_panel_data'],
+
+    allMDA: ['all_mdas'],
 }
 
 export default queryKeys

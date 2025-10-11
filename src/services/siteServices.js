@@ -160,6 +160,18 @@ export const getDashRightPanelSummaryData = (reqData) => {
     return getAuxEnd(`/dashboard/right-panel`, postData)
 }
 
+// FUNCTION TO ADD MDA
+export const addMDA = (reqData) => {
+    const postData = { ...reqData }
+    return postAuxEnd(`/mdas/add`, postData)
+}
+
+// FUNCTION TO GET ALL MDAS DATA
+export const getAllMDAData = (reqData) => {
+    const postData = { ...reqData }
+    return getAuxEnd(`/mdas/all`, postData)
+}
+
 
 
 

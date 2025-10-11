@@ -4,7 +4,7 @@ import {useNavigate} from 'react-router-dom'
 import BreadcrumbCom from '../breadcrumb/BreadcrumbCom'
 import TablePaginatedWrapper from '../tableWrapper/TablePaginatedWrapper'
 import Icons from '../Icons'
-import { getTransactions } from '../../services/siteServices'
+import { getAllMDAData } from '../../services/siteServices'
 import formatNumber from '../../helpers/formatNumber'
 import localImgLoader from '../../helpers/localImageLoader';
 import RouteLinks from '../../RouteLinks';
@@ -16,65 +16,56 @@ import MainBtn from '../btn/MainBtn'
 import EditCom from './EditCom'
 import VerifyModal from '../modals/VerifyModal'
 import StatusModal from '../modals/StatusModal'
+import { useQuery } from '@tanstack/react-query'
+import queryKeys from '../../services/queryKeys'
 
 
 const MDAListCom = memo(() => {
 
     const navigate = useNavigate()
 
-    const [page, setPage] = useState(1)
-    const [mdaRecords, setMDARecords] = useState({loading:true, error:'', data:{}})
-    // const [willFilter, setWillFilter] = useState(false)
-
+const [page, setPage] = useState(1)
     const [filter, setFilter] = useState({type: '', id: ''})
-    const handleFilter = ({target:{name, value}}) => {
-        setFilter(prev => ({...prev, [name]:value}))
+    const [willFilter, setWillFilter] = useState(false)
+
+    const handleFilter = ({target: {name, value}}) => {
+        setFilter(prev => ({...prev, [name]: value}))
     }
 
     const handleFilterByParams = () => {
-        // if(filter.type && !filter.id){
-        //     return
-        // }else if(!filter.type){
-        //     setPage(1)
-        //     setWillFilter(prev => !prev)
-        //     setFilter({type: '', id: ''})
-        // }else{
-        //     setPage(1)
-        //     setWillFilter(prev => !prev)
-        // }
+        if (filter.type && !filter.id) {
+            return
+        } else if (!filter.type) {
+            setPage(1)
+            setWillFilter(prev => !prev)
+            setFilter({type: '', id: ''})
+        } else {
+            setPage(1)
+            setWillFilter(prev => !prev)
+        }
     }
 
-    // const transactions = allTransactions?.data?.transactions // TRANSACTIONS LIST
-    // const pagination = allTransactions?.data?.pagination
-    // const isFetching = allTransactions?.loading
-    // const isError = allTransactions?.error
+    const {data, isFetching, isError, error} = useQuery({
+        queryKey: [...queryKeys.allMDA, page, willFilter],
+        queryFn: () => {
+            const filterData = filter?.type ? {[filter?.type]: filter.id} : {}
+            const reqData = {
+                page,
+                ...filterData
+            }
+            return getAllMDAData(reqData)
+        },
+        staleTime: 0 //0 mins
+    })
+    const MdasData = data?.data?.data?.mdas // PRODUCTS LIST
+    const pagination = data?.data?.data?.pagination
+    // console.log('DATA', data?.data)
 
-    // useEffect(()=>{
-    //     setAllTransaction(prev => ({...prev, loading:true}))
-    //     const payload = filter?.type ? {[filter?.type]: filter.id} : {}
-    //     getTransactions({...payload, page}).then(res => {
-    //         if(res?.status != 200){
-    //             setAllTransaction(prev => ({...prev, loading:false}))
-    //             return
-    //         }
-    //         setAllTransaction({loading:false, error:'', data:res?.data})
-    //     }).catch(err => {
-    //         setAllTransaction({loading:false, error:'error occurred', data:{}})
-    //         console.log('ERR', err)
-    //     })
-    // },[page, willFilter])
 
     //FUNCTION TO OPEN EDIT MODAL
     const [actionModal, setActionModal] = useState({data:{}, name:''})
     const showActionModal = (data, name) => setActionModal({data, name})
     const closeActionModal = () => setActionModal({data:{}, name:''})
-
-
-    useEffect(()=>{
-        setTimeout(()=>{
-            setMDARecords({loading:false, error:'', data:MDAs})
-        }, 1000)
-    },[])
 
     return (
         <>
@@ -127,7 +118,10 @@ const MDAListCom = memo(() => {
                         </div>
                         {/* end of filter section */}
 
-                        <TablePaginatedWrapper data={mdaRecords?.data?.data} isFetching={mdaRecords?.loading} setPage={setPage} itemsPerPage={mdaRecords?.data?.pagination?.limit} pagination={mdaRecords?.data?.pagination}>
+                        {isError ?
+                        <p className='text-red-500'>{error?.message}</p>
+                        :
+                        <TablePaginatedWrapper data={MdasData} isFetching={isFetching} setPage={setPage} itemsPerPage={pagination?.limit} pagination={pagination}>
                         {({ data }) => (
                             <>
                                 <table className="table-auto py-2 w-full text-sm">
@@ -209,6 +203,7 @@ const MDAListCom = memo(() => {
                             </>
                         )}
                         </TablePaginatedWrapper>
+                        }
                     </>
                     
                 </div>

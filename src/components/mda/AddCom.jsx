@@ -1,10 +1,11 @@
 import { memo, useEffect, useMemo, useState } from 'react'
 import {Link} from 'react-router-dom'
+import { useMutation } from "@tanstack/react-query";
 import {Formik, Form} from 'formik'
 import * as Yup from "yup";
 
 import BreadcrumbCom from '../breadcrumb/BreadcrumbCom'
-import { getTransactions } from '../../services/siteServices'
+import { addMDA } from '../../services/siteServices'
 import getDateFromDateString from '../../helpers/GetDateFromDateString';
 import localImgLoader from '../../helpers/localImageLoader';
 import RouteLinks from '../../RouteLinks';
@@ -21,12 +22,15 @@ import { addMDAFields, addMDAFieldsValidation } from '../../helpers/formikValues
 import formatNumber from '../../helpers/formatNumber';
 import RecentlyAdded from '../recentlyAdded/RecentlyAdded';
 import InputFile from '../inputs/InputFile';
+import { isPending } from '@reduxjs/toolkit';
 
 
 // To get the validation schema
 const validationSchema = addMDAFieldsValidation
 
 const AddCom = memo(() =>{
+
+    const [reqData, setReqData] = useState({})
 
     const [isFile, setIsFile] = useState(false)
     const [selectedFile, setSelectedFile] = useState('')
@@ -43,17 +47,38 @@ const AddCom = memo(() =>{
     }
 
     const [verifyModal, setVerifyModal] = useState(false)
-    const [status, setStatus] = useState(false)
 
     const initialValues = useMemo(()=>{
         return {...addMDAFields }
     },[])
 
+    const addMDAFunc = useMutation({
+        mutationFn: (fields) => {
+            return addMDA(fields)
+        },
+        onError: (error) => {
+            // console.log(error)
+            setTimeout(()=>{
+            addMDAFunc.reset()
+            }, import.meta.env.VITE_APP_SETTIMEOUT_TIME)
+        },
+        onSuccess: (res) => {
+            if(res?.data?.status != 1){
+            throw new Error(res?.data?.message)
+            }
+        }
+    })
+
     //FUNCTION TO HANDLE ADD PV
     const handleSubmit = (values, helper) => {
-        // login.mutate(values)
         setVerifyModal(true)
+        setReqData(values)
     };
+
+    const proceedFunc = ()=>{
+        setVerifyModal(false)
+        addMDAFunc.mutate(reqData)
+    }
 
     return (
         <>
@@ -116,13 +141,15 @@ const AddCom = memo(() =>{
                                             <p className='text-sm font-semibold dark:text-slate-high'>
                                                 Year <span className='text-red-500 text-10'>{(props.errors.year && props.touched.year) ? props.errors.year : ''}</span>
                                             </p>
-                                            <InputText 
+                                            <SelectDropdown
                                                 id='year' 
-                                                type='date' 
                                                 name='year' 
                                                 value={props.values.year}
-                                                handleChange={props.handleChange}
-                                            />
+                                                onChange={props.handleChange}
+                                            >
+                                                <option value=''>Select</option>
+                                                <option value='2025'>2025</option>
+                                            </SelectDropdown>
                                         </div>
                                     </div>
                                     <div className='relative text-input flex flex-col gap-1'>
@@ -154,18 +181,16 @@ const AddCom = memo(() =>{
             {verifyModal && 
                 <VerifyModal 
                     text='Are you sure you want to add this MDA?' 
-                    proceedFunc={()=>{
-                        setVerifyModal(false)
-                        setStatus(true)
-                    }} 
+                    proceedFunc={proceedFunc} 
                     cLoseModal={()=>setVerifyModal(false)}
                 />
             }
-            { status &&
+            { (addMDAFunc?.isPending || addMDAFunc?.isSuccess || addMDAFunc?.isError) &&
                 <StatusModal 
-                    text='MDA added successfully' 
-                    isSuccess={true}
-                    cLoseModal={()=>{setSearchCode({loading: false, status:null, data:{}});setStatus(false)}}
+                    text= {addMDAFunc?.isSuccess ? 'MDA added successfully' : addMDAFunc?.error?.message}
+                    isSuccess={addMDAFunc?.isSuccess}
+                    isPending={addMDAFunc?.isPending}
+                    cLoseModal={()=>{addMDAFunc.reset()}}
                 />
             }
         </>
