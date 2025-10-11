@@ -172,6 +172,12 @@ export const getAllMDAData = (reqData) => {
     return getAuxEnd(`/mdas/all`, postData)
 }
 
+// FUNCTION TO ADD ECONOMIC ITEM
+export const addEconomicLine = (reqData) => {
+    const postData = { ...reqData }
+    return postAuxEnd(`/economic-items/add`, postData)
+}
+
 
 
 

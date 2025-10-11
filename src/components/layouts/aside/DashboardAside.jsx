@@ -153,7 +153,7 @@ const asideNavLinks = [
     },
     {name:'Economic Line', title:'', status:1, icon: 'economy', notAllowedUsers: ['user', 'tpo'], subLinks: [
         {name: 'Economic Lines', status:1, icon: 'dot', to: RouteLinks.economicLines, notAllowedUsers: [] },
-        {name: 'Add Economic Item', status:1, icon: 'dot', to: RouteLinks.addEconomicLine, notAllowedUsers: [] },
+        // {name: 'Add Economic Item', status:1, icon: 'dot', to: RouteLinks.addEconomicLine, notAllowedUsers: [] },
         ]
     },
      {name:'Users', title:'', status:1, icon: 'people', notAllowedUsers: ['user', 'tpo'], subLinks: [

@@ -1,10 +1,11 @@
 import { memo, useEffect, useMemo, useState } from 'react'
-import {Link} from 'react-router-dom'
+import {Link, useNavigate, useLocation} from 'react-router-dom'
+import { useMutation } from "@tanstack/react-query";
 import {Formik, Form} from 'formik'
 import * as Yup from "yup";
 
 import BreadcrumbCom from '../breadcrumb/BreadcrumbCom'
-import { getTransactions } from '../../services/siteServices'
+import { addEconomicLine } from '../../services/siteServices'
 import getDateFromDateString from '../../helpers/GetDateFromDateString';
 import localImgLoader from '../../helpers/localImageLoader';
 import RouteLinks from '../../RouteLinks';
@@ -28,6 +29,11 @@ const validationSchema = addEconomicItemFieldsValidation
 
 const addEconomicItem = memo(() =>{
 
+    const [reqData, setReqData] = useState({})
+
+    const {state} = useLocation()
+    const navigate = useNavigate()
+
     const [isFile, setIsFile] = useState(false)
     const [selectedFile, setSelectedFile] = useState('')
     const handleSelectedFile = ({target}) => {
@@ -43,18 +49,46 @@ const addEconomicItem = memo(() =>{
     }
 
     const [verifyModal, setVerifyModal] = useState(false)
-    const [status, setStatus] = useState(false)
 
     const initialValues = useMemo(()=>{
-        return {...addEconomicItemFields }
+        return {...addEconomicItemFields, mda: state?.mda_name, org_code: state?.org_code, mda_uid: state?.mda_uid }
     },[])
+
+    const addEconomicItemFunc = useMutation({
+        mutationFn: (fields) => {
+            return addEconomicLine(fields)
+        },
+        onError: (error) => {
+            // console.log(error)
+            setTimeout(()=>{
+            addEconomicItemFunc.reset()
+            }, import.meta.env.VITE_APP_SETTIMEOUT_TIME)
+        },
+        onSuccess: (res) => {
+            if(res?.data?.status != 1){
+            throw new Error(res?.data?.message)
+            }
+        }
+    })
 
     //FUNCTION TO HANDLE ADD PV
     const handleSubmit = (values, helper) => {
-        // login.mutate(values)
         setVerifyModal(true)
+        delete values.mda
+        setReqData(values)
+        console.log('values', values)
     };
 
+    const proceedFunc = ()=>{
+        setVerifyModal(false)
+        addEconomicItemFunc.mutate(reqData)
+    }
+
+    useEffect(()=>{
+        if(!state?.org_code){
+            navigate(RouteLinks.homePage, {replace: true})
+        }
+    },[])
     return (
         <>
             <div className='w-full flex flex-col gap-8'>
@@ -110,6 +144,7 @@ const addEconomicItem = memo(() =>{
                                                 name='org_code' 
                                                 value={props.values.org_code}
                                                 handleChange={props.handleChange}
+                                                disabled={true}
                                             />
                                         </div>
                                         <div className='relative text-input flex flex-col gap-1'>
@@ -128,13 +163,15 @@ const addEconomicItem = memo(() =>{
                                             <p className='text-sm font-semibold dark:text-slate-high'>
                                                 Year <span className='text-red-500 text-10'>{(props.errors.year && props.touched.year) ? props.errors.year : ''}</span>
                                             </p>
-                                            <InputText 
+                                            <SelectDropdown
                                                 id='year' 
-                                                type='date' 
                                                 name='year' 
                                                 value={props.values.year}
-                                                handleChange={props.handleChange}
-                                            />
+                                                onChange={props.handleChange}
+                                            >
+                                                <option value=''>Select</option>
+                                                <option value='2025'>2025</option>
+                                            </SelectDropdown>
                                         </div>
                                         <div className='relative text-input flex flex-col gap-1'>
                                             <p className='text-sm font-semibold dark:text-slate-high'>
@@ -212,6 +249,7 @@ const addEconomicItem = memo(() =>{
                                                 name='mda' 
                                                 value={props.values.mda}
                                                 handleChange={props.handleChange}
+                                                disabled={true}
                                             />
                                         </div>
                                         <div className='relative text-input flex flex-col gap-1'>
@@ -244,19 +282,17 @@ const addEconomicItem = memo(() =>{
 
             {verifyModal && 
                 <VerifyModal 
-                    text='Are you sure you want to add this MDA?' 
-                    proceedFunc={()=>{
-                        setVerifyModal(false)
-                        setStatus(true)
-                    }} 
+                    text='Are you sure you want to add this Economic Item?' 
+                    proceedFunc={proceedFunc} 
                     cLoseModal={()=>setVerifyModal(false)}
                 />
             }
-            { status &&
+            { (addEconomicItemFunc?.isPending || addEconomicItemFunc?.isSuccess || addEconomicItemFunc?.isError) &&
                 <StatusModal 
-                    text='MDA added successfully' 
-                    isSuccess={true}
-                    cLoseModal={()=>{setSearchCode({loading: false, status:null, data:{}});setStatus(false)}}
+                    text= {addEconomicItemFunc?.isSuccess ? 'Economic Item added successfully' : addEconomicItemFunc?.error?.message}
+                    isSuccess={addEconomicItemFunc?.isSuccess}
+                    isPending={addEconomicItemFunc?.isPending}
+                    cLoseModal={()=>{addEconomicItemFunc.reset()}}
                 />
             }
         </>

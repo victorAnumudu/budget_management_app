@@ -72,14 +72,14 @@ const EconomicItemsCom = memo(() =>{
         <>
             <div className='w-full flex flex-col gap-4'>
                 <BreadcrumbCom title='Economic Items' paths={['Dashboard', 'Economic Items']} />
-                <div className='w-48 ml-auto'>
+                {/* <div className='w-48 ml-auto'>
                     <MainBtn 
                         onClick={() => navigate(RouteLinks.addEconomicLine)} 
                         disabled={false} 
                         className={`bg-primary dark:bg-primary-dark px-2 py-1 rounded-md text-white font-medium sm:self-end ${(false) && 'opacity-50'}`}
                         text='Add Economic Line'
                     />
-                </div>
+                </div> */}
                 <div className='box bg-white dark:bg-black-box text-black-body dark:text-white-body'>
 
                     <>

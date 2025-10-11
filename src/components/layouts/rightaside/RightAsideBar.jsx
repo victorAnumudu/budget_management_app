@@ -19,6 +19,7 @@ export default function RightAsideBar() {
     const {data, isFetching, isError, error} = useQuery({
         queryKey: queryKeys.dashboardRightPanelData,
         queryFn: () => getDashRightPanelSummaryData(),
+        staleTime: 0
     })
 
     const dashRightPanelSummaryData = data?.data?.data // DASHBOARD RIGHT PANEL SUMMARY DATA
