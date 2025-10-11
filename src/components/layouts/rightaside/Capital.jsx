@@ -4,7 +4,7 @@ import ImgCom from '../../img/ImgCom'
 import shortenNumber from '../../../helpers/shortenNumber'
 
 export default function Capital({data}) {
-    const newData = {Capital: data.capital_expenses, Recurrent: data.recurrent_expenses}
+    const newData = {Capital: data?.capital_expenses, Recurrent: data?.recurrent_expenses}
     return (
         <div className='h-full p-2 sm:p-4 large:p-8 flex flex-col gap-8 overflow-y-auto aside-scroll-design'>
             {Object.keys(newData).map((item, index)=>(

@@ -5,7 +5,7 @@ import shortenNumber from '../../../helpers/shortenNumber'
 
 export default function Reserved({data}) {
     
-    const newData = {Contingency: data.contingency, ComServices: data.common_service}
+    const newData = {Contingency: data?.contingency, ComServices: data?.common_service}
 
     return (
         <div className='h-full p-2 sm:p-4 large:p-8 flex flex-col gap-8 overflow-y-auto aside-scroll-design'>
