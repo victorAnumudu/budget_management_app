@@ -3,31 +3,40 @@ import CustomCounter from '../../CustomCounter'
 import ImgCom from '../../img/ImgCom'
 import shortenNumber from '../../../helpers/shortenNumber'
 
-export default function Reserved({data}) {
+export default function Reserved({status, data}) {
     
     const newData = {Contingency: data?.contingency, ComServices: data?.common_service}
 
     return (
         <div className='h-full p-2 sm:p-4 large:p-8 flex flex-col gap-8 overflow-y-auto aside-scroll-design'>
-            {Object.keys(newData).map((item, index)=>(
-                <div className='flex flex-col gap-4'>
-                    <p className='text-base text-slate-high font-bold'>{item}</p>
-                    <div className='grid grid-cols-2 gap-4 sm:gap-6 large:gap-8'>
-                        <div className='p-2 sm:p-3 large:p-4 flex flex-col border border-slate-higher border-dashed'>
-                            <p className='text-base font-bold text-slate-high'>
-                                ₦{shortenNumber(newData[item]?.revised_budget, 2)}
-                            </p>
-                            <p className='text-sm text-slate-higher'>Budget</p>
-                        </div>
-                        <div className='p-2 sm:p-3 large:p-4 flex flex-col border border-slate-higher border-dashed'>
-                            <p className='text-base font-bold text-slate-high'>
-                                ₦{shortenNumber(newData[item]?.balance, 2)}
-                            </p>
-                            <p className='text-sm text-slate-higher'>Balance</p>
+            {(status?.isFetching || status?.isError) ?
+              <div className='box bg-white dark:bg-black-box text-black-body dark:text-white-body'>
+                {status?.isError ? <p className='text-red-500'>{status?.error.message}</p> : <p className='text-slate-800'>Loading...</p>}
+              </div>
+              :
+              <>
+                {Object.keys(newData).map((item, index)=>(
+                    <div className='flex flex-col gap-4'>
+                        <p className='text-base text-slate-high font-bold'>{item}</p>
+                        <div className='grid grid-cols-2 gap-4 sm:gap-6 large:gap-8'>
+                            <div className='p-2 sm:p-3 large:p-4 flex flex-col border border-slate-higher border-dashed'>
+                                <p className='text-base font-bold text-slate-high'>
+                                    ₦{shortenNumber(newData[item]?.revised_budget, 2)}
+                                </p>
+                                <p className='text-sm text-slate-higher'>Budget</p>
+                            </div>
+                            <div className='p-2 sm:p-3 large:p-4 flex flex-col border border-slate-higher border-dashed'>
+                                <p className='text-base font-bold text-slate-high'>
+                                    ₦{shortenNumber(newData[item]?.balance, 2)}
+                                </p>
+                                <p className='text-sm text-slate-higher'>Balance</p>
+                            </div>
                         </div>
                     </div>
-                </div>
-            ))}
+                ))}
+              </>
+            }
+
             <div className='flex flex-col gap-4'>
                 <p className='text-base text-slate-high font-bold'>Recent Loans</p>
                 <div className='flex flex-col gap-4'>

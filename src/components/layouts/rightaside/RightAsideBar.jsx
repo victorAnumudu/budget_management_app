@@ -22,7 +22,7 @@ export default function RightAsideBar() {
     })
 
     const dashRightPanelSummaryData = data?.data?.data // DASHBOARD RIGHT PANEL SUMMARY DATA
-    
+
   return (
     <div className='w-full h-full flex flex-col gap-8'>
         {/* Menu */}
@@ -38,8 +38,8 @@ export default function RightAsideBar() {
         </div>
 
         {/* Body */}
-        {active == 'capital' && <Capital data={dashRightPanelSummaryData} />}
-        {active == 'reserved' && <Reserved data={dashRightPanelSummaryData} />}
+        {active == 'capital' && <Capital status={{isFetching, isError, error}} data={dashRightPanelSummaryData} />}
+        {active == 'reserved' && <Reserved status={{isFetching, isError, error}} data={dashRightPanelSummaryData} />}
     </div>
   )
 }

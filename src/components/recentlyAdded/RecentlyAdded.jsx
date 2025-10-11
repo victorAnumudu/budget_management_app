@@ -71,9 +71,9 @@ const RecentlyAdded = memo(() => {
                                 <th scope="col" className="p-2">
                                     Status
                                 </th>
-                                <th scope="col" className="p-2 text-right">
+                                {/* <th scope="col" className="p-2 text-right">
                                     Action
-                                </th>
+                                </th> */}
                             </tr>
                         </thead>
                         <tbody className='text-black-aside dark:text-slate-high'>
@@ -130,7 +130,7 @@ const RecentlyAdded = memo(() => {
                                                 </div>
                                             </div> 
                                         </td>
-                                        <td className="group relative p-2 text-right">
+                                        {/* <td className="group relative p-2 text-right">
                                             <div className='flex items-center justify-end gap-3 md:gap-4'>
                                                 <div className='p-2 flex justify-center items-center text-slate-500 bg-white-body dark:text-white-body dark:bg-black-body rounded-md'>
                                                     <Icons name='eye' />
@@ -143,7 +143,7 @@ const RecentlyAdded = memo(() => {
                                                     <Icons name='edit' className='text-primary ' />
                                                 </div>
                                             </div>
-                                        </td>
+                                        </td> */}
                                     </tr>
                                 )
                             }
