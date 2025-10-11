@@ -4,7 +4,7 @@ import {Formik, Form} from 'formik'
 import * as Yup from "yup";
 
 import BreadcrumbCom from '../breadcrumb/BreadcrumbCom'
-import { getTransactions, addNewPV } from '../../services/siteServices'
+import { getAnEconomicItem, addNewPV } from '../../services/siteServices'
 import getDateFromDateString from '../../helpers/GetDateFromDateString';
 import localImgLoader from '../../helpers/localImageLoader';
 import RouteLinks from '../../RouteLinks';
@@ -22,7 +22,7 @@ import { searchedEconomicCode } from '../../data/PVData'
 import formatNumber from '../../helpers/formatNumber';
 import RecentlyAdded from '../recentlyAdded/RecentlyAdded';
 import CustomCounter from '../CustomCounter';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import queryKeys from '../../services/queryKeys';
 
 
@@ -34,22 +34,31 @@ const AddPVCom = memo(() => {
     const queryClient = useQueryClient()
 
     const [reqData, setReqData] = useState({})
+
+    const [economicCode, setEconomicCode] = useState({code: '', enabled: false})
     
     const [searchCode, setSearchCode] = useState({loading: false, status:null, data:{}})
 
     const [verifyModal, setVerifyModal] = useState(false)
     const [status, setStatus] = useState(false)
 
-    const initialValues = useMemo(()=>{
-        return {...addPVFields, ...searchCode.data, economic_code:`${searchCode.data.org_code}/${searchCode.data.economic_code}`}
-    },[searchCode.data])
+    const {data, isFetching, isError, error} = useQuery({
+        queryKey: queryKeys.getAnEconomicItem,
+        queryFn: () => {
+            const reqData = {
+                economic_code: economicCode.code
+            }
+            return getAnEconomicItem(reqData)
+        },
+        staleTime: 0, //0 mins
+        enabled: economicCode?.enabled,
+    })
+    const economicItem = data?.data?.data?.economic_item // ECONOMIC ITEM LIST
+    const itemValues = economicItem ? economicItem[0] : {}
 
-    const handleSearchCode = () =>{
-        setSearchCode(prev => ({...prev, loading:true}))
-        setTimeout(()=>{
-            setSearchCode({loading: false, status:true, data:{...searchedEconomicCode}})
-        },1000)
-    }
+    const initialValues = useMemo(()=>{
+        return {...addPVFields, ...itemValues}
+    },[data])
 
     const addPV = useMutation({
         mutationFn: (fields) => {
@@ -59,7 +68,7 @@ const AddPVCom = memo(() => {
             if(res?.data?.status != 1){
                 throw new Error(res?.data?.message)
             }
-            setSearchCode({loading: false, status:null, data:{}})
+            setSearchCode(prev => ({...prev, code: ''}))
             queryClient.refetchQueries({
                 queryKey: [...queryKeys.getAllPVs],
                 // type: 'active',
@@ -84,6 +93,7 @@ const AddPVCom = memo(() => {
     const handleSubmit = () => {
         delete reqData.approval_authorities
         delete reqData.id
+        delete reqData._id
         delete reqData.balance
         delete reqData.total_amount
         delete reqData.year
@@ -91,13 +101,17 @@ const AddPVCom = memo(() => {
         addPV.mutate(reqData)
     };
 
+   useEffect(()=>{
+        setEconomicCode(prev => ({...prev, enabled: false}))
+   },[isFetching])
+
     return (
         <>
             <div className='w-full flex flex-col gap-8'>
                 <BreadcrumbCom title='Add Payment Voucher' paths={['Dashboard', 'Add Payment Voucher']} />
 
                 
-                {searchCode.status == true ?
+                {economicCode.code && economicItem && economicItem.length > 0 ?
                     <div className='box bg-white dark:bg-black-box text-black-body dark:text-white-body'>
                         <>
                             <Formik
@@ -119,26 +133,41 @@ const AddPVCom = memo(() => {
                                                 </h2>
                                             </div> */}
                                             <div className='w-full grid grid-cols-1 sm:grid-cols-2 gap-8'>
-                                                <div className='box min-h-[100] justify-between bg-[#F7D9E3] dark:bg-black-box text-black-body dark:text-white-body'>
-                                                    <p className='text-base sm:text-lg font-bold hover:text-primary '>Monthly Expenses</p>
+                                                <div className='box min-h-[100] justify-between bg-[#CBD4F4] dark:bg-black-box text-black-body dark:text-white-body'>
+                                                    <p className='text-base sm:text-lg font-bold hover:text-primary '>Revised Budget</p>
                                                     <div className='flex flex-wrap gap-2 items-end font-bold'>
                                                         <p className='text-xl sm:text-[30px]'>
                                                         <span className='text-lg sm:text-xl'>
                                                             N
                                                         </span>
-                                                            <CustomCounter targetNumber={1000000} timeInSeconds='1' />
+                                                            <CustomCounter targetNumber={props.values.revised_budget} timeInSeconds='1' />
                                                         </p>
                                                     </div>
                                                 </div>
                                                 <div className='box min-h-[100] justify-between bg-[#CBF0F5] dark:bg-black-box text-black-body dark:text-white-body'>
-                                                    <p className='text-base sm:text-lg font-bold hover:text-primary '>Monthly Balance</p>
-                                                    <div className='flex flex-wrap gap-2 items-end font-bold'>
-                                                        <p className='text-xl sm:text-[30px]'>
-                                                        <span className='text-lg sm:text-xl'>
-                                                            N
-                                                        </span>
-                                                            <CustomCounter targetNumber={1000000} timeInSeconds='1' />
-                                                        </p>
+                                                    <div className='flex justify-between gap-4'>
+                                                        <div className='flex flex-col gap-1'>
+                                                            <p className='text-base sm:text-lg font-bold hover:text-primary '>Total Expenses</p>
+                                                            <div className='flex flex-wrap gap-2 items-end font-bold'>
+                                                                <p className='text-lg sm:text-xl'>
+                                                                <span className='text-base'>
+                                                                    N
+                                                                </span>
+                                                                    <CustomCounter targetNumber={props.values.total_expenses} timeInSeconds='1' />
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                        <div className='flex flex-col gap-1'>
+                                                            <p className='text-base sm:text-lg font-bold hover:text-primary '>Current Balance</p>
+                                                            <div className='flex flex-wrap gap-2 items-end font-bold'>
+                                                                <p className='text-lg sm:text-xl'>
+                                                                <span className='text-base'>
+                                                                    N
+                                                                </span>
+                                                                    <CustomCounter targetNumber={props.values.current_balance} timeInSeconds='1' />
+                                                                </p>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -175,6 +204,7 @@ const AddPVCom = memo(() => {
                                                         name='budget_type' 
                                                         value={props.values.budget_type}
                                                         onChange={props.handleChange}
+                                                        disabled={true}
                                                     >
                                                         <option value=''>Select</option>
                                                         <option value='capital'>Capital</option>
@@ -217,6 +247,7 @@ const AddPVCom = memo(() => {
                                                         name='economic_code' 
                                                         value={props.values.economic_code}
                                                         handleChange={props.handleChange}
+                                                        disabled={true}
                                                     />
                                                 </div>
                                                 <div className='w-full relative text-input flex flex-col gap-1'>
@@ -226,8 +257,9 @@ const AddPVCom = memo(() => {
                                                     <InputText 
                                                         id='beneficiary_mda' 
                                                         name='beneficiary_mda' 
-                                                        value={props.values.beneficiary_mda}
+                                                        value={props.values.mda_info?.mda_name}
                                                         handleChange={props.handleChange}
+                                                        disabled={true}
                                                     />
                                                 </div>
                                             </div>
@@ -322,7 +354,7 @@ const AddPVCom = memo(() => {
                                                     />
                                                 </div>
                                             </div>
-
+                                            
                                             <MainBtn 
                                                 type='submit'
                                                 // disabled={props.errors.length} 
@@ -347,20 +379,21 @@ const AddPVCom = memo(() => {
                                     id='code' 
                                     placeholder='Code'
                                     name='code' 
-                                    // value={''}
-                                    // handleChange={''}
+                                    value={economicCode.code}
+                                    handleChange={(e)=>setEconomicCode(prev => ({...prev, code: e.target.value}))}
                                 />
                             </div>
                             <MainBtn 
                                 type='button'
-                                disabled={searchCode.loading} 
-                                loading={searchCode.loading}
-                                onClick={handleSearchCode}
+                                disabled={isFetching || !economicCode.code} 
+                                loading={isFetching}
+                                onClick={()=>setEconomicCode(prev => ({...prev, enabled: true}))}
                                 className={`bg-primary dark:bg-primary-dark px-2 py-1 mt-4 rounded-md text-white font-medium sm:self-end`}
                                 text='Search'
                             />
                         </div>
-                        {searchCode.status == false && <p className='text-red-500 text-center p-3'>Opps! No such Economic Line was found</p>}
+                        {isError && <p className='text-red-500 text-center p-3'>Opps! AN error occurred, try again</p>}
+                        {economicItem?.length < 1 && <p className='text-red-500 text-center p-3'>Opps! No such Economic Line was found</p>}
                     </div>
                     <div className='box gap-8 bg-white dark:bg-black-box text-black-body dark:text-white-body overflow-x-auto'> 
                         <RecentlyAdded />

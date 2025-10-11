@@ -134,25 +134,47 @@ export const getAllEconomicItems = (reqData) => {
     return getAuxEnd('/economic-items/all', postData, false)
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+// FUNCTION AN ECONOMIC ITEM
+export const getAnEconomicItem = (reqData) => {
+    let postData = {
+        ...reqData
+    }
+    return getAuxEnd('/economic-items/item', postData, false)
+}
 
 // FUNCTION TO GET DASHBOARD DATA
 export const getDashData = (reqData) => {
     const postData = { ...reqData }
-    return getAuxEnd(`/dashboard`, postData)
+    return getAuxEnd(`/dashboard/data`, postData)
 }
+
+// FUNCTION TO GET DASHBOARD SUMMARY DATA
+export const getDashSummaryData = (reqData) => {
+    const postData = { ...reqData }
+    return getAuxEnd(`/dashboard/summary`, postData)
+}
+
+// FUNCTION TO GET DASHBOARD RIGHT PANEL SUMMARY DATA
+export const getDashRightPanelSummaryData = (reqData) => {
+    const postData = { ...reqData }
+    return getAuxEnd(`/dashboard/right-panel`, postData)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // FUNCTION TO GET LOANS TABLE
 export const getLoans = (reqData) => {

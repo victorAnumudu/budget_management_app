@@ -1,4 +1,7 @@
 import React, { useState } from 'react'
+import { useQuery } from "@tanstack/react-query";
+import queryKeys from '../../../services/queryKeys'
+import { getDashRightPanelSummaryData } from '../../../services/siteServices'
 import Icons from '../../Icons'
 import Capital from './Capital'
 import Tickets from './Tickets'
@@ -13,6 +16,13 @@ export default function RightAsideBar() {
         setActive(lowerStr)
     }
 
+    const {data, isFetching, isError, error} = useQuery({
+        queryKey: queryKeys.dashboardRightPanelData,
+        queryFn: () => getDashRightPanelSummaryData(),
+    })
+
+    const dashRightPanelSummaryData = data?.data?.data // DASHBOARD RIGHT PANEL SUMMARY DATA
+    
   return (
     <div className='w-full h-full flex flex-col gap-8'>
         {/* Menu */}
@@ -28,8 +38,8 @@ export default function RightAsideBar() {
         </div>
 
         {/* Body */}
-        {active == 'capital' && <Capital />}
-        {active == 'reserved' && <Reserved />}
+        {active == 'capital' && <Capital data={dashRightPanelSummaryData} />}
+        {active == 'reserved' && <Reserved data={dashRightPanelSummaryData} />}
     </div>
   )
 }
