@@ -83,8 +83,8 @@ export default function HomeCom() {
                     Object.keys(dashSummaryData)?.map((item, index) => {
                       const spanFull = dashSummaryData[item]?.name.toLowerCase() == 'Revised Budget'.toLowerCase()
                       return (
-                        <div className={`${spanFull && 'col-span-2 flex justify-center text-center'}`}>
-                          <div key={index} className='flex items-center gap-2'>
+                        <div key={index} className={`${spanFull && 'col-span-2 flex justify-center text-center'}`}>
+                          <div className='flex items-center gap-2'>
                             {!spanFull &&
                             <div className='min-w-9 min-h-9 bg-white-body dark:bg-black-box dark:shadow-[0_0_0_1px_#f9f9f9] rounded-md flex justify-center items-center'>
                               <Icons name='sales' />

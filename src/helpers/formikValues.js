@@ -29,7 +29,8 @@ export let addPVFieldsValidation = Yup.object().shape({
   beneficiary_bank: Yup.string().required("Required"),
   beneficiary_account: Yup.string().required("Required"),
   gross_amount: Yup.string().required("Required").test('is-decimal', 'Invalid Number', value => (value + "").match(/^\d+(\.\d{0,5})?$/)),
-  net_amount: Yup.string().required("Required").test('is-decimal', 'Invalid Number', value => (value + "").match(/^\d+(\.\d{0,5})?$/))
+  // net_amount: Yup.string().required("Required").test('is-decimal', 'Invalid Number', value => (value + "").match(/^\d+(\.\d{0,5})?$/)),
+  net_amount: Yup.number().required('Net amount is required').typeError('Must be a number')
 });
 
 export let addMDAFields = {

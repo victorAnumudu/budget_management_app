@@ -14,7 +14,7 @@ export default function Capital({status, data}) {
               :
               <>
               {Object.keys(newData).map((item, index)=>(
-                  <div className='flex flex-col gap-4'>
+                  <div key={index} className='flex flex-col gap-4'>
                       <p className='text-base text-slate-high font-bold'>{item}</p>
                       <div className='grid grid-cols-2 gap-4 sm:gap-6 large:gap-8'>
                           <div className='p-2 sm:p-3 large:p-4 flex flex-col border border-slate-higher border-dashed'>

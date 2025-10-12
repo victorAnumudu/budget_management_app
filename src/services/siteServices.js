@@ -139,7 +139,7 @@ export const getAnEconomicItem = (reqData) => {
     let postData = {
         ...reqData
     }
-    return getAuxEnd('/economic-items/item', postData, false)
+    return postAuxEnd('/economic-items/item', postData, false)
 }
 
 // FUNCTION TO GET DASHBOARD DATA
