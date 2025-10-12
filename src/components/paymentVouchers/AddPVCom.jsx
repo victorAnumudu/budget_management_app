@@ -27,7 +27,7 @@ import queryKeys from '../../services/queryKeys';
 
 
 // To get the validation schema
-const validationSchema = Yup.object().shape({}) //addPVFieldsValidation
+const validationSchema = Yup.object().shape({})//addPVFieldsValidation
 
 const AddPVCom = memo(() => {
 
@@ -57,7 +57,7 @@ const AddPVCom = memo(() => {
     const itemValues = economicItem ? economicItem[0] : {}
 
     const initialValues = useMemo(()=>{
-        return {...addPVFields, ...itemValues}
+        return {...addPVFields, ...itemValues, beneficiary_mda:itemValues?.mda_info?.mda_name}
     },[data])
 
     const addPV = useMutation({
@@ -86,7 +86,8 @@ const AddPVCom = memo(() => {
     const handleVerify = (values, helper) => {
         setReqData(values)
         setVerifyModal(true)
-        console.log('helper', values)
+        // console.log(helper)
+        // helper.resetForm()
     };
 
     //FUNCTION TO HANDLE ADD PV
@@ -257,7 +258,7 @@ const AddPVCom = memo(() => {
                                                     <InputText 
                                                         id='beneficiary_mda' 
                                                         name='beneficiary_mda' 
-                                                        value={props.values.mda_info?.mda_name}
+                                                        value={props.values.beneficiary_mda}
                                                         handleChange={props.handleChange}
                                                         disabled={true}
                                                     />

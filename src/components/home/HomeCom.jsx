@@ -8,6 +8,7 @@ import BreadcrumbCom from '../../components/breadcrumb/BreadcrumbCom'
 import CustomCounter from '../../components/CustomCounter'
 import Icons from '../../components/Icons'
 import shortenNumber from '../../helpers/shortenNumber';
+import formatNumber from '../../helpers/formatNumber'
 import { Widget1 } from './Widget1'
 import { Widget2 }from './Widget2'
 import RecentlyAdded from '../recentlyAdded/RecentlyAdded';
@@ -76,18 +77,23 @@ export default function HomeCom() {
               :
               <>
                 <div className='box min-h-[230] justify-between bg-[#CBD4F4] dark:bg-black-box text-black-body dark:text-white-body'>
-                  <p className='mb-4 text-base sm:text-lg font-bold hover:text-primary '>Summary</p>
+                  <p className='mb-4 text-base sm:text-lg font-bold hover:text-primary '>Expenses (Summary)</p>
                   <div className='grid grid-cols-2 gap-4 font-bold'>
                     {
                     Object.keys(dashSummaryData)?.map((item, index) => {
+                      const spanFull = dashSummaryData[item]?.name.toLowerCase() == 'Revised Budget'.toLowerCase()
                       return (
-                        <div key={index} className='flex items-center gap-2'>
-                          <div className='min-w-10 min-h-10 bg-white-body dark:bg-black-box dark:shadow-[0_0_0_1px_#f9f9f9] rounded-md flex justify-center items-center'>
-                            <Icons name='sales' />
-                          </div>
-                          <div>
-                            <p className='text-12 text-slate-500'>{dashSummaryData[item]?.name}</p>                        
-                            <p className='font-bold text-base'>₦{shortenNumber(dashSummaryData[item]?.total_expenses)}</p>
+                        <div className={`${spanFull && 'col-span-2 flex justify-center text-center'}`}>
+                          <div key={index} className='flex items-center gap-2'>
+                            {!spanFull &&
+                            <div className='min-w-9 min-h-9 bg-white-body dark:bg-black-box dark:shadow-[0_0_0_1px_#f9f9f9] rounded-md flex justify-center items-center'>
+                              <Icons name='sales' />
+                            </div>
+                            }
+                            <div className='flex flex-col gap-0'>
+                              <p className='text-12 text-slate-500'>{dashSummaryData[item]?.name}</p>                        
+                              <p className='font-bold text-base'>₦{spanFull ? formatNumber(dashSummaryData[item]?.total_expenses) : shortenNumber(dashSummaryData[item]?.total_expenses)}</p>
+                            </div>
                           </div>
                         </div>
                       )
