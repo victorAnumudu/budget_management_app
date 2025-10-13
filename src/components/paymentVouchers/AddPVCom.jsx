@@ -137,8 +137,8 @@ const AddPVCom = memo(() => {
                                                     <div className='box min-h-[100] justify-between bg-[#CBD4F4] dark:bg-black-box text-black-body dark:text-white-body'>
                                                         <p className='text-base sm:text-lg font-bold hover:text-primary '>Revised Budget</p>
                                                         <div className='flex flex-wrap gap-2 items-end font-bold'>
-                                                            <p className='text-xl sm:text-[30px]'>
-                                                            <span className='text-lg sm:text-xl'>
+                                                            <p className='text-base sm:text-xl'>
+                                                            <span className='text-sm sm:text-base'>
                                                                 N
                                                             </span>
                                                                 <CustomCounter targetNumber={itemValues?.revised_budget} timeInSeconds='1' />
@@ -146,12 +146,12 @@ const AddPVCom = memo(() => {
                                                         </div>
                                                     </div>
                                                     <div className='box min-h-[100] justify-between bg-[#CBF0F5] dark:bg-black-box text-black-body dark:text-white-body'>
-                                                        <div className='flex justify-between gap-4'>
+                                                        <div className='flex flex-col xs:flex-row sm:flex-col xl:flex-row justify-between gap-4'>
                                                             <div className='flex flex-col gap-1'>
                                                                 <p className='text-base sm:text-lg font-bold hover:text-primary '>Total Expenses</p>
                                                                 <div className='flex flex-wrap gap-2 items-end font-bold'>
-                                                                    <p className='text-lg sm:text-xl'>
-                                                                    <span className='text-base'>
+                                                                    <p className='text-base sm:text-xl'>
+                                                                    <span className='text-sm sm:text-base'>
                                                                         N
                                                                     </span>
                                                                         <CustomCounter targetNumber={itemValues?.total_expenses} timeInSeconds='1' />
@@ -161,8 +161,8 @@ const AddPVCom = memo(() => {
                                                             <div className='flex flex-col gap-1'>
                                                                 <p className='text-base sm:text-lg font-bold hover:text-primary '>Current Balance</p>
                                                                 <div className='flex flex-wrap gap-2 items-end font-bold'>
-                                                                    <p className='text-lg sm:text-xl'>
-                                                                    <span className='text-base'>
+                                                                    <p className='text-base sm:text-xl'>
+                                                                    <span className='text-sm sm:text-base'>
                                                                         N
                                                                     </span>
                                                                         <CustomCounter targetNumber={itemValues?.current_balance} timeInSeconds='1' />
@@ -372,7 +372,7 @@ const AddPVCom = memo(() => {
                     :
                     <>
                     <div className='flex flex-col gap-4'>
-                        <div className='grid grid-cols-1 xxs:grid-cols-2 gap-4'>
+                        <div className='grid grid-cols-1 xxs:grid-cols-2 gap-4 place-items-end'>
                             <div className='w-full relative text-input flex flex-col gap-1'>
                                 <p className='text-sm font-semibold dark:text-slate-high'>
                                     Enter Economic Code
