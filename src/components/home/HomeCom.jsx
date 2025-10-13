@@ -41,8 +41,8 @@ export default function HomeCom() {
               :
               <>
                 <div className='box min-h-[230] justify-between bg-[#F7D9E3] dark:bg-black-box text-black-body dark:text-white-body'>
-                  <p className='text-base sm:text-lg font-bold hover:text-primary '>{dashData[0]?.budget_type}</p>
-                  <Widget1 />
+                  <p className='text-base sm:text-lg font-bold hover:text-primary'>{dashData[0]?.budget_type} expenses</p>
+                  {/* <Widget1 /> */}
                   <div className='flex flex-wrap gap-2 items-end font-bold'>
                     <p className='text-xl sm:text-[30px]'>
                       <span className='text-lg sm:text-xl'>
@@ -54,8 +54,8 @@ export default function HomeCom() {
                   </div>
                 </div>
                 <div className='box min-h-[230] justify-between bg-[#CBF0F5] dark:bg-black-box text-black-body dark:text-white-body'>
-                  <p className='text-base sm:text-lg font-bold hover:text-primary '>{dashData[1]?.budget_type}</p>
-                  <Widget2 />
+                  <p className='text-base sm:text-lg font-bold hover:text-primary '>{dashData[1]?.budget_type} expenses</p>
+                  {/* <Widget2 /> */}
                   <div className='flex flex-wrap gap-2 items-end font-bold'>
                     <p className='text-xl sm:text-[30px]'>
                       <span className='text-lg sm:text-xl'>
@@ -77,7 +77,7 @@ export default function HomeCom() {
               :
               <>
                 <div className='box min-h-[230] justify-between bg-[#CBD4F4] dark:bg-black-box text-black-body dark:text-white-body'>
-                  <p className='mb-4 text-base sm:text-lg font-bold hover:text-primary '>Expenses (Summary)</p>
+                  <p className='mb-4 text-base sm:text-lg font-bold hover:text-primary '>Total Expenses</p>
                   <div className='grid grid-cols-2 gap-4 font-bold'>
                     {
                     Object.keys(dashSummaryData)?.map((item, index) => {
@@ -108,7 +108,7 @@ export default function HomeCom() {
 
         </div>
 
-      <div className='box gap-8 bg-white dark:bg-black-box text-black-body dark:text-white-body overflow-x-auto'>
+      <div className='box gap-8 bg-white dark:bg-black-box text-black-body dark:text-white-body'>
         <RecentlyAdded />
       </div>
     </div>

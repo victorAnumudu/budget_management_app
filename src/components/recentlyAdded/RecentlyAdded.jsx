@@ -46,7 +46,7 @@ const RecentlyAdded = memo(() => {
                     </div> */}
                 </div>
                 
-                <div className="w-full overflow-x-auto">
+                <div className="table-scroll w-full overflow-x-auto">
                     <table className="table-auto py-2 w-full text-sm">
                         <thead className="text-sm text-slate-higher dark:text-slate-high dark:font-semibold text-left">
                             <tr>
@@ -80,7 +80,7 @@ const RecentlyAdded = memo(() => {
                             {(allPVs?.length > 0) ? allPVs?.map((item, index) => {
                             if(index <= tableLength) {
                                 return (
-                                    <tr key={item.id || index} className="border-t border-dashed border-slate-high">
+                                    <tr key={item.id || index} className={`${index%2 == 0 && 'bg-white-aside dark:bg-black-aside'} border-t border-dashed border-slate-high`}>
                                         <td className="p-2">
                                             <div className='w-full flex items-center gap-2 whitespace-nowra'>
                                                 <img className="w-8 h-8 rounded-md" src={localImgLoader(`loan_icons/provide_loan.png`)} alt="Icon" />

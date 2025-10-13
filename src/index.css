@@ -10,7 +10,8 @@
   /* --color-primary: #0284c7; */
   --color-secondary: #0284c7;
   --color-secondary-dark: #0284c7;
-  --color-primary: #7008e7;
+  --color-primary: oklch(59.6% 0.145 163.225);
+  /* --color-primary: #7008e7; */
   --color-primary-dark: oklch(60.6% 0.25 292.717);
   --color-orange-light: #ED7747;
   --color-orange-dark: #9a3412;
@@ -78,7 +79,7 @@ html{
 }
 
 *{
-  transition: all .2s;
+  transition: all 0s;
 }
 
 body {
@@ -99,8 +100,11 @@ code {
   .aside-scroll-design {
     @apply [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:rounded-full
   }
+  .table-scroll {
+    @apply [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-primary dark:[&::-webkit-scrollbar-track]:bg-neutral-700 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:rounded-full
+  }
   .box {
-    @apply flex flex-col w-full p-8 rounded-lg h-full border-[1px] border-[#F1F1F4] dark:border-[#1E2027] shadow-[0px_3px_4px_0px_rgba(0,_0,_0,_0.03)]
+    @apply flex flex-col w-full p-4 sm:p-8 rounded-lg h-full border-[1px] border-[#F1F1F4] dark:border-[#1E2027] shadow-[0px_3px_4px_0px_rgba(0,_0,_0,_0.03)]
   }
 }
 
