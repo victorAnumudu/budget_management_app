@@ -125,6 +125,14 @@ export const getAllPVData = (reqData) => {
     return getAuxEnd('/expenses/all', postData, false)
 }
 
+// FUNCTION TO DELETE PV
+export const deletePV = (reqData) => {
+    let postData = {
+        ...reqData
+    }
+    return postAuxEnd('/expenses/delete', postData, false)
+}
+
 
 // FUNCTION TO GET ALL ECONOMIC ITEMS
 export const getAllEconomicItems = (reqData) => {

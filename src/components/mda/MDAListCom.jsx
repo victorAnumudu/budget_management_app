@@ -227,6 +227,7 @@ const [page, setPage] = useState(1)
             }
             { actionModal.name == 'status' &&
                 <StatusModal 
+                    // isPending={}
                     text='Payment Voucher deleted successfully' 
                     isSuccess={true}
                     cLoseModal={()=>{closeActionModal()}}

@@ -4,13 +4,12 @@ import {Link, useNavigate} from 'react-router-dom'
 import BreadcrumbCom from '../breadcrumb/BreadcrumbCom'
 import TablePaginatedWrapper from '../tableWrapper/TablePaginatedWrapper'
 import Icons from '../Icons'
-import { getAllPVData } from '../../services/siteServices'
+import { getAllPVData, deletePV } from '../../services/siteServices'
 import getDateFromDateString from '../../helpers/GetDateFromDateString';
 import getTimeFromDateString from '../../helpers/GetTimeFromDateString';
 import localImgLoader from '../../helpers/localImageLoader';
 import RouteLinks from '../../RouteLinks';
 
-import { PVrecords } from '../../data/PVData' // REMOVE LATER
 import InputText from '../inputs/InputText'
 import SelectDropdown from '../inputs/SelectDropdown'
 import MainBtn from '../btn/MainBtn'
@@ -18,12 +17,13 @@ import EditAddedPV from './EditAddedPV'
 import ViewAddedPV from './ViewAddedPV'
 import VerifyModal from '../modals/VerifyModal'
 import StatusModal from '../modals/StatusModal'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import queryKeys from '../../services/queryKeys'
 
 const PVsCom = memo(() =>{
 
     const navigate = useNavigate()
+    const queryClient = useQueryClient()
 
     const [page, setPage] = useState(1)
     const [filter, setFilter] = useState({type: '', value: ''})
@@ -66,6 +66,27 @@ const PVsCom = memo(() =>{
     })
     const allPVs = allPVsData?.data?.data?.pvs // PVS LIST
     const pagination = allPVsData?.data?.data?.pagination
+
+
+    const delPV = useMutation({
+        mutationFn: (fields) => {
+            if(!fields?.expense_uid){
+                throw new Error('No payment voucher selected')
+            }
+            return deletePV(fields)
+        },
+        onSuccess: (res) => {
+            if(res?.data?.status != 1){
+                throw new Error(res?.data?.message)
+            }
+            queryClient.invalidateQueries({ queryKey: [...queryKeys.getAllPVs] })
+        },
+        onSettled: () => {
+            setTimeout(()=>{
+                delPV.reset()
+            }, import.meta.env.VITE_APP_SETTIMEOUT_TIME)
+        }
+    })
 
     return (
         <>
@@ -250,14 +271,17 @@ const PVsCom = memo(() =>{
                     text='Are you sure you want to delete this Payment Voucher?' 
                     proceedFunc={()=>{
                         showActionModal(actionModal.data, 'status')
+                        const expense_uid = actionModal?.data?.expense_uid
+                        delPV.mutate({expense_uid})
                     }} 
                     cLoseModal={closeActionModal}
                 />
             }
             { actionModal.name == 'status' &&
                 <StatusModal 
-                    text='Payment Voucher deleted successfully' 
-                    isSuccess={true}
+                    isPending={delPV.isPending}
+                    text={delPV.isSuccess ? 'PV deleted succeefully' : 'Unable to delete payment voucher'} 
+                    isSuccess={delPV.isSuccess}
                     cLoseModal={()=>{closeActionModal()}}
                 />
             }
