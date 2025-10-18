@@ -21,9 +21,15 @@ axios.interceptors.request.use(
     }
 );
 
-const postAuxEnd = (path, postData, media=false) => {
+const postAuxEnd = (path, postData, fData=false, media=false) => {
+    const newPostData = fData ? new FormData() : postData;
+    if(fData){
+        for (let data in postData) {
+          newPostData.append(data, postData[data]);
+        }
+    }
     const basePath = media ? import.meta.env.VITE_APP_BACKOFFICE_BASE_URL : import.meta.env.VITE_APP_BACKOFFICE_BASE_URL
-    return axios.post(`${basePath}${path}`, postData).then(res => {
+    return axios.post(`${basePath}${path}`, newPostData).then(res => {
         return res
     }).catch(err => {
         let status = err?.response?.data?.status
@@ -174,6 +180,12 @@ export const addMDA = (reqData) => {
     return postAuxEnd(`/mdas/add`, postData)
 }
 
+// FUNCTION TO UPLOAD MDA
+export const uploadMDA = (reqData) => {
+    const postData = { ...reqData }
+    return postAuxEnd(`/mdas/upload-mdas`, postData, true)
+}
+
 // FUNCTION TO GET ALL MDAS DATA
 export const getAllMDAData = (reqData) => {
     const postData = { ...reqData }
@@ -184,56 +196,4 @@ export const getAllMDAData = (reqData) => {
 export const addEconomicLine = (reqData) => {
     const postData = { ...reqData }
     return postAuxEnd(`/economic-items/add`, postData)
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// FUNCTION TO GET LOANS TABLE
-export const getLoans = (reqData) => {
-    const postData = { ...reqData }
-    return getAuxEnd(`/loans`, postData)
-}
-
-// FUNCTION TO GET TRANSACTIONS TABLE
-export const getTransactions = (reqData) => {
-    const postData = { ...reqData }
-    return getAuxEnd(`/transactions`, postData)
-}
-
-// FUNCTION TO GET REPAYMENTS TABLE
-export const getRepayments = (reqData) => {
-    const postData = { ...reqData }
-    return getAuxEnd(`/repayments`, postData)
-}
-
-// FUNCTION TO GET LOAN CHARGES TABLE
-export const getLoanCharges = (reqData) => {
-    const postData = { ...reqData }
-    return getAuxEnd(`/loan-charges`, postData)
-}
-
-// FUNCTION TO GET OFFERS LIST TABLE
-export const getOffers = (reqData) => {
-    const postData = { ...reqData }
-    return getAuxEnd(`/offers`, postData)
-}
-
-// FUNCTION TO GET REPAYMENT SCHEDULE TABLE
-export const getRepaymentSchedule = (reqData) => {
-    const postData = { ...reqData }
-    return getAuxEnd(`/repayment-schedules`, postData)
 }

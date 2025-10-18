@@ -4,7 +4,7 @@ import {Link, useNavigate} from 'react-router-dom'
 import BreadcrumbCom from '../breadcrumb/BreadcrumbCom'
 import TablePaginatedWrapper from '../tableWrapper/TablePaginatedWrapper'
 import Icons from '../Icons'
-import { getAllEconomicItems, getTransactions } from '../../services/siteServices'
+import { getAllEconomicItems } from '../../services/siteServices'
 import getDateFromDateString from '../../helpers/GetDateFromDateString';
 import getTimeFromDateString from '../../helpers/GetTimeFromDateString';
 import formatNumber from '../../helpers/formatNumber';

@@ -1,11 +1,11 @@
 import { memo, useEffect, useMemo, useState } from 'react'
-import {Link} from 'react-router-dom'
-import { useMutation } from "@tanstack/react-query";
+import {Link, replace, useNavigate} from 'react-router-dom'
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {Formik, Form} from 'formik'
 import * as Yup from "yup";
 
 import BreadcrumbCom from '../breadcrumb/BreadcrumbCom'
-import { addMDA } from '../../services/siteServices'
+import { addMDA, uploadMDA } from '../../services/siteServices'
 import getDateFromDateString from '../../helpers/GetDateFromDateString';
 import localImgLoader from '../../helpers/localImageLoader';
 import RouteLinks from '../../RouteLinks';
@@ -22,7 +22,7 @@ import { addMDAFields, addMDAFieldsValidation } from '../../helpers/formikValues
 import formatNumber from '../../helpers/formatNumber';
 import RecentlyAdded from '../recentlyAdded/RecentlyAdded';
 import InputFile from '../inputs/InputFile';
-import { isPending } from '@reduxjs/toolkit';
+import queryKeys from '../../services/queryKeys';
 
 
 // To get the validation schema
@@ -30,20 +30,23 @@ const validationSchema = addMDAFieldsValidation
 
 const AddCom = memo(() =>{
 
+    const queryClient = useQueryClient()
+    const navigate = useNavigate()
+
     const [reqData, setReqData] = useState({})
 
     const [isFile, setIsFile] = useState(false)
     const [selectedFile, setSelectedFile] = useState('')
     const handleSelectedFile = ({target}) => {
         const fileToRead = target.files[0]
-        console.log('Target', fileToRead)
-            const reader = new FileReader();
-            // reader.onload = function(e) {
-            //     const data = e.target.result; // The file content
-            //     // Pass data to an Excel parsing library
-            // };
-            const main = reader.readAsBinaryString(fileToRead); // Or reader.readAsArrayBuffer(file);
-            console.log('main', main)
+        setSelectedFile(fileToRead)
+        // console.log('Target', fileToRead)
+        // const reader = new FileReader();
+        // reader.onload = function(e) {
+        //     const data = e.target.result; // The file content
+        //     // Pass data to an Excel parsing library
+        // };
+        // const main = reader.readAsArrayBuffer(fileToRead); // Or reader.readAsBinaryString(fileToRead)
     }
 
     const [verifyModal, setVerifyModal] = useState(false)
@@ -52,6 +55,7 @@ const AddCom = memo(() =>{
         return {...addMDAFields }
     },[])
 
+    //MUTATION FUNCTION TO ADD MDA
     const addMDAFunc = useMutation({
         mutationFn: (fields) => {
             return addMDA(fields)
@@ -69,6 +73,35 @@ const AddCom = memo(() =>{
         }
     })
 
+    //MUTATION FUNCTION TO UPLOAD MDA FILE
+    const uploadMDAFunc = useMutation({
+        mutationFn: (fields) => {
+            if(!fields.file){
+                throw new Error('No File Selected')
+            }
+            return uploadMDA(fields)
+        },
+        onError: (error) => {
+            // console.log(error)
+            setTimeout(()=>{
+            uploadMDAFunc.reset()
+            }, import.meta.env.VITE_APP_SETTIMEOUT_TIME)
+        },
+        onSuccess: (res) => {
+            if(res?.data?.status != 1){
+            throw new Error(res?.data?.message)
+            }
+            setSelectedFile('')
+            queryClient.refetchQueries({queryKey: [...queryKeys.allMDA]})
+            navigate(RouteLinks.mdaList, {replace: true})
+        },
+        onSettled: () => {
+            setTimeout(()=>{
+                uploadMDAFunc.reset()
+            }, import.meta.env.VITE_APP_SETTIMEOUT_TIME)
+        }
+    })
+
     //FUNCTION TO HANDLE ADD PV
     const handleSubmit = (values, helper) => {
         setVerifyModal(true)
@@ -78,6 +111,12 @@ const AddCom = memo(() =>{
     const proceedFunc = ()=>{
         setVerifyModal(false)
         addMDAFunc.mutate(reqData)
+    }
+
+    // function to upload mda
+    const uploadFile = () => {
+        console.log('selectedFile', selectedFile)
+        uploadMDAFunc.mutate({file: selectedFile})
     }
 
     return (
@@ -101,13 +140,14 @@ const AddCom = memo(() =>{
                                 id='name'
                                 type='file'
                                 accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                                value={selectedFile}
                                 onChange={handleSelectedFile}
                             />
                         </div>
                         {isFile && 
                         <div className='w-28'>
                             <MainBtn 
-                                // onClick={} 
+                                onClick={uploadFile} 
                                 disabled={false} 
                                 className={`bg-secondary px-2 py-1 rounded-md text-white font-medium sm:self-end ${(false) && 'opacity-50'}`}
                                 text='Upload File'
