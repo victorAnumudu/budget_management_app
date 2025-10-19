@@ -14,8 +14,9 @@ const validationSchema = addPVFieldsValidation
 
 
 const ViewAddedPV = memo(({data, closeModal}) =>{
-    const code = data.data.org_code+'/'+data.data.economic_code
-    const initialValues = {...data?.data, economic_code:code}
+    const capturedDate = new Date(data?.data?.date_captured) 
+    const dateCaptured = `${capturedDate.getFullYear()}-${capturedDate.getMonth() > 9 ? capturedDate.getMonth() : '0'+capturedDate.getMonth()}-${capturedDate.getDate() > 9 ? capturedDate.getDate() : '0'+capturedDate.getDate()}`
+    const initialValues = {...data?.data, date_captured: dateCaptured}
     
     //FUNCTION TO HANDLE ADD PV
     const handleSubmit = (values, helper) => {
@@ -51,13 +52,13 @@ const ViewAddedPV = memo(({data, closeModal}) =>{
                                 <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-8'>
                                     <div className='relative text-input flex flex-col gap-1'>
                                         <p className='text-sm font-semibold dark:text-slate-high'>
-                                            Date <span className='text-red-500 text-10'>{(props.errors.date && props.touched.date) ? props.errors.date : ''}</span>
+                                            Date <span className='text-red-500 text-10'>{(props.errors.date_captured && props.touched.date_captured) ? props.errors.date_captured : ''}</span>
                                         </p>
                                         <InputText 
-                                            id='date' 
+                                            id='date_captured' 
                                             type='date' 
-                                            name='date' 
-                                            value={props.values.date}
+                                            name='date_captured' 
+                                            value={props.values.date_captured}
                                             handleChange={props.handleChange}
                                             disabled={true}
                                         />

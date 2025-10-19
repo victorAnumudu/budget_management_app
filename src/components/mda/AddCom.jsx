@@ -108,16 +108,16 @@ const AddCom = memo(() =>{
         setReqData(values)
     };
 
+    // function to preceed with adding an mda or uploading mda file
     const proceedFunc = ()=>{
         setVerifyModal(false)
-        addMDAFunc.mutate(reqData)
+        if(isFile){
+            uploadMDAFunc.mutate({file: selectedFile}) // function to upload mda
+        }else{
+            addMDAFunc.mutate(reqData)  // function to add an mda
+        }
     }
 
-    // function to upload mda
-    const uploadFile = () => {
-        console.log('selectedFile', selectedFile)
-        uploadMDAFunc.mutate({file: selectedFile})
-    }
 
     return (
         <>
@@ -144,16 +144,16 @@ const AddCom = memo(() =>{
                                 onChange={handleSelectedFile}
                             />
                         </div>
-                        {isFile && 
+                        
                         <div className='w-28'>
                             <MainBtn 
-                                onClick={uploadFile} 
+                                onClick={()=>handleSubmit()} 
                                 disabled={false} 
                                 className={`bg-secondary px-2 py-1 rounded-md text-white font-medium sm:self-end ${(false) && 'opacity-50'}`}
                                 text='Upload File'
                             />
                         </div>
-                        }
+                        
                     </div>
                     :
                     <Formik
@@ -220,17 +220,17 @@ const AddCom = memo(() =>{
 
             {verifyModal && 
                 <VerifyModal 
-                    text='Are you sure you want to add this MDA?' 
+                    text={isFile ? 'Are you sure you want to upload this file?' : 'Are you sure you want to add this MDA?'} 
                     proceedFunc={proceedFunc} 
                     cLoseModal={()=>setVerifyModal(false)}
                 />
             }
-            { (addMDAFunc?.isPending || addMDAFunc?.isSuccess || addMDAFunc?.isError) &&
+            { (addMDAFunc?.isPending || addMDAFunc?.isSuccess || addMDAFunc?.isError || uploadMDAFunc?.isPending || uploadMDAFunc?.isSuccess || uploadMDAFunc?.isError) &&
                 <StatusModal 
-                    text= {addMDAFunc?.isSuccess ? 'MDA added successfully' : addMDAFunc?.error?.message}
-                    isSuccess={addMDAFunc?.isSuccess}
-                    isPending={addMDAFunc?.isPending}
-                    cLoseModal={()=>{addMDAFunc.reset()}}
+                    text= {addMDAFunc?.isSuccess ? 'MDA added successfully' : uploadMDAFunc?.isSuccess ? 'File uploaded successfully' : uploadMDAFunc?.error ? uploadMDAFunc?.error?.message : addMDAFunc?.error?.message}
+                    isSuccess={addMDAFunc?.isSuccess || uploadMDAFunc?.isSuccess}
+                    isPending={addMDAFunc?.isPending || uploadMDAFunc?.isPending}
+                    cLoseModal={()=>{isFile ? uploadMDAFunc.reset() : addMDAFunc.reset()}}
                 />
             }
         </>

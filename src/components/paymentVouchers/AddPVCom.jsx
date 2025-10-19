@@ -275,6 +275,7 @@ const AddPVCom = memo(() => {
                                                             name='economic_description' 
                                                             value={props.values.economic_description}
                                                             handleChange={props.handleChange}
+                                                            disabled={true}
                                                         />
                                                     </div>
                                                     <div className='w-full relative text-input flex flex-col gap-1'>
