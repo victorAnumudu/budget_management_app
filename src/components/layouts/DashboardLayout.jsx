@@ -13,19 +13,19 @@ const DashboardLayout = memo(() => {
       const {showAsideDrawer, setShowAsideDrawer} = generalLayoutContext()
       
       return (
-        <div className='w-full flex gap-10 relative m-auto h-screen overflow-x-hidden overflow-y-auto bg-white-body dark:bg-black-body p-8 pt-0 lg:p-10'>
-            <div className='hidden lg:block min-w-[300px] px-8 py-4 rounded-3xl sticky top-0 h-full bg-white-aside dark:bg-black-aside shadow-round_black dark:shadow-round_white'>
+        <div className='w-full max-w-[2400px] flex gap-10 relative m-auto h-screen overflow-x-hidden overflow-y-auto bg-white-body dark:bg-black-body p-8 pt-0 lg:p-10'>
+            <div className='hidden lg:block min-w-[300px] px-8 py-4 rounded-3xl sticky top-0 h-full bg-white-aside dark:bg-black-box shadow-round_black dark:shadow-round_white'>
                 <DashboardAside />
             </div>
     
             <div className={`${showAsideDrawer =='aside' ? 'left-0' : '-left-full'} lg:hidden w-full fixed inset-0 z-[999]`}>
                 <div className={`${showAsideDrawer =='aside' ? 'fixed left-0 top-0 inset-0' : '-left-full'} w-full bg-[rgba(0,_0,_0,_0.2)] dark:bg-[rgba(0,_0,_0,_0.4)] transition-all cursor-pointer`} onClick={()=>setShowAsideDrawer('')} ></div>
-                <div className={`fixed px-8 py-4 h-full w-4/5 sm:w-[400px] bg-white-aside dark:bg-black-aside dark:text-white-light`}>
+                <div className={`fixed px-8 py-4 h-full w-4/5 sm:w-[400px] bg-white-aside dark:bg-black-box dark:text-white-light`}>
                     <DashboardAside />
                 </div>
             </div>
     
-            <div className={`main w-full bg-inherit large:mr-[400px]`}>
+            <div className={`main w-full bg-inherit max_width:mr-[400px]`}>
                 <div className='fixed top-0 left-0 z-[980] w-full px-8 bg-inherit lg:hidden'>
                     <DashboardHeader />
                 </div> 
@@ -43,12 +43,12 @@ const DashboardLayout = memo(() => {
     
             {/* Right Aisde */}
             <>
-                <div className={`px-8 py-4 hidden large:flex fixed right-5 top-0 bottom-0 sm:w-[400px] bg-[#192440] dark:bg-black-aside text-white-body`}>
+                <div className={`px-8 py-4 hidden max_width:flex fixed right-5 max_screen_size:right-[calc(((100vw-2400px)/2)+20px)] top-0 bottom-0 sm:w-[400px] bg-[#192440] dark:bg-black-box text-white-body`}>
                     <RightAsideBar />
                 </div>
                 <div className={`${showAsideDrawer =='right-aside' ? 'right-0 w-full' : '-right-full w-0'} fixed inset-0 z-[999] large:hidden bg-[rgba(0,_0,_0,_0.2)] dark:bg-[rgba(0,_0,_0,_0.4)] transition-all cursor-pointer`} onClick={()=>setShowAsideDrawer('')}>
                     {/* <div className={`${showAsideDrawer =='right-aside' ? 'right-0' : '-right-full'} fixed z-[999] right-0 top-0 inset-0 w-full bg-white/20 bg-red-400 transition-all cursor-pointer`} onClick={()=>setShowAsideDrawer('')} ></div> */}
-                    <div onClick={(e)=>e.stopPropagation()} className={`${showAsideDrawer =='right-aside' ? 'right-0' : '-right-full'} fixed z-[999] top-0 botom-0 px-8 py-4 h-full w-4/5 sm:w-[400px] bg-[#192440] dark:bg-black-aside text-white-body`}>
+                    <div onClick={(e)=>e.stopPropagation()} className={`${showAsideDrawer =='right-aside' ? 'right-0' : '-right-full'} fixed z-[999] top-0 botom-0 px-8 py-4 h-full w-4/5 sm:w-[400px] bg-black-box text-white-body`}>
                         <RightAsideBar />
                     </div>
                 </div>

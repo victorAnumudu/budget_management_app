@@ -28,11 +28,11 @@ export default function RightAsideBar() {
     <div className='w-full h-full flex flex-col gap-8'>
         {/* Menu */}
         <div className='grid grid-cols-2 gap-8'>
-            <button name='capital' onClick={() => handleActiveMenu('capital')} className={`flex flex-col gap-1 justify-center items-center px-2 py-3 large:px-4 large:py-5 rounded-md shadow-round_white bg-[#0E172E] dark:bg-black-box text-white-body hover:scale-[1.1] ${active == 'capital' && 'scale-[1.2]'}`}>
+            <button name='capital' onClick={() => handleActiveMenu('capital')} className={`flex flex-col gap-1 justify-center items-center px-2 py-3 large:px-4 large:py-5 rounded-md shadow-round_white bg-[#0E172E] dark:bg-black text-white-body hover:scale-[1.1] ${active == 'capital' && 'scale-[1.2]'}`}>
                 <Icons name='dashboard' className='text-3xl' />
                 {/* <span className='text-12'>Capital/Recurrent</span> */}
             </button>
-            <button name='reserved' onClick={() => handleActiveMenu('reserved')} className={`flex flex-col gap-1 justify-center items-center px-2 py-3 large:px-4 large:py-5 rounded-md shadow-round_white bg-[#0E172E] dark:bg-black-box text-white-body hover:scale-[1.1] ${active == 'reserved' && 'scale-[1.2]'}`}>
+            <button name='reserved' onClick={() => handleActiveMenu('reserved')} className={`flex flex-col gap-1 justify-center items-center px-2 py-3 large:px-4 large:py-5 rounded-md shadow-round_white bg-[#0E172E] dark:bg-black text-white-body hover:scale-[1.1] ${active == 'reserved' && 'scale-[1.2]'}`}>
                 <Icons name='dashboard' className='text-3xl' />
                 {/* <span className='text-12'>Contingency/comm. ser</span> */}
             </button>

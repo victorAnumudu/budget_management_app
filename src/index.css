@@ -31,6 +31,7 @@
   --breakpoint-xs: 25rem;
   --breakpoint-large: 95.938rem;
   --breakpoint-max_width: 106.25rem;
+  --breakpoint-max_screen_size: 150rem;
 
   /* --shadow-round_black: '0 0px 1px 0 rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.19)'; */
   /* --shadow-round_white: '0 0px 1px 0 rgba(255, 255, 255, 0.2), 0 1px 5px 0 rgba(255, 255, 255, 0.19)'; */
@@ -74,8 +75,15 @@
   }
 } */
 
-html{
+html {
   scroll-behavior: smooth;
+  font-size: 100%; /* 16px base */
+}
+
+@media (max-width: 575px) {
+  html {
+    font-size: 87.5%; /* 14px */
+  }
 }
 
 *{

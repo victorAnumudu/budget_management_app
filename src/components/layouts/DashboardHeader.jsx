@@ -38,7 +38,7 @@ const DashboardHeader = memo(() => {
                     </Link>
 
                     {/* RIGHT DRAWER BUTTON */}
-                     <div onClick={()=>setShowAsideDrawer('right-aside')} className='large:hidden  w-10 h-10 border border-slate-high text-slate-higher dark:text-white-body rounded-md px-2 flex justify-center items-center gap-2 cursor-pointer' title='Switch Color Mode'>
+                     <div onClick={()=>setShowAsideDrawer('right-aside')} className='max_width:hidden  w-10 h-10 border border-slate-high text-slate-higher dark:text-white-body rounded-md px-2 flex justify-center items-center gap-2 cursor-pointer' title='Switch Color Mode'>
                         <Icons name='right-panel' className="text-sm md:text-xl font-bold" />
                     </div>
 
@@ -56,27 +56,30 @@ const DashboardHeader = memo(() => {
                         <LuSunDim className="text-sm md:text-xl font-bold" />
                         }
                     </div>
-
+                    
                     <div onClick={()=>handleActiveMenu('avatar')} className='relative cursor-pointer w-10 h-10 rounded shadow-round_black dark:shadow-round_white'>
                         <ImgCom src={'user_avatar.jpg'} alt='user avatar' className='w-full h-full p-1 rounded-full' />
                         {activeMenu == 'avatar' &&
-                            <div className="pop-modal z-[777] absolute w-52 sm:w-96 bg-white dark:bg-black-box right-0 top-16 overflow-hidden rounded shadow-round_black dark:shadow-round_white">
-                                <div className="w-full h-full flex flex-col gap-4">
-                                    <div className="p-4 py-2 flex flex-col gap-2 text-white bg-primary dark:bg-black-box text-base sm:text-lg">
-                                        <h1 className="font-semibold">{firstname ? `${firstname} ${lastname}` : 'Username'}</h1>
-                                        <p className="-mt-2">{email ? email : 'username@gmail.com'}</p>
-                                    </div>
-                                    <div className="min-h-28"></div>
-                                    <div className="rounded w-full flex justify-center items-center gap-2">
-                                        <MainBtn
-                                            text='Logout' 
-                                            className="text-black-body hover:text-red-500 dark:text-white-body font-bold text-lg" 
-                                            onClick={()=>setLogoutModal(true)}
-                                            icon='logout'
-                                        />
+                            <>
+                                <div className="fixed top-0 left-0 right-0 bottom-0 bg-black/10"></div>
+                                <div className="pop-modal z-[777] absolute w-52 sm:w-96 bg-white dark:bg-black-box right-0 top-16 overflow-hidden rounded shadow-round_black dark:shadow-round_white">
+                                    <div className="w-full h-full flex flex-col gap-4">
+                                        <div className="p-4 py-2 flex flex-col gap-2 text-white bg-primary dark:bg-black-box text-base sm:text-lg">
+                                            <h1 className="font-semibold">{firstname ? `${firstname} ${lastname}` : 'Username'}</h1>
+                                            <p className="-mt-2">{email ? email : 'username@gmail.com'}</p>
+                                        </div>
+                                        <div className="min-h-28"></div>
+                                        <div className="rounded w-full flex justify-center items-center gap-2">
+                                            <MainBtn
+                                                text='Logout' 
+                                                className="text-black-body hover:text-red-500 dark:text-white-body font-bold text-lg" 
+                                                onClick={()=>setLogoutModal(true)}
+                                                icon='logout'
+                                            />
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            </>
                         }
                     </div>
                 </div>
