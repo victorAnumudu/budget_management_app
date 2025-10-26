@@ -17,6 +17,7 @@ import AddMDAPage from './pages/AddMDAPage' //ADD MDA PAGE
 import UsersPage from './pages/UsersPage' //USERS LIST PAGE
 import AddEconomicItemPage from './pages/AddEconomicItemPage' //ALL ECONOMIC ITEMS PAGE
 import EconomicItemsPage from './pages/EconomicItemsPage' //ADD ECONOMIC ITEM PAGE
+import ProfilePage from './pages/ProfilePage' // USER PROFILE PAGE
 
 
 
@@ -37,6 +38,7 @@ export default function SiteRoutes() {
         <Route path={RouteLinks.users} element={<UsersPage />} /> {`*/USERS LIST PAGE*/`}
         <Route path={RouteLinks.economicLines} element={<EconomicItemsPage />} /> {`*/ALL ECONOMIC ITEMS PAGE*/`}
         <Route path={RouteLinks.addEconomicLine} element={<AddEconomicItemPage />} /> {`*/ADD ECONOMIC ITEM PAGE*/`}
+        <Route path={RouteLinks.profile} element={<ProfilePage />} /> {`*/USER PROFILE PAGE*/`}
       </Route>
 
       {/* ERROR PAGE */}

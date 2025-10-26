@@ -12,6 +12,7 @@ const RouteLinks = {
     addUser: '/add-user',
     economicLines: '/economic-lines',
     addEconomicLine: '/add-economic-line',
+    profile: '/profile',
 
 
     offers: '/offers',

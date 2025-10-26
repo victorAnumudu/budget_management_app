@@ -23,7 +23,7 @@ const BreadcrumbCom = memo(({title, span, paths}) => {
 
   return (
     // ${stickNav ? 'sticky top-0 transition-[top] duration-1000 shadow-md shadow-black' : '-top-[100px] static'}
-    <div className={`sticky z-[970] top-[78px] lg:-top-10 bg-white-body dark:bg-black-body border-b border-transparent dark:border-black-box dark:shadow-sm dark:shadow-black-box`}>
+    <div className={`sticky z-[970] top-[70px] lg:-top-10 bg-white-body dark:bg-black-body border-b border-transparent dark:border-black-box dark:shadow-sm dark:shadow-black-box`}>
       <div className= {`w-full py-2 flex justify-between items-center`}>
         <div className='flex flex-col gap-2'>
           <div className='flex flex-col md:flex-row gap-1 md:items-center'>

@@ -40,7 +40,7 @@ export default function HomeCom() {
               </div>
               :
               <>
-                <div className='box min-h-[230] justify-between bg-[#F7D9E3] dark:bg-black-box text-black-body dark:text-white-body'>
+                <div data-aos="zoom-in" className='box min-h-[230] justify-between bg-[#F7D9E3] dark:bg-black-box text-black-body dark:text-white-body'>
                   <p className='text-base sm:text-lg font-bold hover:text-primary'>{dashData[0]?.budget_type} expenses</p>
                   {/* <Widget1 /> */}
                   <div className='flex flex-wrap gap-2 items-end font-bold'>
@@ -53,7 +53,7 @@ export default function HomeCom() {
                     <p className='sm:text-[13.9px]'>{dashData[0]?.period}</p>
                   </div>
                 </div>
-                <div className='box min-h-[230] justify-between bg-[#CBF0F5] dark:bg-black-box text-black-body dark:text-white-body'>
+                <div data-aos="zoom-in" className='box min-h-[230] justify-between bg-[#CBF0F5] dark:bg-black-box text-black-body dark:text-white-body'>
                   <p className='text-base sm:text-lg font-bold hover:text-primary '>{dashData[1]?.budget_type} expenses</p>
                   {/* <Widget2 /> */}
                   <div className='flex flex-wrap gap-2 items-end font-bold'>
@@ -76,7 +76,7 @@ export default function HomeCom() {
               </div>
               :
               <>
-                <div className='box min-h-[230] justify-between bg-[#CBD4F4] dark:bg-black-box text-black-body dark:text-white-body'>
+                <div data-aos="zoom-in" className='box min-h-[230] justify-between bg-[#CBD4F4] dark:bg-black-box text-black-body dark:text-white-body'>
                   <p className='mb-4 text-base sm:text-lg font-bold hover:text-primary '>Total Expenses</p>
                   <div className='grid grid-cols-2 gap-4 font-bold'>
                     {
@@ -105,7 +105,7 @@ export default function HomeCom() {
             }
           </div>
         </div>
-        <div className='box gap-8 bg-white dark:bg-black-box text-black-body dark:text-white-body'>
+        <div data-aos="fade-up" className='box gap-8 bg-white dark:bg-black-box text-black-body dark:text-white-body'>
           <RecentlyAdded />
         </div>
     </div>

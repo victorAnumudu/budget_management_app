@@ -19,9 +19,9 @@ function App() {
     window.scrollTo(0,0)
     AOS.init({
       offset: 200,
-      duration: 500,
+      duration: 300,
       easing: 'ease-in-sine',
-      // delay: 100,
+      delay: 100,
     });
   },[pathname])
 

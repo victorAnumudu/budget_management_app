@@ -161,4 +161,8 @@ const asideNavLinks = [
         // {name: 'Add User', status:1, icon: 'dot', to: RouteLinks.addUser },
         ]
     },
+    {name:'Settings', title:'', status:1, icon: 'sales', notAllowedUsers: [], subLinks: [
+        {name: 'Profile', status:1, icon: 'dot', to: RouteLinks.profile, notAllowedUsers: []},
+        ],
+    },
 ]
