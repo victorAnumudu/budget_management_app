@@ -1,12 +1,13 @@
 import { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
-import { QueryClientProvider, QueryClient } from '@tanstack/react-query'
+import AOS from 'aos';
 
 import SiteRoutes from './SiteRoutes';
 import LogoutModal from './components/layouts/LogoutModal';
 import { generalLayoutContext } from './context/GeneralLayoutContext';
 
 import './App.css';
+import 'aos/dist/aos.css'; // Import the AOS styles
 
 function App() {
 
@@ -16,6 +17,12 @@ function App() {
 
   useEffect(()=>{
     window.scrollTo(0,0)
+    AOS.init({
+      offset: 200,
+      duration: 500,
+      easing: 'ease-in-sine',
+      // delay: 100,
+    });
   },[pathname])
 
   return (

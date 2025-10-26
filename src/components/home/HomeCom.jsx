@@ -99,18 +99,15 @@ export default function HomeCom() {
                       )
                     })
                     }
-                  </div>
+                  </div>      
                 </div>
               </>
             }
-
           </div>
-
         </div>
-
-      <div className='box gap-8 bg-white dark:bg-black-box text-black-body dark:text-white-body'>
-        <RecentlyAdded />
-      </div>
+        <div className='box gap-8 bg-white dark:bg-black-box text-black-body dark:text-white-body'>
+          <RecentlyAdded />
+        </div>
     </div>
   )
 }
