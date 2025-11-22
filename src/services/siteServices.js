@@ -197,3 +197,21 @@ export const addEconomicLine = (reqData) => {
     const postData = { ...reqData }
     return postAuxEnd(`/economic-items/add`, postData)
 }
+
+// FUNCTION TO GET ALL WARRANTS
+export const getAllWarrants = (reqData) => {
+    const postData = { ...reqData }
+    return getAuxEnd(`/warrants/all`, postData)
+}
+
+// FUNCTION TO REMOVE ITEM(S) FROM WARRANT
+export const removeWarrantItem = (reqData) => {
+    const postData = { ...reqData }
+    return postAuxEnd(`/warrants/remove`, postData)
+}
+
+// FUNCTION TO DELETE WARRANT
+export const deleteWarrant = (reqData) => {
+    const postData = { ...reqData }
+    return postAuxEnd(`/warrants/delete`, postData)
+}

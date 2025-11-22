@@ -1,0 +1,328 @@
+import React, { useEffect, useState } from 'react'
+import BreadcrumbCom from '../breadcrumb/BreadcrumbCom'
+import Icons from '../Icons'
+import localImgLoader from '../../helpers/localImageLoader'
+import getDateFromDateString from '../../helpers/GetDateFromDateString'
+import formatNumber from '../../helpers/formatNumber'
+import groupByEconomicCode from '../../helpers/groupByEconomicCode'
+import MainBtn from '../btn/MainBtn'
+import { getAllWarrants, removeWarrantItem, deleteWarrant } from '../../services/siteServices'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import queryKeys from '../../services/queryKeys'
+import VerifyModal from '../modals/VerifyModal'
+import StatusModal from '../modals/StatusModal'
+import { useSelector } from 'react-redux'
+import RouteLinks from '../../RouteLinks'
+import { useNavigate } from 'react-router-dom'
+
+export default function WarrantDetails({stateData}) {
+    const {userDetails:{email}} = useSelector((state) => state.userDetails)
+    const navigate = useNavigate()
+    const queryClient = useQueryClient()
+
+    const [actionModal, setActionModal] = useState({data:{}, name:''})
+    const showActionModal = (data, name) => setActionModal({data, name})
+    const closeActionModal = () => setActionModal({data:{}, name:''})
+
+    const [itemsToRemove, setItemsToRemove] = useState([])
+    const handleAddItemToRemove = (id) => {
+        if(itemsToRemove.includes(id)){
+            const oldItems = itemsToRemove.slice(0)
+            const IndexToRemove = oldItems.indexOf(id)
+            oldItems.splice(IndexToRemove, 1)
+            const newItems = oldItems
+            setItemsToRemove(newItems)
+        }else{
+            setItemsToRemove(prev => ([...prev, id]))
+        }
+    }
+
+    const {data:allWarrantData, isFetching, isError, error} = useQuery({
+        queryKey: [...queryKeys.getWarrantById],
+        queryFn: () => {
+            const reqData = {
+                _id: stateData?._id
+            }
+            return getAllWarrants(reqData)
+        },
+        staleTime: 0 //0 mins
+    })
+
+    const singleWarrant = allWarrantData?.data?.data?.warrants[0] // SINGLE WARRANT
+
+    // const gross = singleWarrant?.expenses_id?.reduce((acc, item)=>{
+    //     return acc + item?.gross_amount
+    // },0)
+    const net = singleWarrant?.expenses_id?.reduce((acc, item)=>{
+        return acc + item?.net_amount
+    },0)
+
+    
+    const groupDataByMDA = groupByEconomicCode(singleWarrant?.expenses_id)
+
+    const removeItemFromWarrant = useMutation({
+        mutationFn: (fields) => {
+            if(!fields?.warrant_id){
+                throw new Error('No valid warrant ID was selected')
+            }
+            return removeWarrantItem(fields)
+        },
+        onSuccess: (res) => {
+            if(res?.data?.status != 1){
+                throw new Error(res?.data?.message)
+            }
+            queryClient.invalidateQueries({ queryKey: [...queryKeys.getWarrantById] })
+        },
+        onSettled: () => {
+            setItemsToRemove([])
+            setTimeout(()=>{
+                removeItemFromWarrant.reset()
+            }, import.meta.env.VITE_APP_SETTIMEOUT_TIME)
+        }
+    })
+
+    const warrantDelete = useMutation({
+        mutationFn: (fields) => {
+            if(!fields?.warrant_id){
+                throw new Error('No valid warrant ID was selected')
+            }
+            return deleteWarrant(fields)
+        },
+        onSuccess: (res) => {
+            if(res?.data?.status != 1){
+                throw new Error(res?.data?.message)
+            }
+            navigate(RouteLinks.warrants)
+        },
+        onSettled: () => {
+            setItemsToRemove([])
+            setTimeout(()=>{
+                warrantDelete.reset()
+            }, import.meta.env.VITE_APP_SETTIMEOUT_TIME)
+        }
+    })
+
+    const proceed = ()=>{
+        showActionModal(actionModal.data, 'status')
+        const data = {
+            warrant_id: stateData?._id,
+            issued_by: email,
+            expenses_id: actionModal.data
+        }
+        removeItemFromWarrant.mutate(data)
+    }
+
+    const proceedDelWarrant = ()=>{
+        showActionModal(actionModal.data, 'delete_warrant_status')
+        const data = {
+            warrant_id: stateData?._id,
+            issued_by: email,
+        }
+        warrantDelete.mutate(data)
+    }
+  
+
+    return (
+        <>
+        <div className='w-full flex flex-col gap-4'>
+            <BreadcrumbCom title='Warrants Details' paths={['Dashboard', 'Warrants Details']} />
+            {(isFetching || isError) ?
+            <div className='box bg-white dark:bg-black-box text-black-body dark:text-white-body'>
+                {isError ? <p className='text-red-500'>{error.message}</p> : <p className='text-slate-800'>Loading...</p>}
+            </div>
+            :
+            <>
+                <div className='w-full flex justify-between items-center gap-4'>
+                    {itemsToRemove.length > 0 &&
+                    <div className='w-36'>
+                        <MainBtn 
+                            onClick={()=>showActionModal(itemsToRemove, 'delete_many')}
+                            disabled={false} 
+                            className={`bg-red-600 dark:bg-red-700 px-2 py-1 rounded-md text-white font-medium sm:self-end ${(false) && 'opacity-50'}`}
+                            text={`Remove ${itemsToRemove.length > 1 ? `${itemsToRemove.length} items` : `${itemsToRemove.length} item`}`}
+                        />
+                    </div>
+                    }
+                    <>
+                    {groupDataByMDA.length < 1 ?
+                    <div className='w-52 ml-auto'>
+                        <MainBtn 
+                            // onClick={() => navigate(RouteLinks.addWarrant)} 
+                            disabled={false} 
+                            className={`bg-primary dark:bg-primary-dark px-2 py-1 rounded-md text-white font-medium sm:self-end ${(false) && 'opacity-50'}`}
+                            text='Add Items to this Warrant'
+                        />
+                    </div>
+                    :
+                    <div className='w-52 ml-auto'>
+                        <MainBtn 
+                            // onClick={() => navigate(RouteLinks.addWarrant)} 
+                            disabled={false} 
+                            className={`bg-primary dark:bg-primary-dark px-2 py-1 rounded-md text-white font-medium sm:self-end ${(false) && 'opacity-50'}`}
+                            text='Generate Warrant'
+                        />
+                    </div>
+                    }
+                    </>
+                    
+                </div>
+                <div className='w-full flex flex-col gap-10'>
+                    <div className='w-full flex flex-col gap-4'>
+                        <p className='text-base font-bold dark:text-white-aside flex gap-4'>
+                            Warrant Number: <span>{singleWarrant?._id}</span>
+                            {groupDataByMDA.length > 1 &&
+                            <button
+                                className={`text-sm bg-primary dark:bg-primary-dark px-2 py-1 rounded-md text-white font-medium sm:self-end ${(false) && 'opacity-50'}`}
+                            >Add Items to this Warrant</button>
+                            }
+                        </p>
+                        <p className='text-base font-bold dark:text-white-aside border p-1 rounded-sm'>By this warrant, you are authorised to pay the total sum of <span className='italic'>{formatNumber(net)}</span></p>
+                    </div>
+                    {groupDataByMDA?.map((data, index)=>{
+                        const groupNetAmt = data?.pvs?.reduce((acc, item)=>{
+                            return acc + item?.net_amount
+                        },0)
+                        return(
+                            <div key={data?.org_code || index} className='w-full'>
+                                <p className='text-base font-bold dark:text-white-aside'>{data?.org_code} - {data?.beneficiary_mda}</p>
+                                <div className='overflow-x-auto'>
+                                    <table className="table-auto py-2 w-full text-sm">
+                                        <thead className="text-sm text-slate-higher dark:text-slate-high dark:font-semibold text-left">
+                                        <tr>
+                                            <th scope="col" className="p-2">
+                                            </th>
+                                            <th scope="col" className="p-2">
+                                                Code/Description
+                                            </th>
+                                            <th scope="col" className="p-2">
+                                                PV Description
+                                            </th>
+                                            <th scope="col" className="p-2">
+                                                Beneficiary
+                                            </th>
+                                            <th scope="col" className="p-2">
+                                                Amt
+                                            </th>
+                                            <th scope="col" className="p-2 text-right">
+                                                Action
+                                            </th>
+                                        </tr>
+                                        </thead>
+                                        <tbody className='text-black-aside dark:text-slate-high'>
+
+                                        {data?.pvs && data.pvs.map((item, index) => {
+                                            return (
+                                                <tr key={item.id || index} className="border-t border-dashed border-slate-high">
+                                                    <td className="p-2">
+                                                        <div className="text-left">
+                                                            <input type='checkbox' onClick={()=>handleAddItemToRemove(item?._id)} />
+                                                        </div> 
+                                                    </td>
+                                                    <td className="p-2">
+                                                        <div className='w-full flex items-center gap-2 whitespace-nowrap'>
+                                                            {/* <img className="w-8 h-8 rounded-md" src={localImgLoader(`loan_icons/provide_loan.png`)} alt="Icon" /> */}
+                                                            <div className="text-left">
+                                                                <div className="text-sm font-semibold line-clamp-1">{item?.economic_code}</div>
+                                                                <div title={item?.economic_description} className="font-normal text-slate-higher">{item?.economic_description}</div>
+                                                            </div>  
+                                                        </div>
+                                                    </td>
+                                                    <td className="p-2">
+                                                        <div className="text-left">
+                                                            <div title={item?.pv_description} className="text-sm font-semibold line-clamp-2">{item?.pv_description}</div>
+                                                        </div> 
+                                                    </td>
+                                                    <td className="p-2">
+                                                        <div className="text-left">
+                                                            <div className="text-sm font-semibold">{item?.beneficiary_name}</div>
+                                                            <div className="font-normal text-slate-higher">{item?.beneficiary_account}</div>
+                                                            <div className="font-normal text-slate-higher">{item?.beneficiary_bank}</div>
+                                                        </div> 
+                                                    </td>
+                                                    <td className="p-2">
+                                                        <div className="text-left">
+                                                            <div className="font-normal text-slate-higher">{item?.net_amount}</div>
+                                                        </div> 
+                                                    </td>
+                                                    <td className="group relative p-2 text-right">
+                                                        <div className='flex items-center justify-end gap-3 md:gap-4'>
+                                                            <div className='p-2 flex cursor-pointer justify-center items-center text-slate-500 bg-white-body dark:text-white-body dark:bg-black-body rounded-md'>
+                                                                <button onClick={()=>showActionModal([item?._id], 'delete')}>
+                                                                    <Icons name='trash' className={`text-red-500 ${itemsToRemove.length && 'opacity-30'}`} />
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            )})
+                                        }
+                                        <tr className="border-y border-dashed border-slate-high">
+                                            <td className="p-2" colSpan={3}>
+                                                <div className='w-full flex items-center gap-2 whitespace-nowrap'>
+                                                    <div className="text-sm font-semibold line-clamp-1">Sub Total</div>
+                                                </div>
+                                            </td>
+                                            <td className="p-2" colSpan={1}>
+                                                <div className='w-full flex items-center gap-2 whitespace-nowrap'>
+                                                    <div className="text-sm font-semibold line-clamp-1">{groupNetAmt}</div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        )
+                    })}
+                </div>
+            </>
+            }
+
+            {groupDataByMDA.length < 1 &&
+                <div className='w-full flex flex-col gap-4'>
+                    <p className='text-base font-bold text-red-600'>This Warrant is empty, would you want it deleted, click delete</p>
+                    <div className='w-36'>
+                        <MainBtn 
+                            onClick={()=>showActionModal(itemsToRemove, 'delete_warrant')}
+                            disabled={false} 
+                            className={`bg-red-600 dark:bg-red-700 px-2 py-1 rounded-md text-white font-medium sm:self-end ${(false) && 'opacity-50'}`}
+                            text={`Delete Warrant`}
+                        />
+                    </div>
+                </div>
+            }
+        </div>
+        {(actionModal.name == 'delete' || actionModal.name == 'delete_many') && 
+            <VerifyModal 
+                text='Are you sure you want to delete this?' 
+                proceedFunc={proceed} 
+                cLoseModal={closeActionModal}
+            />
+        }
+        { actionModal.name == 'status' &&
+            <StatusModal 
+                isPending={removeItemFromWarrant.isPending}
+                text={removeItemFromWarrant.isSuccess ? 'deleted successfully' : 'Unable to delete'} 
+                isSuccess={removeItemFromWarrant.isSuccess}
+                cLoseModal={()=>{closeActionModal()}}
+            />
+        }
+
+        {(actionModal.name == 'delete_warrant' || actionModal.name == 'delete_many') && 
+            <VerifyModal 
+                text='Are you sure you want to delete this warrant?' 
+                proceedFunc={proceedDelWarrant} 
+                cLoseModal={closeActionModal}
+            />
+        }
+        { actionModal.name == 'delete_warrant_status' &&
+            <StatusModal 
+                isPending={warrantDelete.isPending}
+                text={warrantDelete.isSuccess ? 'deleted successfully' : 'Unable to delete'} 
+                isSuccess={warrantDelete.isSuccess}
+                cLoseModal={()=>{closeActionModal()}}
+            />
+        }
+        </>
+    )
+}

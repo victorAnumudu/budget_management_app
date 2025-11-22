@@ -18,7 +18,9 @@ import UsersPage from './pages/UsersPage' //USERS LIST PAGE
 import AddEconomicItemPage from './pages/AddEconomicItemPage' //ALL ECONOMIC ITEMS PAGE
 import EconomicItemsPage from './pages/EconomicItemsPage' //ADD ECONOMIC ITEM PAGE
 import ProfilePage from './pages/ProfilePage' // USER PROFILE PAGE
-
+import WarrantsPage from './pages/WarrantsPage' // WARRANT PAGE
+import WarrantDetailsPage from './pages/WarrantDetailsPage' // WARRANT DETAILS PAGE
+import AddWarrantPage from './pages/AddWarrantPage' // WARRANT DETAILS PAGE
 
 
 // const Home = lazy(() => import('./pages/Home'));
@@ -39,6 +41,9 @@ export default function SiteRoutes() {
         <Route path={RouteLinks.economicLines} element={<EconomicItemsPage />} /> {`*/ALL ECONOMIC ITEMS PAGE*/`}
         <Route path={RouteLinks.addEconomicLine} element={<AddEconomicItemPage />} /> {`*/ADD ECONOMIC ITEM PAGE*/`}
         <Route path={RouteLinks.profile} element={<ProfilePage />} /> {`*/USER PROFILE PAGE*/`}
+        <Route path={RouteLinks.warrants} element={<WarrantsPage />} /> {`*/WARRANT PAGE*/`}
+        <Route path={RouteLinks.warrantDetails} element={<WarrantDetailsPage />} /> {`*/WARRANT DETAILS PAGE*/`}
+        <Route path={RouteLinks.addWarrant} element={<AddWarrantPage />} /> {`*/ADD WARRANT PAGE*/`}
       </Route>
 
       {/* ERROR PAGE */}

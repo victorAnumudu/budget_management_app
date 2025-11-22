@@ -7,6 +7,8 @@ const queryKeys = {
     dashboardRightPanelData: ['dashboard_right_panel_data'],
 
     allMDA: ['all_mdas'],
+    getAllWarrants: ['get_all_warrants'], // all warrants
+    getWarrantById: ['get_warrant_by_id'], // single warrant by id
 }
 
 export default queryKeys

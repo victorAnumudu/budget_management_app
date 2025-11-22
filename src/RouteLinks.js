@@ -13,6 +13,9 @@ const RouteLinks = {
     economicLines: '/economic-lines',
     addEconomicLine: '/add-economic-line',
     profile: '/profile',
+    warrants: '/warrants',
+    addWarrant: '/add-warrant',
+    warrantDetails: '/warrant-details',
 
 
     offers: '/offers',
