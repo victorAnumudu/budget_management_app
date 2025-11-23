@@ -43,6 +43,28 @@ const postAuxEnd = (path, postData, fData=false, media=false) => {
     })
 }
 
+const putAuxEnd = (path, postData, fData=false, media=false) => {
+    const newPostData = fData ? new FormData() : postData;
+    if(fData){
+        for (let data in postData) {
+          newPostData.append(data, postData[data]);
+        }
+    }
+    const basePath = media ? import.meta.env.VITE_APP_BACKOFFICE_BASE_URL : import.meta.env.VITE_APP_BACKOFFICE_BASE_URL
+    return axios.put(`${basePath}${path}`, newPostData).then(res => {
+        return res
+    }).catch(err => {
+        let status = err?.response?.data?.status
+        if(status == -1000){
+            localStorage.clear();
+            window.location.href = `${RouteLinks.loginPage}?sessionExpired=true`;
+            return
+        }
+        return err?.response
+        // throw new Error(message);
+    })
+}
+
 const getAuxEnd = (path, reqData= null) => {
     const basePath = import.meta.env.VITE_APP_BACKOFFICE_BASE_URL
     return axios.get(`${basePath}${path}`,{ params: reqData }).then(res => {
@@ -220,4 +242,10 @@ export const deleteWarrant = (reqData) => {
 export const createWarrant = (reqData) => {
     const postData = { ...reqData }
     return postAuxEnd(`/warrants/add`, postData)
+}
+
+// FUNCTION TO GENERATE WARRANT
+export const generateWarrant = (reqData) => {
+    const postData = { ...reqData }
+    return putAuxEnd(`/warrants/update`, postData)
 }

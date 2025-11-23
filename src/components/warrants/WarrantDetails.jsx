@@ -6,7 +6,7 @@ import getDateFromDateString from '../../helpers/GetDateFromDateString'
 import formatNumber from '../../helpers/formatNumber'
 import groupByEconomicCode from '../../helpers/groupByEconomicCode'
 import MainBtn from '../btn/MainBtn'
-import { getAllWarrants, removeWarrantItem, deleteWarrant } from '../../services/siteServices'
+import { getAllWarrants, removeWarrantItem, deleteWarrant, generateWarrant } from '../../services/siteServices'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import queryKeys from '../../services/queryKeys'
 import VerifyModal from '../modals/VerifyModal'
@@ -62,7 +62,8 @@ export default function WarrantDetails({stateData}) {
 
     
     const groupDataByMDA = groupByEconomicCode(singleWarrant?.expenses_id)
-console.log('groupDataByMDA', groupDataByMDA, singleWarrant?.expenses_id)
+
+    // mutation to remove items from warrant
     const removeItemFromWarrant = useMutation({
         mutationFn: (fields) => {
             if(!fields?.warrant_id){
@@ -84,6 +85,7 @@ console.log('groupDataByMDA', groupDataByMDA, singleWarrant?.expenses_id)
         }
     })
 
+    // mutation to delete warrant
     const warrantDelete = useMutation({
         mutationFn: (fields) => {
             if(!fields?.warrant_id){
@@ -105,6 +107,30 @@ console.log('groupDataByMDA', groupDataByMDA, singleWarrant?.expenses_id)
         }
     })
 
+    const generateWarrantMutation = useMutation({
+        mutationFn: (fields) => {
+            if(!fields?.warrant_id){
+                throw new Error('No valid warrant ID was selected')
+            }
+            return generateWarrant(fields)
+        },
+        onError: (err) => {
+            alert(err.message)
+        },
+        onSuccess: (res) => {
+            if(res?.data?.status != 1){
+                throw new Error(res?.data?.message)
+            }
+            alert('Successful')
+            queryClient.invalidateQueries({ queryKey: [...queryKeys.getWarrantById] })
+        },
+        onSettled: () => {
+            setTimeout(()=>{
+                generateWarrantMutation.reset()
+            }, import.meta.env.VITE_APP_SETTIMEOUT_TIME)
+        }
+    })
+
     const proceed = ()=>{
         showActionModal(actionModal.data, 'status')
         const data = {
@@ -122,6 +148,15 @@ console.log('groupDataByMDA', groupDataByMDA, singleWarrant?.expenses_id)
             issued_by: email,
         }
         warrantDelete.mutate(data)
+    }
+
+    const proceedToGenerateWarrant = ()=>{
+        closeActionModal()
+        const data = {
+            warrant_id: stateData?._id,
+            issued_by: email,
+        }
+        generateWarrantMutation.mutate(data)
     }
   
 
@@ -157,14 +192,27 @@ console.log('groupDataByMDA', groupDataByMDA, singleWarrant?.expenses_id)
                         />
                     </div>
                     :
-                    <div className='w-52 ml-auto'>
+                    <>
+                    {singleWarrant.status == 1 ?
+                    <div className='w-16 ml-auto'>
                         <MainBtn 
-                            // onClick={() => navigate(RouteLinks.addWarrant)} 
+                            // onClick={()=>showActionModal([stateData?._id], 'generate_warrant')}
                             disabled={false} 
                             className={`bg-primary dark:bg-primary-dark px-2 py-1 rounded-md text-white font-medium sm:self-end ${(false) && 'opacity-50'}`}
-                            text='Generate Warrant'
+                            text={`Print`}
                         />
                     </div>
+                    :
+                    <div className='w-52 ml-auto'>
+                        <MainBtn 
+                            onClick={()=>showActionModal([stateData?._id], 'generate_warrant')}
+                            disabled={false} 
+                            className={`bg-primary dark:bg-primary-dark px-2 py-1 rounded-md text-white font-medium sm:self-end ${(false) && 'opacity-50'}`}
+                            text={`${generateWarrantMutation.isPending ? 'Loading...' : 'Generate Warrant'}`}
+                        />
+                    </div>
+                    }
+                    </>
                     }
                     </>
                     
@@ -173,7 +221,7 @@ console.log('groupDataByMDA', groupDataByMDA, singleWarrant?.expenses_id)
                     <div className='w-full flex flex-col gap-4'>
                         <p className='text-base font-bold dark:text-white-aside flex gap-4'>
                             Warrant Number: <span>{singleWarrant?._id}</span>
-                            {groupDataByMDA?.length >= 1 &&
+                            {(groupDataByMDA?.length >= 1 && singleWarrant.status != 1) &&
                             <button
                                 className={`text-sm bg-sky-800 dark:bg-primary-dark px-2 py-1 rounded-md text-white font-medium sm:self-end ${(false) && 'opacity-50'}`}
                             >
@@ -303,6 +351,13 @@ console.log('groupDataByMDA', groupDataByMDA, singleWarrant?.expenses_id)
             <VerifyModal 
                 text='Are you sure you want to delete this?' 
                 proceedFunc={proceed} 
+                cLoseModal={closeActionModal}
+            />
+        }
+        {actionModal.name == 'generate_warrant' && 
+            <VerifyModal 
+                text='Are you sure you want to generate this warrant as a working document?' 
+                proceedFunc={proceedToGenerateWarrant} 
                 cLoseModal={closeActionModal}
             />
         }

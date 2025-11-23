@@ -79,7 +79,7 @@ const AddToWarrant = memo(() =>{
         },
         staleTime: 0 //0 mins
     })
-    const allPVs = allPVsData?.data?.data?.pvs // PVS LIST
+    const allPVs = allPVsData?.data?.data?.pvs.filter(item => !item?.warrant_status) // PVS LIST
     const pagination = allPVsData?.data?.data?.pagination
 
 
@@ -137,6 +137,7 @@ const AddToWarrant = memo(() =>{
 
                     <>
                         {/* filter section */}
+                        {allPVs?.length > 0 &&
                         <div className='px-2 py-2 mb-4 flex flex-col sm:flex-row flex-wrap sm:items-center gap-2'>
                             <Icons name='filter' className='text-3xl text-slate-600' />
                             <div className='w-full sm:max-w-48'>
@@ -171,6 +172,7 @@ const AddToWarrant = memo(() =>{
                                 />
                             </div>
                         </div>
+                        }
                         {/* end of filter section */}
 
                         <TablePaginatedWrapper data={allPVs} isFetching={isFetching} setPage={setPage} itemsPerPage={pagination?.limit} pagination={pagination}>
@@ -206,67 +208,65 @@ const AddToWarrant = memo(() =>{
                                     </thead>
                                     <tbody className='text-black-aside dark:text-slate-high'>
                                         {(data && data.length > 0) ? data?.map((item, index) => {
-                                            if(item?.warrant_status != 1){
-                                                return (
-                                                    <tr key={item.id || index} className="border-t border-dashed border-slate-high">
-                                                        <td className="p-2">
+                                            return (
+                                                <tr key={item.id || index} className="border-t border-dashed border-slate-high">
+                                                    <td className="p-2">
+                                                        <div className="text-left">
+                                                            <input type='checkbox' onClick={()=>handleAddItemsToItemsToAdd(item?.expense_uid)} />
+                                                        </div> 
+                                                    </td>
+                                                    <td className="p-2">
+                                                        <div className='w-full flex items-center gap-2 whitespace-nowra'>
+                                                            <img className="w-8 h-8 rounded-md" src={localImgLoader(`loan_icons/provide_loan.png`)} alt="Icon" />
                                                             <div className="text-left">
-                                                                <input type='checkbox' onClick={()=>handleAddItemsToItemsToAdd(item?.expense_uid)} />
-                                                            </div> 
-                                                        </td>
-                                                        <td className="p-2">
-                                                            <div className='w-full flex items-center gap-2 whitespace-nowra'>
-                                                                <img className="w-8 h-8 rounded-md" src={localImgLoader(`loan_icons/provide_loan.png`)} alt="Icon" />
-                                                                <div className="text-left">
-                                                                    <div title={item?.beneficiary_mda} className="text-sm font-semibold line-clamp-1">{item?.beneficiary_mda}</div>
-                                                                    <div className="text-sm font-semibold">{item?.pv_number}</div>
-                                                                    <div className="font-normal text-slate-higher">{getDateFromDateString(item?.date_captured)}</div>
-                                                                </div>  
+                                                                <div title={item?.beneficiary_mda} className="text-sm font-semibold line-clamp-1">{item?.beneficiary_mda}</div>
+                                                                <div className="text-sm font-semibold">{item?.pv_number}</div>
+                                                                <div className="font-normal text-slate-higher">{getDateFromDateString(item?.date_captured)}</div>
+                                                            </div>  
+                                                        </div>
+                                                    </td>
+                                                    <td className="p-2">
+                                                        <div className="text-left">
+                                                            <div title={item?.economic_description} className="text-sm font-semibold line-clamp-1">{item?.economic_description}</div>
+                                                            <div className="font-normal text-slate-higher">{item?.economic_code}</div>
+                                                            {/* <div className="font-normal text-slate-higher">{item?.org_code}/{item?.economic_code}</div> */}
+                                                        </div> 
+                                                    </td>
+                                                    <td className="p-2">
+                                                        <div className="text-left">
+                                                            <div title={item?.pv_description} className="text-sm font-semibold line-clamp-2">{item?.pv_description}</div>
+                                                        </div> 
+                                                    </td>
+                                                    <td className="p-2">
+                                                        <div className="text-left">
+                                                            <div className="text-sm font-semibold">{item?.beneficiary_name}</div>
+                                                            <div className="font-normal text-slate-higher">{item?.beneficiary_account}</div>
+                                                            <div className="font-normal text-slate-higher">{item?.beneficiary_bank}</div>
+                                                        </div> 
+                                                    </td>
+                                                    <td className="p-2">
+                                                        <div className="text-left">
+                                                            <div className="text-sm font-semibold">{item?.gross_amount}</div>
+                                                            <div className="font-normal text-slate-higher">{item?.net_amount}</div>
+                                                        </div> 
+                                                    </td>
+                                                    <td className="p-2">
+                                                        <div className="text-left">
+                                                            <div className="text-sm font-semibold">{item?.approval_authority}</div>
+                                                            <div className="font-normal text-slate-higher">{item?.budget_type}</div>
+                                                        </div> 
+                                                    </td>
+                                                    <td className="group relative p-2 text-right">
+                                                        <div className='flex items-center justify-end gap-3 md:gap-4'>
+                                                            <div className='p-2 flex cursor-pointer justify-center items-center text-slate-500 bg-white-body dark:text-white-body dark:bg-black-body rounded-md'>
+                                                                <button onClick={()=>showActionModal(item, 'view')}>
+                                                                    <Icons name='eye' />
+                                                                </button>
                                                             </div>
-                                                        </td>
-                                                        <td className="p-2">
-                                                            <div className="text-left">
-                                                                <div title={item?.economic_description} className="text-sm font-semibold line-clamp-1">{item?.economic_description}</div>
-                                                                <div className="font-normal text-slate-higher">{item?.economic_code}</div>
-                                                                {/* <div className="font-normal text-slate-higher">{item?.org_code}/{item?.economic_code}</div> */}
-                                                            </div> 
-                                                        </td>
-                                                        <td className="p-2">
-                                                            <div className="text-left">
-                                                                <div title={item?.pv_description} className="text-sm font-semibold line-clamp-2">{item?.pv_description}</div>
-                                                            </div> 
-                                                        </td>
-                                                        <td className="p-2">
-                                                            <div className="text-left">
-                                                                <div className="text-sm font-semibold">{item?.beneficiary_name}</div>
-                                                                <div className="font-normal text-slate-higher">{item?.beneficiary_account}</div>
-                                                                <div className="font-normal text-slate-higher">{item?.beneficiary_bank}</div>
-                                                            </div> 
-                                                        </td>
-                                                        <td className="p-2">
-                                                            <div className="text-left">
-                                                                <div className="text-sm font-semibold">{item?.gross_amount}</div>
-                                                                <div className="font-normal text-slate-higher">{item?.net_amount}</div>
-                                                            </div> 
-                                                        </td>
-                                                        <td className="p-2">
-                                                            <div className="text-left">
-                                                                <div className="text-sm font-semibold">{item?.approval_authority}</div>
-                                                                <div className="font-normal text-slate-higher">{item?.budget_type}</div>
-                                                            </div> 
-                                                        </td>
-                                                        <td className="group relative p-2 text-right">
-                                                            <div className='flex items-center justify-end gap-3 md:gap-4'>
-                                                                <div className='p-2 flex cursor-pointer justify-center items-center text-slate-500 bg-white-body dark:text-white-body dark:bg-black-body rounded-md'>
-                                                                    <button onClick={()=>showActionModal(item, 'view')}>
-                                                                        <Icons name='eye' />
-                                                                    </button>
-                                                                </div>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                )
-                                            }
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            )
                                         })
                                         :
                                         <tr className="p-2 border-t border-dashed border-slate-high">
