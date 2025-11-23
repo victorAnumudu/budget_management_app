@@ -52,7 +52,6 @@ export default function WarrantDetails({stateData}) {
     })
 
     const singleWarrant = allWarrantData?.data?.data?.warrants[0] // SINGLE WARRANT
-
     // const gross = singleWarrant?.expenses_id?.reduce((acc, item)=>{
     //     return acc + item?.gross_amount
     // },0)
@@ -181,19 +180,9 @@ export default function WarrantDetails({stateData}) {
                         />
                     </div>
                     }
+                    
                     <>
-                    {groupDataByMDA.length < 1 ?
-                    <div className='w-52 ml-auto'>
-                        <MainBtn 
-                            // onClick={() => navigate(RouteLinks.addWarrant)} 
-                            disabled={false} 
-                            className={`bg-primary dark:bg-primary-dark px-2 py-1 rounded-md text-white font-medium sm:self-end ${(false) && 'opacity-50'}`}
-                            text='Add Items to this Warrant'
-                        />
-                    </div>
-                    :
-                    <>
-                    {singleWarrant.status == 1 ?
+                    {singleWarrant?.status == 1 ?
                     <div className='w-16 ml-auto'>
                         <MainBtn 
                             // onClick={()=>showActionModal([stateData?._id], 'generate_warrant')}
@@ -202,7 +191,7 @@ export default function WarrantDetails({stateData}) {
                             text={`Print`}
                         />
                     </div>
-                    :
+                    : groupDataByMDA?.length >= 1 ?
                     <div className='w-52 ml-auto'>
                         <MainBtn 
                             onClick={()=>showActionModal([stateData?._id], 'generate_warrant')}
@@ -211,8 +200,8 @@ export default function WarrantDetails({stateData}) {
                             text={`${generateWarrantMutation.isPending ? 'Loading...' : 'Generate Warrant'}`}
                         />
                     </div>
-                    }
-                    </>
+                    : 
+                    null
                     }
                     </>
                     
@@ -221,15 +210,16 @@ export default function WarrantDetails({stateData}) {
                     <div className='w-full flex flex-col gap-4'>
                         <p className='text-base font-bold dark:text-white-aside flex gap-4'>
                             Warrant Number: <span>{singleWarrant?._id}</span>
-                            {(groupDataByMDA?.length >= 1 && singleWarrant.status != 1) &&
+                            {singleWarrant.status != 1 &&
                             <button
+                                onClick={()=>navigate(RouteLinks.addWarrant, {state: {expenses_id:singleWarrant?.expenses_id, warrant_id: singleWarrant?._id}})}
                                 className={`text-sm bg-sky-800 dark:bg-primary-dark px-2 py-1 rounded-md text-white font-medium sm:self-end ${(false) && 'opacity-50'}`}
                             >
                                 Add Items to this Warrant
                             </button>
                             }
                         </p>
-                        {groupDataByMDA.length &&
+                        {groupDataByMDA.length > 0 &&
                         <WarrantHeaderCom amt={net} status={singleWarrant?.status} />
                         }
                     </div>
@@ -330,26 +320,26 @@ export default function WarrantDetails({stateData}) {
                         )
                     })}
                 </div>
+                {groupDataByMDA.length < 1 &&
+                    <div className='w-full flex flex-col gap-4'>
+                        <p className='text-base font-bold text-red-600'>This Warrant is empty, would you want it deleted, click delete</p>
+                        <div className='w-36'>
+                            <MainBtn 
+                                onClick={()=>showActionModal(itemsToRemove, 'delete_warrant')}
+                                disabled={false} 
+                                className={`bg-red-600 dark:bg-red-700 px-2 py-1 rounded-md text-white font-medium sm:self-end ${(false) && 'opacity-50'}`}
+                                text={`Delete Warrant`}
+                            />
+                        </div>
+                    </div>
+                }
             </>
             }
 
-            {groupDataByMDA.length < 1 &&
-                <div className='w-full flex flex-col gap-4'>
-                    <p className='text-base font-bold text-red-600'>This Warrant is empty, would you want it deleted, click delete</p>
-                    <div className='w-36'>
-                        <MainBtn 
-                            onClick={()=>showActionModal(itemsToRemove, 'delete_warrant')}
-                            disabled={false} 
-                            className={`bg-red-600 dark:bg-red-700 px-2 py-1 rounded-md text-white font-medium sm:self-end ${(false) && 'opacity-50'}`}
-                            text={`Delete Warrant`}
-                        />
-                    </div>
-                </div>
-            }
         </div>
         {(actionModal.name == 'delete' || actionModal.name == 'delete_many') && 
             <VerifyModal 
-                text='Are you sure you want to delete this?' 
+                text='Are you sure you want to remove item(s) ?' 
                 proceedFunc={proceed} 
                 cLoseModal={closeActionModal}
             />
@@ -364,7 +354,7 @@ export default function WarrantDetails({stateData}) {
         { actionModal.name == 'status' &&
             <StatusModal 
                 isPending={removeItemFromWarrant.isPending}
-                text={removeItemFromWarrant.isSuccess ? 'deleted successfully' : 'Unable to delete'} 
+                text={removeItemFromWarrant.isSuccess ? 'removed successfully' : 'Unable to remove item'} 
                 isSuccess={removeItemFromWarrant.isSuccess}
                 cLoseModal={()=>{closeActionModal()}}
             />

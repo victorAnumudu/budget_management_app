@@ -1,10 +1,10 @@
 import { memo, useEffect, useState } from 'react'
-import {Link, useNavigate} from 'react-router-dom'
+import {Link, useLocation, useNavigate} from 'react-router-dom'
 
 import BreadcrumbCom from '../breadcrumb/BreadcrumbCom'
 import TablePaginatedWrapper from '../tableWrapper/TablePaginatedWrapper'
 import Icons from '../Icons'
-import { getAllPVData, createWarrant } from '../../services/siteServices'
+import { getAllPVData, createWarrant, addMoreToWarrant } from '../../services/siteServices'
 import getDateFromDateString from '../../helpers/GetDateFromDateString';
 import getTimeFromDateString from '../../helpers/GetTimeFromDateString';
 import localImgLoader from '../../helpers/localImageLoader';
@@ -21,13 +21,17 @@ import ViewAddedPV from '../paymentVouchers/ViewAddedPV'
 import { useSelector } from 'react-redux'
 
 const AddToWarrant = memo(() =>{
+
+    const {state} = useLocation()
+
+    const idsFromState = state.expenses_id.length ? state.expenses_id.map(item => item._id) : []
         
     const {userDetails:{email}} = useSelector((state) => state.userDetails)
 
     const navigate = useNavigate()
     const queryClient = useQueryClient()
 
-    const [itemsToAdd, setItemsToAdd] = useState([])
+    const [itemsToAdd, setItemsToAdd] = useState([...idsFromState])
     const handleAddItemsToItemsToAdd = (id) => {
         if(itemsToAdd.includes(id)){
             const oldItems = itemsToAdd.slice(0)
@@ -105,6 +109,27 @@ const AddToWarrant = memo(() =>{
         }
     })
 
+    const addMoreToWarrantMutation = useMutation({
+        mutationFn: (fields) => {
+            if(!fields?.warrant_id){
+                throw new Error('No warrant found')
+            }
+            return addMoreToWarrant(fields)
+        },
+        onSuccess: (res) => {
+            if(res?.data?.status != 1){
+                throw new Error(res?.data?.message)
+            }
+            setItemsToAdd([])
+            navigate(RouteLinks.warrants, {replace: true})
+        },
+        onSettled: () => {
+            setTimeout(()=>{
+                addMoreToWarrantMutation.reset()
+            }, import.meta.env.VITE_APP_SETTIMEOUT_TIME)
+        }
+    })
+
     const proceedToAddToWarrant = () => {
         showActionModal(actionModal.data, 'status')
         const data = {
@@ -118,6 +143,23 @@ const AddToWarrant = memo(() =>{
         addToWarrant.mutate(data)
     }
 
+    const proceedToAddMoreItemsToWarrant = () => {
+        showActionModal(actionModal.data, 'status')
+        const data = {
+            warrant_id: state.warrant_id,
+            expenses_id: itemsToAdd
+        }
+        addMoreToWarrantMutation.mutate(data)
+    }
+
+    const proceed = () => {
+        if(state){
+            return proceedToAddMoreItemsToWarrant()
+        }else{
+            return proceedToAddToWarrant
+        }
+    }
+
     return (
         <>
             <div className='w-full flex flex-col gap-4'>
@@ -125,7 +167,7 @@ const AddToWarrant = memo(() =>{
                 {itemsToAdd.length > 0 &&
                     <div className='w-36'>
                         <MainBtn 
-                            onClick={()=>showActionModal(itemsToAdd, 'add_many')}
+                            onClick={()=>showActionModal(itemsToAdd, 'add')}
                             disabled={false} 
                             className={`bg-primary dark:bg-primary-dark px-2 py-1 rounded-md text-white font-medium sm:self-end ${(false) && 'opacity-50'}`}
                             text={`Add ${itemsToAdd.length > 1 ? `${itemsToAdd.length} items` : `${itemsToAdd.length} item`}`}
@@ -286,18 +328,18 @@ const AddToWarrant = memo(() =>{
                 </div>
             </div>
             {actionModal.name == 'view' && <ViewAddedPV data={actionModal} closeModal={closeActionModal} />}
-            {actionModal.name == 'add_many' && 
+            {actionModal.name == 'add' && 
                 <VerifyModal 
                     text='Are you sure you want to add this Payment Voucher and proceed to generate warrant?' 
-                    proceedFunc={proceedToAddToWarrant} 
+                    proceedFunc={proceed} 
                     cLoseModal={closeActionModal}
                 />
             }
             { actionModal.name == 'status' &&
                 <StatusModal 
-                    isPending={addToWarrant.isPending}
-                    text={addToWarrant.isSuccess ? 'Warrant formed, preceed to generate the warrant' : 'Unable to create warrant'} 
-                    isSuccess={addToWarrant.isSuccess}
+                    isPending={addToWarrant.isPending || addMoreToWarrantMutation.isPending}
+                    text={(addToWarrant.isSuccess || addMoreToWarrantMutation.isSuccess) ? 'Warrant added, preceed to generate the warrant' : 'Unable to add'} 
+                    isSuccess={addToWarrant.isSuccess || addMoreToWarrantMutation.isSuccess}
                     cLoseModal={()=>{closeActionModal()}}
                 />
             }

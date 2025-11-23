@@ -244,6 +244,12 @@ export const createWarrant = (reqData) => {
     return postAuxEnd(`/warrants/add`, postData)
 }
 
+// FUNCTION TO MORE ITEMS TO WARRANT
+export const addMoreToWarrant = (reqData) => {
+    const postData = { ...reqData }
+    return postAuxEnd(`/warrants/add/more`, postData)
+}
+
 // FUNCTION TO GENERATE WARRANT
 export const generateWarrant = (reqData) => {
     const postData = { ...reqData }

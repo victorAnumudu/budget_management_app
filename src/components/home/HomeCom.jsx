@@ -105,7 +105,7 @@ export default function HomeCom() {
             }
           </div>
         </div>
-        <div data-aos="fade-up" className='box gap-8 bg-white dark:bg-black-box text-black-body dark:text-white-body'>
+        <div data-aos="fade-right" className='box gap-8 bg-white dark:bg-black-box text-black-body dark:text-white-body'>
           <RecentlyAdded />
         </div>
     </div>
