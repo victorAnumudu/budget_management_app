@@ -4,7 +4,7 @@ import {Link, useNavigate} from 'react-router-dom'
 import BreadcrumbCom from '../breadcrumb/BreadcrumbCom'
 import TablePaginatedWrapper from '../tableWrapper/TablePaginatedWrapper'
 import Icons from '../Icons'
-import { getAllPVData, deletePV } from '../../services/siteServices'
+import { getAllPVData, createWarrant } from '../../services/siteServices'
 import getDateFromDateString from '../../helpers/GetDateFromDateString';
 import getTimeFromDateString from '../../helpers/GetTimeFromDateString';
 import localImgLoader from '../../helpers/localImageLoader';
@@ -17,11 +17,28 @@ import VerifyModal from '../modals/VerifyModal'
 import StatusModal from '../modals/StatusModal'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import queryKeys from '../../services/queryKeys'
+import ViewAddedPV from '../paymentVouchers/ViewAddedPV'
+import { useSelector } from 'react-redux'
 
 const AddToWarrant = memo(() =>{
+        
+    const {userDetails:{email}} = useSelector((state) => state.userDetails)
 
     const navigate = useNavigate()
     const queryClient = useQueryClient()
+
+    const [itemsToAdd, setItemsToAdd] = useState([])
+    const handleAddItemsToItemsToAdd = (id) => {
+        if(itemsToAdd.includes(id)){
+            const oldItems = itemsToAdd.slice(0)
+            const IndexToRemove = oldItems.indexOf(id)
+            oldItems.splice(IndexToRemove, 1)
+            const newItems = oldItems
+            setItemsToAdd(newItems)
+        }else{
+            setItemsToAdd(prev => ([...prev, id]))
+        }
+    }
 
     const [page, setPage] = useState(1)
     const [filter, setFilter] = useState({type: '', value: ''})
@@ -66,38 +83,55 @@ const AddToWarrant = memo(() =>{
     const pagination = allPVsData?.data?.data?.pagination
 
 
-    const delPV = useMutation({
+    const addToWarrant = useMutation({
         mutationFn: (fields) => {
-            if(!fields?.expense_uid){
-                throw new Error('No payment voucher selected')
+            if(!fields?.expenses_id.length){
+                throw new Error('No payment voucher was added')
             }
-            return deletePV(fields)
+            return createWarrant(fields)
         },
         onSuccess: (res) => {
             if(res?.data?.status != 1){
                 throw new Error(res?.data?.message)
             }
+            setItemsToAdd([])
             queryClient.invalidateQueries({ queryKey: [...queryKeys.getAllPVs] })
         },
         onSettled: () => {
             setTimeout(()=>{
-                delPV.reset()
+                addToWarrant.reset()
             }, import.meta.env.VITE_APP_SETTIMEOUT_TIME)
         }
     })
+
+    const proceedToAddToWarrant = () => {
+        showActionModal(actionModal.data, 'status')
+        const data = {
+            status: 0,
+            issued_by: email,
+            date_issued: new Date().toLocaleDateString(),
+            expenses_id: actionModal.data
+        }
+
+        // "date_issued": "2025-08-06T00:00:00.000Z"
+        addToWarrant.mutate(data)
+    }
 
     return (
         <>
             <div className='w-full flex flex-col gap-4'>
                 <BreadcrumbCom title='Add to Warrants' paths={['Dashboard', 'Add to Warrants']} />
-                <div className='w-20 ml-auto'>
-                    <MainBtn 
-                        onClick={() => navigate(RouteLinks.addPV)} 
-                        disabled={false} 
-                        className={`bg-primary dark:bg-primary-dark px-2 py-1 rounded-md text-white font-medium sm:self-end ${(false) && 'opacity-50'}`}
-                        text='Add PV'
-                    />
-                </div>
+                {itemsToAdd.length > 0 &&
+                    <div className='w-36'>
+                        <MainBtn 
+                            onClick={()=>showActionModal(itemsToAdd, 'add_many')}
+                            disabled={false} 
+                            className={`bg-primary dark:bg-primary-dark px-2 py-1 rounded-md text-white font-medium sm:self-end ${(false) && 'opacity-50'}`}
+                            text={`Add ${itemsToAdd.length > 1 ? `${itemsToAdd.length} items` : `${itemsToAdd.length} item`}`}
+                        />
+                    </div>
+                }
+
                 <div className='box bg-white dark:bg-black-box text-black-body dark:text-white-body'>
 
                     <>
@@ -145,6 +179,8 @@ const AddToWarrant = memo(() =>{
                                     <thead className="text-sm text-slate-higher dark:text-slate-high dark:font-semibold text-left">
                                         <tr>
                                             <th scope="col" className="p-2">
+                                            </th>
+                                            <th scope="col" className="p-2">
                                                 MDA/Date
                                             </th>
                                             <th scope="col" className="p-2">
@@ -162,87 +198,75 @@ const AddToWarrant = memo(() =>{
                                             <th scope="col" className="p-2">
                                                 Approval
                                             </th>
-                                            <th scope="col" className="p-2">
-                                                Status
-                                            </th>
                                             <th scope="col" className="p-2 text-right">
-                                                Action
+                                                View
                                             </th>
                                         </tr>
                                     </thead>
                                     <tbody className='text-black-aside dark:text-slate-high'>
-                                        {(data && data.length > 0) ? data?.map((item, index) => (
-                                            <tr key={item.id || index} className="border-t border-dashed border-slate-high">
-                                                <td className="p-2">
-                                                    <div className='w-full flex items-center gap-2 whitespace-nowra'>
-                                                        <img className="w-8 h-8 rounded-md" src={localImgLoader(`loan_icons/provide_loan.png`)} alt="Icon" />
-                                                        <div className="text-left">
-                                                            <div title={item?.beneficiary_mda} className="text-sm font-semibold line-clamp-1">{item?.beneficiary_mda}</div>
-                                                            <div className="text-sm font-semibold">{item?.pv_number}</div>
-                                                            <div className="font-normal text-slate-higher">{getDateFromDateString(item?.date_captured)}</div>
-                                                        </div>  
-                                                    </div>
-                                                </td>
-                                                <td className="p-2">
-                                                    <div className="text-left">
-                                                        <div title={item?.economic_description} className="text-sm font-semibold line-clamp-1">{item?.economic_description}</div>
-                                                        <div className="font-normal text-slate-higher">{item?.economic_code}</div>
-                                                        {/* <div className="font-normal text-slate-higher">{item?.org_code}/{item?.economic_code}</div> */}
-                                                    </div> 
-                                                </td>
-                                                <td className="p-2">
-                                                    <div className="text-left">
-                                                        <div title={item?.pv_description} className="text-sm font-semibold line-clamp-2">{item?.pv_description}</div>
-                                                    </div> 
-                                                </td>
-                                                <td className="p-2">
-                                                    <div className="text-left">
-                                                        <div className="text-sm font-semibold">{item?.beneficiary_name}</div>
-                                                        <div className="font-normal text-slate-higher">{item?.beneficiary_account}</div>
-                                                        <div className="font-normal text-slate-higher">{item?.beneficiary_bank}</div>
-                                                    </div> 
-                                                </td>
-                                                <td className="p-2">
-                                                    <div className="text-left">
-                                                        <div className="text-sm font-semibold">{item?.gross_amount}</div>
-                                                        <div className="font-normal text-slate-higher">{item?.net_amount}</div>
-                                                    </div> 
-                                                </td>
-                                                <td className="p-2">
-                                                    <div className="text-left">
-                                                        <div className="text-sm font-semibold">{item?.approval_authority}</div>
-                                                        <div className="font-normal text-slate-higher">{item?.budget_type}</div>
-                                                    </div> 
-                                                </td>
-                                                
-                                                <td className="p-2">
-                                                    <div className="text-left">
-                                                        <div className="font-normal text-slate-higher">50%</div>
-                                                        <div className="relative h-[6px] w-full bg-white-body dark:bg-black-body rounded-full overflow-hidden">
-                                                        <div className={`absolute left-0 h-full w-1/2 bg-emerald-600`}></div>
-                                                        </div>
-                                                    </div> 
-                                                </td>
-                                                <td className="group relative p-2 text-right">
-                                                    <div className='flex items-center justify-end gap-3 md:gap-4'>
-                                                        <div className='p-2 flex cursor-pointer justify-center items-center text-slate-500 bg-white-body dark:text-white-body dark:bg-black-body rounded-md'>
-                                                            <Icons name='eye' />
-                                                        </div>
-                                                        <div className='absolute top-2 right-3 hidden group-hover:flex gap-2 p-2 justify-center items-center text-slate-500 bg-white-body dark:text-white-body dark:bg-black-body rounded-md'>
-                                                            <button onClick={()=>showActionModal(item, 'view')}>
-                                                                <Icons name='eye' />
-                                                            </button>
-                                                            <button onClick={()=>showActionModal(item, 'delete')}>
-                                                                <Icons name='trash' className='text-red-500' />
-                                                            </button>
-                                                            <button onClick={()=>showActionModal(item, 'edit')}>
-                                                                <Icons name='edit' className='text-primary ' />
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        ))
+                                        {(data && data.length > 0) ? data?.map((item, index) => {
+                                            if(item?.warrant_status != 1){
+                                                return (
+                                                    <tr key={item.id || index} className="border-t border-dashed border-slate-high">
+                                                        <td className="p-2">
+                                                            <div className="text-left">
+                                                                <input type='checkbox' onClick={()=>handleAddItemsToItemsToAdd(item?.expense_uid)} />
+                                                            </div> 
+                                                        </td>
+                                                        <td className="p-2">
+                                                            <div className='w-full flex items-center gap-2 whitespace-nowra'>
+                                                                <img className="w-8 h-8 rounded-md" src={localImgLoader(`loan_icons/provide_loan.png`)} alt="Icon" />
+                                                                <div className="text-left">
+                                                                    <div title={item?.beneficiary_mda} className="text-sm font-semibold line-clamp-1">{item?.beneficiary_mda}</div>
+                                                                    <div className="text-sm font-semibold">{item?.pv_number}</div>
+                                                                    <div className="font-normal text-slate-higher">{getDateFromDateString(item?.date_captured)}</div>
+                                                                </div>  
+                                                            </div>
+                                                        </td>
+                                                        <td className="p-2">
+                                                            <div className="text-left">
+                                                                <div title={item?.economic_description} className="text-sm font-semibold line-clamp-1">{item?.economic_description}</div>
+                                                                <div className="font-normal text-slate-higher">{item?.economic_code}</div>
+                                                                {/* <div className="font-normal text-slate-higher">{item?.org_code}/{item?.economic_code}</div> */}
+                                                            </div> 
+                                                        </td>
+                                                        <td className="p-2">
+                                                            <div className="text-left">
+                                                                <div title={item?.pv_description} className="text-sm font-semibold line-clamp-2">{item?.pv_description}</div>
+                                                            </div> 
+                                                        </td>
+                                                        <td className="p-2">
+                                                            <div className="text-left">
+                                                                <div className="text-sm font-semibold">{item?.beneficiary_name}</div>
+                                                                <div className="font-normal text-slate-higher">{item?.beneficiary_account}</div>
+                                                                <div className="font-normal text-slate-higher">{item?.beneficiary_bank}</div>
+                                                            </div> 
+                                                        </td>
+                                                        <td className="p-2">
+                                                            <div className="text-left">
+                                                                <div className="text-sm font-semibold">{item?.gross_amount}</div>
+                                                                <div className="font-normal text-slate-higher">{item?.net_amount}</div>
+                                                            </div> 
+                                                        </td>
+                                                        <td className="p-2">
+                                                            <div className="text-left">
+                                                                <div className="text-sm font-semibold">{item?.approval_authority}</div>
+                                                                <div className="font-normal text-slate-higher">{item?.budget_type}</div>
+                                                            </div> 
+                                                        </td>
+                                                        <td className="group relative p-2 text-right">
+                                                            <div className='flex items-center justify-end gap-3 md:gap-4'>
+                                                                <div className='p-2 flex cursor-pointer justify-center items-center text-slate-500 bg-white-body dark:text-white-body dark:bg-black-body rounded-md'>
+                                                                    <button onClick={()=>showActionModal(item, 'view')}>
+                                                                        <Icons name='eye' />
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                )
+                                            }
+                                        })
                                         :
                                         <tr className="p-2 border-t border-dashed border-slate-high">
                                             <td className="px-3 py-2" colSpan={8}>
@@ -258,25 +282,21 @@ const AddToWarrant = memo(() =>{
                         )}
                         </TablePaginatedWrapper>
                     </>
-                    
                 </div>
             </div>
-            {actionModal.name == 'delete' && 
+            {actionModal.name == 'view' && <ViewAddedPV data={actionModal} closeModal={closeActionModal} />}
+            {actionModal.name == 'add_many' && 
                 <VerifyModal 
-                    text='Are you sure you want to delete this Payment Voucher?' 
-                    proceedFunc={()=>{
-                        showActionModal(actionModal.data, 'status')
-                        const expense_uid = actionModal?.data?.expense_uid
-                        delPV.mutate({expense_uid})
-                    }} 
+                    text='Are you sure you want to add this Payment Voucher and proceed to generate warrant?' 
+                    proceedFunc={proceedToAddToWarrant} 
                     cLoseModal={closeActionModal}
                 />
             }
             { actionModal.name == 'status' &&
                 <StatusModal 
-                    isPending={delPV.isPending}
-                    text={delPV.isSuccess ? 'PV deleted succeefully' : 'Unable to delete payment voucher'} 
-                    isSuccess={delPV.isSuccess}
+                    isPending={addToWarrant.isPending}
+                    text={addToWarrant.isSuccess ? 'Warrant formed, preceed to generate the warrant' : 'Unable to create warrant'} 
+                    isSuccess={addToWarrant.isSuccess}
                     cLoseModal={()=>{closeActionModal()}}
                 />
             }

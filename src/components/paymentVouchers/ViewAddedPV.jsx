@@ -17,7 +17,6 @@ const ViewAddedPV = memo(({data, closeModal}) =>{
     const capturedDate = new Date(data?.data?.date_captured) 
     const dateCaptured = `${capturedDate.getFullYear()}-${capturedDate.getMonth() > 9 ? capturedDate.getMonth() : '0'+capturedDate.getMonth()}-${capturedDate.getDate() > 9 ? capturedDate.getDate() : '0'+capturedDate.getDate()}`
     const initialValues = {...data?.data, date_captured: dateCaptured}
-    
     //FUNCTION TO HANDLE ADD PV
     const handleSubmit = (values, helper) => {
         // login.mutate(values)
@@ -109,8 +108,8 @@ const ViewAddedPV = memo(({data, closeModal}) =>{
                                             ))
                                             :
                                             <>
-                                            <option value='capital'>Governor</option>
-                                            <option value='recurrent'>Commissioner</option>
+                                            <option value='governor'>Governor</option>
+                                            <option value='commissioner'>Commissioner</option>
                                             </>
                                             }
                                             </>

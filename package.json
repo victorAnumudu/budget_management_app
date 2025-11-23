@@ -24,6 +24,7 @@
     "react-lazy-load-image-component": "^1.6.3",
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.6.2",
+    "rosaenlg-n2words": "^3.4.0",
     "tailwindcss": "^4.1.10",
     "yup": "^1.6.1"
   },

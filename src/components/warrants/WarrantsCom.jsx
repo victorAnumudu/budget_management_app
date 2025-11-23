@@ -89,50 +89,52 @@ const WarrantsCom = memo(() =>{
         <>
             <div className='w-full flex flex-col gap-4'>
                 <BreadcrumbCom title='Warrants' paths={['Dashboard', 'Warrants']} />
-                <div className='w-30 ml-auto'>
+                <div className='w-48 ml-auto'>
                     <MainBtn 
                         onClick={() => navigate(RouteLinks.addWarrant)} 
                         disabled={false} 
                         className={`bg-primary dark:bg-primary-dark px-2 py-1 rounded-md text-white font-medium sm:self-end ${(false) && 'opacity-50'}`}
-                        text='Add Warrant'
+                        text='Create new Warrant'
                     />
                 </div>
                 <div className='box bg-white dark:bg-black-box text-black-body dark:text-white-body'>
 
                     <>
                         {/* filter section */}
-                        <div className='px-2 py-2 mb-4 flex flex-col sm:flex-row flex-wrap sm:items-center gap-2'>
-                            <Icons name='filter' className='text-3xl text-slate-600' />
-                            <div className='w-full sm:max-w-48'>
-                                <SelectDropdown
-                                    name='type'
-                                    value={filter?.type}
-                                    onChange={handleFilter}
-                                >
-                                    <option value=''>All</option>
-                                    <option value='_id'>Warrant Number</option>
-                                </SelectDropdown>
+                        {allWarrants?.length > 0 &&
+                            <div className='px-2 py-2 mb-4 flex flex-col sm:flex-row flex-wrap sm:items-center gap-2'>
+                                <Icons name='filter' className='text-3xl text-slate-600' />
+                                <div className='w-full sm:max-w-48'>
+                                    <SelectDropdown
+                                        name='type'
+                                        value={filter?.type}
+                                        onChange={handleFilter}
+                                    >
+                                        <option value=''>All</option>
+                                        <option value='_id'>Warrant Number</option>
+                                    </SelectDropdown>
+                                </div>
+                                <div className='w-full sm:max-w-48'>
+                                    <InputText 
+                                        id='id' 
+                                        name='value' 
+                                        value={filter?.value}
+                                        disabled={!filter.type}
+                                        placeholder={filter.type && `enter ${filter.type}`} 
+                                        className={`h-10 w-full p-2 rounded-md text-black-aside dark:text-slate-high outline-none border border-black-aside dark:border-slate-high ${!filter.type && 'opacity-30'}`} 
+                                        handleChange={handleFilter}
+                                    />
+                                </div>
+                                <div className='w-20'>
+                                    <MainBtn 
+                                        onClick={handleFilterByParams} 
+                                        disabled={filter.type && !filter.value} 
+                                        className={`bg-primary dark:bg-primary-dark px-2 py-1 rounded-md text-white font-medium sm:self-end ${(filter.type && !filter.value) && 'opacity-50'}`}
+                                        text='Submit'
+                                    />
+                                </div>
                             </div>
-                            <div className='w-full sm:max-w-48'>
-                                <InputText 
-                                    id='id' 
-                                    name='value' 
-                                    value={filter?.value}
-                                    disabled={!filter.type}
-                                    placeholder={filter.type && `enter ${filter.type}`} 
-                                    className={`h-10 w-full p-2 rounded-md text-black-aside dark:text-slate-high outline-none border border-black-aside dark:border-slate-high ${!filter.type && 'opacity-30'}`} 
-                                    handleChange={handleFilter}
-                                />
-                            </div>
-                            <div className='w-20'>
-                                <MainBtn 
-                                    onClick={handleFilterByParams} 
-                                    disabled={filter.type && !filter.value} 
-                                    className={`bg-primary dark:bg-primary-dark px-2 py-1 rounded-md text-white font-medium sm:self-end ${(filter.type && !filter.value) && 'opacity-50'}`}
-                                    text='Submit'
-                                />
-                            </div>
-                        </div>
+                        }
                         {/* end of filter section */}
                         {isError &&
                         <div className='box bg-white dark:bg-black-box text-black-body dark:text-white-body'>
@@ -158,7 +160,7 @@ const WarrantsCom = memo(() =>{
                                                 Gross/Net Amt
                                             </th>
                                             <th scope="col" className="p-2">
-                                                Status
+                                                Generated
                                             </th>
                                             <th scope="col" className="p-2 text-right">
                                                 Action
@@ -205,25 +207,25 @@ const WarrantsCom = memo(() =>{
                                                     <td className="p-2">
                                                         <div className="text-left">
                                                             {/* <div className="text-sm font-semibold">{item?.approval_authority}</div> */}
-                                                            <div className="font-normal text-slate-higher">{item?.status}</div>
+                                                            <div className="font-normal text-slate-higher">{item?.status ? 'true' : 'False'}</div>
                                                         </div> 
                                                     </td>
                                                     <td className="group relative p-2 text-right">
                                                         <div className='flex items-center justify-end gap-3 md:gap-4'>
                                                             <div className='p-2 flex cursor-pointer justify-center items-center text-slate-500 bg-white-body dark:text-white-body dark:bg-black-body rounded-md'>
-                                                                <Icons name='eye' />
-                                                            </div>
-                                                            <div className='absolute top-2 right-3 hidden group-hover:flex gap-2 p-2 justify-center items-center text-slate-500 bg-white-body dark:text-white-body dark:bg-black-body rounded-md'>
+                                                                {/* <Icons name='eye' /> */}
                                                                 <button onClick={()=>navigate(RouteLinks.warrantDetails, {state: item}, {replace: true})}>
                                                                     <Icons name='eye' />
                                                                 </button>
+                                                            </div>
+                                                            {/* <div className='absolute top-2 right-3 hidden group-hover:flex gap-2 p-2 justify-center items-center text-slate-500 bg-white-body dark:text-white-body dark:bg-black-body rounded-md'>
                                                                 <button onClick={()=>showActionModal(item, 'delete')}>
                                                                     <Icons name='trash' className='text-red-500' />
                                                                 </button>
                                                                 <button onClick={()=>showActionModal(item, 'edit')}>
                                                                     <Icons name='edit' className='text-primary ' />
                                                                 </button>
-                                                            </div>
+                                                            </div> */}
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -253,7 +255,7 @@ const WarrantsCom = memo(() =>{
                     proceedFunc={()=>{
                         showActionModal(actionModal.data, 'status')
                         const expense_uid = actionModal?.data?.expense_uid
-                        delPV.mutate({expense_uid})
+                        delPV.mutate({})
                     }} 
                     cLoseModal={closeActionModal}
                 />

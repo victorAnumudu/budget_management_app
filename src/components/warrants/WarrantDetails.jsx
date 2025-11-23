@@ -14,8 +14,13 @@ import StatusModal from '../modals/StatusModal'
 import { useSelector } from 'react-redux'
 import RouteLinks from '../../RouteLinks'
 import { useNavigate } from 'react-router-dom'
+import numberToWords from '../../helpers/NumberTowords'
+
 
 export default function WarrantDetails({stateData}) {
+    // const num = numberToText.convertToText("12346")
+    // console.log(num)
+
     const {userDetails:{email}} = useSelector((state) => state.userDetails)
     const navigate = useNavigate()
     const queryClient = useQueryClient()
@@ -170,13 +175,17 @@ export default function WarrantDetails({stateData}) {
                     <div className='w-full flex flex-col gap-4'>
                         <p className='text-base font-bold dark:text-white-aside flex gap-4'>
                             Warrant Number: <span>{singleWarrant?._id}</span>
-                            {groupDataByMDA.length > 1 &&
+                            {groupDataByMDA?.length >= 1 &&
                             <button
-                                className={`text-sm bg-primary dark:bg-primary-dark px-2 py-1 rounded-md text-white font-medium sm:self-end ${(false) && 'opacity-50'}`}
-                            >Add Items to this Warrant</button>
+                                className={`text-sm bg-sky-800 dark:bg-primary-dark px-2 py-1 rounded-md text-white font-medium sm:self-end ${(false) && 'opacity-50'}`}
+                            >
+                                Add Items to this Warrant
+                            </button>
                             }
                         </p>
-                        <p className='text-base font-bold dark:text-white-aside border p-1 rounded-sm'>By this warrant, you are authorised to pay the total sum of <span className='italic'>{formatNumber(net)}</span></p>
+                        <p className='text-base font-bold dark:text-white-aside border p-1 rounded-sm'>
+                            By this warrant, you are authorised to pay the total sum of {numberToWords(net)} <span className='italic'>({'₦'}{formatNumber(net)})</span>
+                        </p>
                     </div>
                     {groupDataByMDA?.map((data, index)=>{
                         const groupNetAmt = data?.pvs?.reduce((acc, item)=>{
@@ -201,7 +210,7 @@ export default function WarrantDetails({stateData}) {
                                                 Beneficiary
                                             </th>
                                             <th scope="col" className="p-2">
-                                                Amt
+                                                Amt (₦)
                                             </th>
                                             <th scope="col" className="p-2 text-right">
                                                 Action

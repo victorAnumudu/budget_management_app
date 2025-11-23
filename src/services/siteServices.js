@@ -215,3 +215,9 @@ export const deleteWarrant = (reqData) => {
     const postData = { ...reqData }
     return postAuxEnd(`/warrants/delete`, postData)
 }
+
+// FUNCTION TO CREATE WARRANT
+export const createWarrant = (reqData) => {
+    const postData = { ...reqData }
+    return postAuxEnd(`/warrants/add`, postData)
+}
