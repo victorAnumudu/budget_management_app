@@ -95,6 +95,7 @@ const AddToWarrant = memo(() =>{
                 throw new Error(res?.data?.message)
             }
             setItemsToAdd([])
+            navigate(RouteLinks.warrants, {replace: true})
             queryClient.invalidateQueries({ queryKey: [...queryKeys.getAllPVs] })
         },
         onSettled: () => {

@@ -181,7 +181,9 @@ export default function WarrantDetails({stateData}) {
                             </button>
                             }
                         </p>
+                        {groupDataByMDA.length &&
                         <WarrantHeaderCom amt={net} status={singleWarrant?.status} />
+                        }
                     </div>
                     {groupDataByMDA?.map((data, index)=>{
                         const groupNetAmt = data?.pvs?.reduce((acc, item)=>{
