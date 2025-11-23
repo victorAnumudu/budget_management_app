@@ -62,7 +62,7 @@ export default function WarrantDetails({stateData}) {
 
     
     const groupDataByMDA = groupByEconomicCode(singleWarrant?.expenses_id)
-
+console.log('groupDataByMDA', groupDataByMDA, singleWarrant?.expenses_id)
     const removeItemFromWarrant = useMutation({
         mutationFn: (fields) => {
             if(!fields?.warrant_id){
