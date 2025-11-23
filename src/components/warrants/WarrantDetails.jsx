@@ -14,12 +14,10 @@ import StatusModal from '../modals/StatusModal'
 import { useSelector } from 'react-redux'
 import RouteLinks from '../../RouteLinks'
 import { useNavigate } from 'react-router-dom'
-import numberToWords from '../../helpers/NumberTowords'
+import WarrantHeaderCom from './WarrantHeaderCom'
 
 
 export default function WarrantDetails({stateData}) {
-    // const num = numberToText.convertToText("12346")
-    // console.log(num)
 
     const {userDetails:{email}} = useSelector((state) => state.userDetails)
     const navigate = useNavigate()
@@ -183,9 +181,7 @@ export default function WarrantDetails({stateData}) {
                             </button>
                             }
                         </p>
-                        <p className='text-base font-bold dark:text-white-aside border p-1 rounded-sm'>
-                            By this warrant, you are authorised to pay the total sum of {numberToWords(net)} <span className='italic'>({'₦'}{formatNumber(net)})</span>
-                        </p>
+                        <WarrantHeaderCom amt={net} status={singleWarrant?.status} />
                     </div>
                     {groupDataByMDA?.map((data, index)=>{
                         const groupNetAmt = data?.pvs?.reduce((acc, item)=>{
@@ -250,7 +246,7 @@ export default function WarrantDetails({stateData}) {
                                                     </td>
                                                     <td className="p-2">
                                                         <div className="text-left">
-                                                            <div className="font-normal text-slate-higher">{item?.net_amount}</div>
+                                                            <div className="font-normal text-slate-higher">{formatNumber(item?.net_amount)}</div>
                                                         </div> 
                                                     </td>
                                                     <td className="group relative p-2 text-right">
@@ -266,14 +262,14 @@ export default function WarrantDetails({stateData}) {
                                             )})
                                         }
                                         <tr className="border-y border-dashed border-slate-high">
-                                            <td className="p-2" colSpan={3}>
+                                            <td className="p-2" colSpan={4}>
                                                 <div className='w-full flex items-center gap-2 whitespace-nowrap'>
                                                     <div className="text-sm font-semibold line-clamp-1">Sub Total</div>
                                                 </div>
                                             </td>
                                             <td className="p-2" colSpan={1}>
                                                 <div className='w-full flex items-center gap-2 whitespace-nowrap'>
-                                                    <div className="text-sm font-semibold line-clamp-1">{groupNetAmt}</div>
+                                                    <div className="text-sm font-semibold line-clamp-1">{formatNumber(groupNetAmt)}</div>
                                                 </div>
                                             </td>
                                         </tr>
