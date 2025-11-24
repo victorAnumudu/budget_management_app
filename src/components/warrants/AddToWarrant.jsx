@@ -156,7 +156,7 @@ const AddToWarrant = memo(() =>{
         if(state){
             return proceedToAddMoreItemsToWarrant()
         }else{
-            return proceedToAddToWarrant
+            return proceedToAddToWarrant()
         }
     }
 

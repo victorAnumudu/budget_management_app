@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
+import { useReactToPrint } from 'react-to-print'
 import BreadcrumbCom from '../breadcrumb/BreadcrumbCom'
 import Icons from '../Icons'
 import localImgLoader from '../../helpers/localImageLoader'
@@ -18,6 +19,9 @@ import WarrantHeaderCom from './WarrantHeaderCom'
 
 
 export default function WarrantDetails({stateData}) {
+
+    const contentRef = useRef();
+    const reactToPrintFn = useReactToPrint({ contentRef, documentTitle: `Warrant-${stateData?._id}`});
 
     const {userDetails:{email}} = useSelector((state) => state.userDetails)
     const navigate = useNavigate()
@@ -185,7 +189,7 @@ export default function WarrantDetails({stateData}) {
                     {singleWarrant?.status == 1 ?
                     <div className='w-16 ml-auto'>
                         <MainBtn 
-                            // onClick={()=>showActionModal([stateData?._id], 'generate_warrant')}
+                            onClick={reactToPrintFn}
                             disabled={false} 
                             className={`bg-primary dark:bg-primary-dark px-2 py-1 rounded-md text-white font-medium sm:self-end ${(false) && 'opacity-50'}`}
                             text={`Print`}
@@ -206,7 +210,11 @@ export default function WarrantDetails({stateData}) {
                     </>
                     
                 </div>
-                <div className='w-full flex flex-col gap-10'>
+                <div ref={contentRef} className='print:p-12 w-full flex flex-col gap-10'>
+                    {/* header on each page printed */}
+                    <div className="hidden print:flex fixed top-12 right-12">
+                        <h2>{new Date().toLocaleDateString()}</h2>
+                    </div>
                     <div className='w-full flex flex-col gap-4'>
                         <p className='text-base font-bold dark:text-white-aside flex gap-4'>
                             Warrant Number: <span>{singleWarrant?._id}</span>
