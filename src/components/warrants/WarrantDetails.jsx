@@ -210,15 +210,15 @@ export default function WarrantDetails({stateData}) {
                     </>
                     
                 </div>
-                <div ref={contentRef} className='print:p-12 w-full flex flex-col gap-10'>
+                <div ref={contentRef} className='print:px-20 print:py-30 w-full flex flex-col gap-10'>
                     {/* header on each page printed */}
-                    <div className="hidden print:flex fixed top-12 right-12">
+                    <div className="hidden print:flex fixed top-28 right-20">
                         <h2>{new Date().toLocaleDateString()}</h2>
                     </div>
                     <div className='w-full flex flex-col gap-4'>
                         <p className='text-base font-bold dark:text-white-aside flex gap-4'>
-                            Warrant Number: <span>{singleWarrant?._id}</span>
-                            {singleWarrant.status != 1 &&
+                            {/* Warrant Number: <span>{singleWarrant?._id}</span> */}
+                            {singleWarrant?.status != 1 &&
                             <button
                                 onClick={()=>navigate(RouteLinks.addWarrant, {state: {expenses_id:singleWarrant?.expenses_id, warrant_id: singleWarrant?._id}})}
                                 className={`text-sm bg-sky-800 dark:bg-primary-dark px-2 py-1 rounded-md text-white font-medium sm:self-end ${(false) && 'opacity-50'}`}
@@ -228,7 +228,7 @@ export default function WarrantDetails({stateData}) {
                             }
                         </p>
                         {groupDataByMDA.length > 0 &&
-                        <WarrantHeaderCom amt={net} status={singleWarrant?.status} />
+                        <WarrantHeaderCom amt={net} status={singleWarrant?.status} warrantId={singleWarrant?._id} />
                         }
                     </div>
                     {groupDataByMDA?.map((data, index)=>{
@@ -236,13 +236,13 @@ export default function WarrantDetails({stateData}) {
                             return acc + item?.net_amount
                         },0)
                         return(
-                            <div key={data?.org_code || index} className='w-full'>
+                            <div key={data?.org_code || index} className='w-full print:text-sm print:font-medium'>
                                 <p className='text-base font-bold dark:text-white-aside'>{data?.org_code} - {data?.beneficiary_mda}</p>
                                 <div className='overflow-x-auto'>
                                     <table className="table-auto py-2 w-full text-sm">
                                         <thead className="text-sm text-slate-higher dark:text-slate-high dark:font-semibold text-left">
                                         <tr>
-                                            <th scope="col" className="p-2">
+                                            <th scope="col" className="print:hidden p-2">
                                             </th>
                                             <th scope="col" className="p-2">
                                                 Code/Description
@@ -256,7 +256,7 @@ export default function WarrantDetails({stateData}) {
                                             <th scope="col" className="p-2">
                                                 Amt (₦)
                                             </th>
-                                            <th scope="col" className="p-2 text-right">
+                                            <th scope="col" className="print:hidden p-2 text-right">
                                                 Action
                                             </th>
                                         </tr>
@@ -266,7 +266,7 @@ export default function WarrantDetails({stateData}) {
                                         {data?.pvs && data.pvs.map((item, index) => {
                                             return (
                                                 <tr key={item.id || index} className="border-t border-dashed border-slate-high">
-                                                    <td className="p-2">
+                                                    <td className="print:hidden p-2">
                                                         <div className="text-left">
                                                             <input type='checkbox' onClick={()=>handleAddItemToRemove(item?._id)} />
                                                         </div> 
@@ -297,7 +297,7 @@ export default function WarrantDetails({stateData}) {
                                                             <div className="font-normal text-slate-higher">{formatNumber(item?.net_amount)}</div>
                                                         </div> 
                                                     </td>
-                                                    <td className="group relative p-2 text-right">
+                                                    <td className="print:hidden group relative p-2 text-right">
                                                         <div className='flex items-center justify-end gap-3 md:gap-4'>
                                                             <div className='p-2 flex cursor-pointer justify-center items-center text-slate-500 bg-white-body dark:text-white-body dark:bg-black-body rounded-md'>
                                                                 <button onClick={()=>showActionModal([item?._id], 'delete')}>
@@ -312,12 +312,12 @@ export default function WarrantDetails({stateData}) {
                                         <tr className="border-y border-dashed border-slate-high">
                                             <td className="p-2" colSpan={4}>
                                                 <div className='w-full flex items-center gap-2 whitespace-nowrap'>
-                                                    <div className="text-sm font-semibold line-clamp-1">Sub Total</div>
+                                                    <div className="text-sm font-semibold">Sub Total</div>
                                                 </div>
                                             </td>
                                             <td className="p-2" colSpan={1}>
                                                 <div className='w-full flex items-center gap-2 whitespace-nowrap'>
-                                                    <div className="text-sm font-semibold line-clamp-1">{formatNumber(groupNetAmt)}</div>
+                                                    <div className="text-sm font-semibold">{formatNumber(groupNetAmt)}</div>
                                                 </div>
                                             </td>
                                         </tr>
@@ -327,6 +327,7 @@ export default function WarrantDetails({stateData}) {
                             </div>
                         )
                     })}
+                    <p className='mt-4 text-center font-bold'>Grand Total: {formatNumber(net)}</p>
                 </div>
                 {groupDataByMDA.length < 1 &&
                     <div className='w-full flex flex-col gap-4'>

@@ -24,7 +24,7 @@ const AddToWarrant = memo(() =>{
 
     const {state} = useLocation()
 
-    const idsFromState = state?.expenses_id.length ? state?.expenses_id.map(item => item._id) : []
+    const idsFromState = state?.expenses_id?.length ? state?.expenses_id.map(item => item._id) : []
         
     const {userDetails:{email}} = useSelector((state) => state.userDetails)
 
