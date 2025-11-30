@@ -2,7 +2,7 @@ import React from "react";
 import numberToWords from "../../helpers/NumberTowords";
 import formatNumber from "../../helpers/formatNumber";
 
-export default function WarrantHeaderCom({ amt, status, warrantId }) {
+export default function WarrantHeaderCom({ amt, status, warrantNumber, warrantId }) {
  
   return (
     <>
@@ -10,8 +10,8 @@ export default function WarrantHeaderCom({ amt, status, warrantId }) {
         <div className="w-full text-base print:text-sm font-medium flex flex-col gap-6">
           <div className="flex flex-col gap-3">
             <div className="w-full">
-              <p className="dark:text-white-aside">RECURRENT EXPENDITURE RELEASE WARRANT NO. {warrantId}</p>
-              <p className="dark:text-white-aside">Ref: MOF/HCF/CEW/{warrantId}</p>
+              <p className="dark:text-white-aside">RECURRENT EXPENDITURE RELEASE WARRANT NO. {warrantNumber}</p>
+              <p className="dark:text-white-aside">Ref: MOF/HCF/CEW/{warrantNumber}</p>
             </div>
               <div className="w-full">
                 <p className="dark:text-white-aside">The Accountant-General</p>

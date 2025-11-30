@@ -16,6 +16,7 @@ import { useSelector } from 'react-redux'
 import RouteLinks from '../../RouteLinks'
 import { useNavigate } from 'react-router-dom'
 import WarrantHeaderCom from './WarrantHeaderCom'
+import GenerateWarrantModal from './GenerateWarrantModal'
 
 
 export default function WarrantDetails({stateData}) {
@@ -118,14 +119,17 @@ export default function WarrantDetails({stateData}) {
             return generateWarrant(fields)
         },
         onError: (err) => {
-            alert(err.message)
+            // alert(err.message)
         },
         onSuccess: (res) => {
             if(res?.data?.status != 1){
                 throw new Error(res?.data?.message)
             }
-            alert('Successful')
-            queryClient.invalidateQueries({ queryKey: [...queryKeys.getWarrantById] })
+            // alert('Successful')
+            setTimeout(()=>{
+                queryClient.invalidateQueries({ queryKey: [...queryKeys.getWarrantById] })
+                closeActionModal()
+            }, import.meta.env.VITE_APP_SETTIMEOUT_TIME)
         },
         onSettled: () => {
             setTimeout(()=>{
@@ -153,12 +157,14 @@ export default function WarrantDetails({stateData}) {
         warrantDelete.mutate(data)
     }
 
-    const proceedToGenerateWarrant = ()=>{
-        closeActionModal()
+    const proceedToGenerateWarrant = (warrant_number)=>{
+        // closeActionModal()
         const data = {
             warrant_id: stateData?._id,
+            warrant_number: warrant_number,
             issued_by: email,
         }
+        // console.log('warrant_number', warrant_number)
         generateWarrantMutation.mutate(data)
     }
   
@@ -228,7 +234,7 @@ export default function WarrantDetails({stateData}) {
                             }
                         </p>
                         {groupDataByMDA.length > 0 &&
-                        <WarrantHeaderCom amt={net} status={singleWarrant?.status} warrantId={singleWarrant?._id} />
+                        <WarrantHeaderCom amt={net} status={singleWarrant?.status} warrantNumber={singleWarrant?.warrant_number} warrantId={singleWarrant?._id} />
                         }
                     </div>
                     {groupDataByMDA?.map((data, index)=>{
@@ -354,10 +360,16 @@ export default function WarrantDetails({stateData}) {
             />
         }
         {actionModal.name == 'generate_warrant' && 
-            <VerifyModal 
+            // <VerifyModal 
+            //     text='Are you sure you want to generate this warrant as a working document?' 
+            //     proceedFunc={proceedToGenerateWarrant} 
+            //     cLoseModal={closeActionModal}
+            // />
+            <GenerateWarrantModal 
                 text='Are you sure you want to generate this warrant as a working document?' 
                 proceedFunc={proceedToGenerateWarrant} 
                 cLoseModal={closeActionModal}
+                generateWarrantMutation={generateWarrantMutation}
             />
         }
         { actionModal.name == 'status' &&

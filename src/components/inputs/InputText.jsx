@@ -1,13 +1,15 @@
 import { memo } from "react"
 
-const InputText = memo(({id, name, type='text', placeholder, disabled, value, handleChange}) => {
+const InputText = memo(({id, name, type='text', placeholder, disabled, value, minLength, maxLength, handleChange}) => {
     return (
       <div className='w-full h-10 relative overflow-hidden'>
           <input 
             id={id} 
             name={name} 
             type={type} 
-            value={value} 
+            value={value}
+            maxLength={maxLength} 
+            minLength={minLength}
             placeholder={placeholder} 
             disabled={disabled} 
             onChange={handleChange} 
