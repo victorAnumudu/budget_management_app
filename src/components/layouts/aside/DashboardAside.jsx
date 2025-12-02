@@ -148,7 +148,8 @@ const asideNavLinks = [
     },
     {name:'Warrants', title:'', status:1, icon: 'product', notAllowedUsers: ['user', 'tpo'], subLinks: [
         {name: 'View All Warrants', status:1, icon: 'dot', to: RouteLinks.warrants, notAllowedUsers: [] },
-        {name: 'Add Warrant', status:1, icon: 'dot', to: RouteLinks.addWarrant, notAllowedUsers: [] },
+        {name: 'Add Recurrent Warrant', status:1, icon: 'dot', to: RouteLinks.createRecurrentWarrant, notAllowedUsers: [] },
+        {name: 'Add Cap Warrant', status:1, icon: 'dot', to: RouteLinks.createCapWarrant, notAllowedUsers: [] },
         ]
     },
     {name:'MDAs', title:'', status:1, icon: 'product', notAllowedUsers: ['user', 'tpo'], subLinks: [

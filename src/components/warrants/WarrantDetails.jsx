@@ -22,7 +22,7 @@ import GenerateWarrantModal from './GenerateWarrantModal'
 export default function WarrantDetails({stateData}) {
 
     const contentRef = useRef();
-    const reactToPrintFn = useReactToPrint({ contentRef, documentTitle: `Warrant-${stateData?._id}`});
+    const reactToPrintFn = useReactToPrint({ contentRef, documentTitle: `Warrant-${stateData?.warrant_number}`});
 
     const {userDetails:{email}} = useSelector((state) => state.userDetails)
     const navigate = useNavigate()
@@ -63,7 +63,6 @@ export default function WarrantDetails({stateData}) {
     const net = singleWarrant?.expenses_id?.reduce((acc, item)=>{
         return acc + item?.net_amount
     },0)
-
     
     const groupDataByMDA = groupByEconomicCode(singleWarrant?.expenses_id)
 
@@ -216,17 +215,20 @@ export default function WarrantDetails({stateData}) {
                     </>
                     
                 </div>
-                <div ref={contentRef} className='print:px-20 print:py-30 w-full flex flex-col gap-10'>
+                <div ref={contentRef} className='w-full flex flex-col gap-10'>
                     {/* header on each page printed */}
-                    <div className="hidden print:flex fixed top-28 right-20">
-                        <h2>{new Date().toLocaleDateString()}</h2>
+                    <div className="hidden print:flex fixed top-0 right-0">
+                        <h2>
+                            MOF/HCF/CEW/{singleWarrant?.warrant_number}
+                            {/* {new Date().toLocaleDateString()} */}
+                        </h2>
                     </div>
                     <div className='w-full flex flex-col gap-4'>
                         <p className='text-base font-bold dark:text-white-aside flex gap-4'>
                             {/* Warrant Number: <span>{singleWarrant?._id}</span> */}
                             {singleWarrant?.status != 1 &&
                             <button
-                                onClick={()=>navigate(RouteLinks.addWarrant, {state: {expenses_id:singleWarrant?.expenses_id, warrant_id: singleWarrant?._id}})}
+                                onClick={()=>navigate(`${singleWarrant?.warrant_type == 'recurrent' ? RouteLinks.createRecurrentWarrant : RouteLinks.createCapWarrant}`, {state: {expenses_id:singleWarrant?.expenses_id, warrant_id: singleWarrant?._id}})}
                                 className={`text-sm bg-sky-800 dark:bg-primary-dark px-2 py-1 rounded-md text-white font-medium sm:self-end ${(false) && 'opacity-50'}`}
                             >
                                 Add Items to this Warrant
@@ -234,7 +236,7 @@ export default function WarrantDetails({stateData}) {
                             }
                         </p>
                         {groupDataByMDA.length > 0 &&
-                        <WarrantHeaderCom amt={net} status={singleWarrant?.status} warrantNumber={singleWarrant?.warrant_number} warrantId={singleWarrant?._id} />
+                        <WarrantHeaderCom amt={net} status={singleWarrant?.status} warrantNumber={singleWarrant?.warrant_number} warrant_type={singleWarrant?.warrant_type} />
                         }
                     </div>
                     {groupDataByMDA?.map((data, index)=>{

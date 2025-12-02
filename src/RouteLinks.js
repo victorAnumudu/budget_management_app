@@ -14,7 +14,8 @@ const RouteLinks = {
     addEconomicLine: '/add-economic-line',
     profile: '/profile',
     warrants: '/warrants',
-    addWarrant: '/add-warrant',
+    createRecurrentWarrant: '/create-recurrent-warrant',
+    createCapWarrant: '/create-capital-warrant',
     warrantDetails: '/warrant-details',
 
 

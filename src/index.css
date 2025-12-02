@@ -179,3 +179,13 @@ code {
   100%{content: '...';}
 }
 
+@media print {
+  @page {
+    size: auto; /* Or specify a size like A4, Letter */
+    margin: 100px; /* Adjust margins as needed */
+
+    /* @bottom-right {
+      content: "Page " counter(page) " of " counter(pages);
+    } */
+  }
+}

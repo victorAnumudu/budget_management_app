@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import notAuthorizeUser from '../helpers/notAuthorizeUser'
 import RouteLinks from '../RouteLinks'
-import AddToWarrant from '../components/warrants/AddToWarrant'
+import CreateWarrant from '../components/warrants/CreateWarrant'
 
-export default function AddWarrantPage() {
+export default function CreateCapWarrantPage() {
 
   const navigate = useNavigate()
 
@@ -19,6 +19,6 @@ export default function AddWarrantPage() {
 
 
   return (
-    <AddToWarrant />
+    <CreateWarrant budget_type={'capital'} />
   )
 }
