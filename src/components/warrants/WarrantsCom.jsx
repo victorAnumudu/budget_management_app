@@ -89,14 +89,14 @@ const WarrantsCom = memo(() =>{
         <>
             <div className='w-full flex flex-col gap-4'>
                 <BreadcrumbCom title='Warrants' paths={['Dashboard', 'Warrants']} />
-                <div className='w-48 ml-auto'>
+                {/* <div className='w-48 ml-auto'>
                     <MainBtn 
                         onClick={() => navigate(RouteLinks.addWarrant)} 
                         disabled={false} 
                         className={`bg-primary dark:bg-primary-dark px-2 py-1 rounded-md text-white font-medium sm:self-end ${(false) && 'opacity-50'}`}
                         text='Create new Warrant'
                     />
-                </div>
+                </div> */}
                 <div className='box bg-white dark:bg-black-box text-black-body dark:text-white-body'>
 
                     <>
