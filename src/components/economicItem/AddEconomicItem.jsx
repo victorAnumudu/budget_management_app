@@ -76,12 +76,12 @@ const addEconomicItem = memo(() =>{
         setVerifyModal(true)
         delete values.mda
         setReqData(values)
-        console.log('values', values)
     };
 
     const proceedFunc = ()=>{
         setVerifyModal(false)
-        addEconomicItemFunc.mutate(reqData)
+        const newReqData = {...reqData, economic_code: `${reqData?.org_code}/${reqData?.economic_code}`}
+        addEconomicItemFunc.mutate(newReqData)
     }
 
     useEffect(()=>{
