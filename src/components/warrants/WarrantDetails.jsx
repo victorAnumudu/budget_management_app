@@ -21,8 +21,13 @@ import GenerateWarrantModal from './GenerateWarrantModal'
 
 export default function WarrantDetails({stateData}) {
 
+    const warrantPrefix = 'MOF/HCF/CEW/'
+
     const contentRef = useRef();
-    const reactToPrintFn = useReactToPrint({ contentRef, documentTitle: `Warrant-${stateData?.warrant_number}`});
+    const reactToPrintFn = useReactToPrint({ 
+        contentRef, 
+        documentTitle: `${warrantPrefix}${stateData?.warrant_number}`
+    });
 
     const {userDetails:{email}} = useSelector((state) => state.userDetails)
     const navigate = useNavigate()
@@ -191,23 +196,26 @@ export default function WarrantDetails({stateData}) {
                     }
                     
                     <>
-                    {singleWarrant?.status == 1 ?
-                    <div className='w-16 ml-auto'>
-                        <MainBtn 
-                            onClick={reactToPrintFn}
-                            disabled={false} 
-                            className={`bg-primary dark:bg-primary-dark px-2 py-1 rounded-md text-white font-medium sm:self-end ${(false) && 'opacity-50'}`}
-                            text={`Print`}
-                        />
-                    </div>
-                    : groupDataByMDA?.length >= 1 ?
-                    <div className='w-52 ml-auto'>
-                        <MainBtn 
-                            onClick={()=>showActionModal([stateData?._id], 'generate_warrant')}
-                            disabled={false} 
-                            className={`bg-primary dark:bg-primary-dark px-2 py-1 rounded-md text-white font-medium sm:self-end ${(false) && 'opacity-50'}`}
-                            text={`${generateWarrantMutation.isPending ? 'Loading...' : 'Generate Warrant'}`}
-                        />
+                    {groupDataByMDA?.length >= 1 ?
+                    <div className='w-full flex justify-end gap-2'>
+                        <div className='w-16'>
+                            <MainBtn 
+                                onClick={reactToPrintFn}
+                                disabled={false} 
+                                className={`bg-primary dark:bg-primary-dark px-2 py-1 rounded-md text-white font-medium sm:self-end ${(false) && 'opacity-50'}`}
+                                text={`Print`}
+                            />
+                        </div>
+                        {singleWarrant?.status != 1 &&
+                            <div className='w-52'>
+                                <MainBtn 
+                                    onClick={()=>showActionModal([stateData?._id], 'generate_warrant')}
+                                    disabled={false} 
+                                    className={`bg-primary dark:bg-primary-dark px-2 py-1 rounded-md text-white font-medium sm:self-end ${(false) && 'opacity-50'}`}
+                                    text={`${generateWarrantMutation.isPending ? 'Loading...' : 'Generate Warrant'}`}
+                                />
+                            </div>
+                        }
                     </div>
                     : 
                     null
@@ -217,24 +225,27 @@ export default function WarrantDetails({stateData}) {
                 </div>
                 <div ref={contentRef} className='w-full flex flex-col gap-10'>
                     {/* header on each page printed */}
-                    <div className="hidden print:flex fixed top-0 right-0">
+                    {/* <div className="hidden print:flex print:text-sm fixed top-0 right-0">
                         <h2>
-                            MOF/HCF/CEW/{singleWarrant?.warrant_number}
-                            {/* {new Date().toLocaleDateString()} */}
+                            {warrantPrefix}{singleWarrant?.warrant_number}
                         </h2>
-                    </div>
+                    </div> */}
                     <div className='w-full flex flex-col gap-4'>
-                        <p className='text-base font-bold dark:text-white-aside flex gap-4'>
+                        <div className='text-base font-bold dark:text-white-aside flex flex-col gap-4'>
                             {/* Warrant Number: <span>{singleWarrant?._id}</span> */}
                             {singleWarrant?.status != 1 &&
-                            <button
-                                onClick={()=>navigate(`${singleWarrant?.warrant_type == 'recurrent' ? RouteLinks.createRecurrentWarrant : RouteLinks.createCapWarrant}`, {state: {expenses_id:singleWarrant?.expenses_id, warrant_id: singleWarrant?._id}})}
-                                className={`text-sm bg-sky-800 dark:bg-primary-dark px-2 py-1 rounded-md text-white font-medium sm:self-end ${(false) && 'opacity-50'}`}
-                            >
-                                Add Items to this Warrant
-                            </button>
+                            <>
+                                <div>
+                                    <button
+                                        onClick={()=>navigate(`${singleWarrant?.warrant_type == 'recurrent' ? RouteLinks.createRecurrentWarrant : RouteLinks.createCapWarrant}`, {state: {expenses_id:singleWarrant?.expenses_id, warrant_id: singleWarrant?._id}})}
+                                        className={`print:hidden text-sm bg-sky-800 dark:bg-primary-dark px-2 py-1 rounded-md text-white font-medium sm:self-end ${(false) && 'opacity-50'}`}
+                                    >
+                                        Add Items to this Warrant
+                                    </button>
+                                </div>
+                            </>
                             }
-                        </p>
+                        </div>
                         {groupDataByMDA.length > 0 &&
                         <WarrantHeaderCom amt={net} status={singleWarrant?.status} warrantNumber={singleWarrant?.warrant_number} warrant_type={singleWarrant?.warrant_type} />
                         }
@@ -245,17 +256,17 @@ export default function WarrantDetails({stateData}) {
                         },0)
                         return(
                             <div key={data?.org_code || index} className='w-full print:text-sm print:font-medium'>
-                                <p className='text-base font-bold dark:text-white-aside'>{data?.org_code} - {data?.beneficiary_mda}</p>
+                                <p className='text-base font-bold dark:text-slate-high'>{data?.org_code} - {data?.beneficiary_mda}</p>
                                 <div className='overflow-x-auto'>
                                     <table className="table-auto py-2 w-full text-sm">
-                                        <thead className="text-sm text-slate-higher dark:text-slate-high dark:font-semibold text-left">
+                                        <thead className="text-sm text-black dark:text-slate-high font-semibold text-left">
                                         <tr>
                                             <th scope="col" className="print:hidden p-2">
                                             </th>
                                             <th scope="col" className="p-2">
                                                 Code/Description
                                             </th>
-                                            <th scope="col" className="p-2">
+                                            <th scope="col" className="p-2 min-w-[200px] max-w-[200px]">
                                                 PV Description
                                             </th>
                                             <th scope="col" className="p-2">
@@ -283,31 +294,31 @@ export default function WarrantDetails({stateData}) {
                                                         <div className='w-full flex items-center gap-2 whitespace-nowrap'>
                                                             {/* <img className="w-8 h-8 rounded-md" src={localImgLoader(`loan_icons/provide_loan.png`)} alt="Icon" /> */}
                                                             <div className="text-left">
-                                                                <div className="text-sm font-semibold line-clamp-1">{item?.economic_code}</div>
-                                                                <div title={item?.economic_description} className="font-normal text-slate-higher">{item?.economic_description}</div>
+                                                                <div className="text-sm font-semibold print:font-normal line-clamp-1">{item?.economic_code}</div>
+                                                                <div title={item?.economic_description} className="font-normal">{item?.economic_description}</div>
                                                             </div>  
                                                         </div>
                                                     </td>
                                                     <td className="p-2">
                                                         <div className="text-left">
-                                                            <div title={item?.pv_description} className="text-sm font-semibold line-clamp-2">{item?.pv_description}</div>
+                                                            <div title={item?.pv_description} className="text-sm font-semibold print:font-normal">{item?.pv_description}</div>
                                                         </div> 
                                                     </td>
                                                     <td className="p-2">
                                                         <div className="text-left">
-                                                            <div className="text-sm font-semibold">{item?.beneficiary_name}</div>
-                                                            <div className="font-normal text-slate-higher">{item?.beneficiary_account}</div>
-                                                            <div className="font-normal text-slate-higher">{item?.beneficiary_bank}</div>
+                                                            <div className="text-sm font-semibold print:font-normal">{item?.beneficiary_name}</div>
+                                                            <div className="font-normal">{item?.beneficiary_account}</div>
+                                                            <div className="font-normal">{item?.beneficiary_bank}</div>
                                                         </div> 
                                                     </td>
                                                     <td className="p-2">
                                                         <div className="text-left">
-                                                            <div className="font-normal text-slate-higher">{formatNumber(item?.net_amount)}</div>
+                                                            <div className="font-normal">{formatNumber(item?.net_amount)}</div>
                                                         </div> 
                                                     </td>
                                                     <td className="print:hidden group relative p-2 text-right">
                                                         <div className='flex items-center justify-end gap-3 md:gap-4'>
-                                                            <div className='p-2 flex cursor-pointer justify-center items-center text-slate-500 bg-white-body dark:text-white-body dark:bg-black-body rounded-md'>
+                                                            <div className='p-2 flex cursor-pointer justify-center items-center bg-white-body dark:bg-black-body rounded-md'>
                                                                 <button onClick={()=>showActionModal([item?._id], 'delete')}>
                                                                     <Icons name='trash' className={`text-red-500 ${itemsToRemove.length && 'opacity-30'}`} />
                                                                 </button>
@@ -318,7 +329,7 @@ export default function WarrantDetails({stateData}) {
                                             )})
                                         }
                                         <tr className="border-y border-dashed border-slate-high">
-                                            <td className="p-2" colSpan={4}>
+                                            <td className="p-2" colSpan={3}>
                                                 <div className='w-full flex items-center gap-2 whitespace-nowrap'>
                                                     <div className="text-sm font-semibold">Sub Total</div>
                                                 </div>

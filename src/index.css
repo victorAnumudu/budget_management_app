@@ -80,6 +80,12 @@ html {
   font-size: 100%; /* 16px base */
 }
 
+@media print {
+  html {
+    font-size: 90%; /* 16px base */
+  }
+}
+
 @media (max-width: 575px) {
   html {
     font-size: 87.5%; /* 14px */
@@ -182,7 +188,7 @@ code {
 @media print {
   @page {
     size: auto; /* Or specify a size like A4, Letter */
-    margin: 100px; /* Adjust margins as needed */
+    margin: 50px 80px; /* Adjust margins as needed */
 
     /* @bottom-right {
       content: "Page " counter(page) " of " counter(pages);
