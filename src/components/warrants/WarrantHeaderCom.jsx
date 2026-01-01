@@ -18,7 +18,7 @@ export default function WarrantHeaderCom({ amt, status, warrantNumber, warrant_t
               <h1 className="text-emerald-600">OFFICE OF THE HONOURABLE COMMISSIONER</h1>
               <h1 className="text-red-500 italic">MINISTRY OF FINANCE</h1>
             </div>
-            <div className="w-full h-[.5px] bg-emerald-600"></div>
+            <div className="relative w-full h-[.5px] bg-emerald-600 overflow-visible"></div>
           </div>
           <div className="flex flex-col gap-3">
             <div className="w-full">

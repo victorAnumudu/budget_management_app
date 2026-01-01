@@ -26,7 +26,7 @@ export default function WarrantDetails({stateData}) {
     const contentRef = useRef();
     const reactToPrintFn = useReactToPrint({ 
         contentRef, 
-        documentTitle: `${warrantPrefix}${stateData?.warrant_number}`
+        documentTitle: warrantPrefix + stateData?.warrant_number
     });
 
     const {userDetails:{email}} = useSelector((state) => state.userDetails)
