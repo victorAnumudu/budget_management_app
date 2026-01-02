@@ -359,7 +359,8 @@ const AddPVCom = memo(() => {
                                                 
                                                 <MainBtn 
                                                     type='submit'
-                                                    // disabled={Object.keys(props.errors).length} 
+                                                    // disabled={Object.keys(props.errors).length > 0} 
+                                                    // disabled={(props.touched && !props.isValid)}
                                                     className={`bg-secondary px-2 py-1 mt-4 rounded-md text-white font-medium sm:self-end`}
                                                     text='Add Payment Voucher'
                                                 />

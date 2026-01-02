@@ -219,10 +219,12 @@ const PVsCom = memo(() =>{
                                                 </td>
                                                 
                                                 <td className="p-2">
-                                                    <div className="text-left">
-                                                        <div className="font-normal text-slate-higher">50%</div>
+                                                    <div className="text-left flex flex-col items-center">
+                                                        <div className="font-normal text-slate-higher">
+                                                            {item.warrant_number ? 1 : 0}
+                                                        </div>
                                                         <div className="relative h-[6px] w-full bg-white-body dark:bg-black-body rounded-full overflow-hidden">
-                                                        <div className={`absolute left-0 h-full w-1/2 bg-emerald-600`}></div>
+                                                            <div className={`absolute left-0 h-full w-full ${item.warrant_number ? 'bg-emerald-600' : 'bg-red-500'}`}></div>
                                                         </div>
                                                     </div> 
                                                 </td>
@@ -235,9 +237,11 @@ const PVsCom = memo(() =>{
                                                             <button onClick={()=>showActionModal(item, 'view')}>
                                                                 <Icons name='eye' />
                                                             </button>
-                                                            <button onClick={()=>showActionModal(item, 'delete')}>
-                                                                <Icons name='trash' className='text-red-500' />
-                                                            </button>
+                                                            {!item.warrant_number &&
+                                                                <button onClick={()=>showActionModal(item, 'delete')}>
+                                                                    <Icons name='trash' className='text-red-500' />
+                                                                </button>
+                                                            }
                                                             <button onClick={()=>showActionModal(item, 'edit')}>
                                                                 <Icons name='edit' className='text-primary ' />
                                                             </button>
@@ -281,7 +285,7 @@ const PVsCom = memo(() =>{
             { actionModal.name == 'status' &&
                 <StatusModal 
                     isPending={delPV.isPending}
-                    text={delPV.isSuccess ? 'PV deleted succeefully' : 'Unable to delete payment voucher'} 
+                    text={delPV.isSuccess ? 'PV deleted succeefully' : delPV?.error?.message} 
                     isSuccess={delPV.isSuccess}
                     cLoseModal={()=>{closeActionModal()}}
                 />
