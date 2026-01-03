@@ -5,9 +5,13 @@ export let addPVFields = {
   pv_number: "",
   budget_type: '',
   approval_authority: '',
+  org_uid: "",
+  economic_uid: "",
+
   economic_code: '',
   beneficiary_mda: '',
   economic_description: '',
+
   pv_description: '',
   beneficiary_name: '',
   beneficiary_bank: '',
@@ -21,9 +25,13 @@ export let addPVFieldsValidation = Yup.object().shape({
   pv_number: Yup.string().required("Required"),
   budget_type: Yup.string().required("Required"),
   approval_authority: Yup.string().required("Required"),
-  economic_code: Yup.string().required("Required"),
-  beneficiary_mda: Yup.string().required("Required"),
-  economic_description: Yup.string().required("Required"),
+  org_uid: Yup.string().required("Required"),
+  economic_uid: Yup.string().required("Required"),
+
+  // economic_code: Yup.string(),
+  // beneficiary_mda: Yup.string(),
+  // economic_description: Yup.string(),
+
   pv_description: Yup.string().required("Required"),
   beneficiary_name: Yup.string().required("Required"),
   beneficiary_bank: Yup.string().required("Required"),

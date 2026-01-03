@@ -56,6 +56,8 @@ const AddPVCom = memo(() => {
 
     const initialValues = useMemo(()=>{
         return {...addPVFields, 
+            org_uid: itemValues?.mda_uid,
+            economic_uid: itemValues?.ei_uid,
             org_code:itemValues?.mda_info?.org_code,
             economic_description: itemValues?.economic_description,
             budget_type: itemValues?.budget_type,
@@ -103,6 +105,22 @@ const AddPVCom = memo(() => {
     //FUNCTION TO HANDLE ADD PV
     const handleSubmit = () => {
         // delete reqData.approval_authorities
+
+        // const newReqData = {
+        //     "date_captured": "12/08/2025",
+        //     "pv_number": "AG/OC/01/25",
+        //     "pv_description": "Office stationeries",
+        //     "budget_type": "recurrent",
+        //     "beneficiary_name": "Peter John",
+        //     "beneficiary_account": "1010202030",
+        //     "beneficiary_bank": "Union",
+        //     "gross_amount": 990000,
+        //     "net_amount": 990000,
+        //     "captured_by": "admin@admin.com",
+        //     "approval_authority": "comissioner",
+        //     "org_uid": "68cc5a9ab6e3605930d1eb56",
+        //     "economic_uid": "68cc85f543d33cd0413cc229",
+        // }
         addPV.mutate(reqData)
     };
 

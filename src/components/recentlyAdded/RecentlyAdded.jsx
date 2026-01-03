@@ -85,7 +85,7 @@ const RecentlyAdded = memo(() => {
                                             <div className='w-full flex items-center gap-2 whitespace-nowra'>
                                                 <img className="w-8 h-8 rounded-md" src={localImgLoader(`loan_icons/provide_loan.png`)} alt="Icon" />
                                                 <div className="text-left">
-                                                    <div title={item?.beneficiary_mda} className="text-sm font-semibold line-clamp-1">{item?.beneficiary_mda}</div>
+                                                    <div title={item?.mda_info?.mda_name} className="text-sm font-semibold line-clamp-1">{item?.mda_info?.mda_name}</div>
                                                     <div className="text-sm font-semibold">{item?.pv_number}</div>
                                                     <div className="font-normal text-slate-higher">{getDateFromDateString(item?.date_captured)}</div>
                                                 </div>  
@@ -93,8 +93,8 @@ const RecentlyAdded = memo(() => {
                                         </td>
                                         <td className="p-2">
                                             <div className="text-left">
-                                                <div title={item?.economic_description} className="text-sm font-semibold line-clamp-1">{item?.economic_description}</div>
-                                                <div className="font-normal text-slate-higher">{item?.economic_code}</div>
+                                                <div title={item?.economicitem_info?.economic_description} className="text-sm font-semibold line-clamp-1">{item?.economicitem_info?.economic_description}</div>
+                                                <div className="font-normal text-slate-higher">{item?.economicitem_info?.economic_code}</div>
                                             </div> 
                                         </td>
                                         <td className="p-2">
@@ -123,10 +123,12 @@ const RecentlyAdded = memo(() => {
                                         </td>
                                         
                                         <td className="p-2">
-                                            <div className="text-left">
-                                                <div className="font-normal text-slate-higher">50%</div>
+                                            <div className="text-left flex flex-col items-center">
+                                                <div className="font-normal text-slate-higher">
+                                                    {item.warrant_number ? 1 : 0}
+                                                </div>
                                                 <div className="relative h-[6px] w-full bg-white-body dark:bg-black-body rounded-full overflow-hidden">
-                                                <div className={`absolute left-0 h-full w-1/2 bg-emerald-600`}></div>
+                                                    <div className={`absolute left-0 h-full w-full ${item.warrant_number ? 'bg-emerald-600' : 'bg-red-500'}`}></div>
                                                 </div>
                                             </div> 
                                         </td>

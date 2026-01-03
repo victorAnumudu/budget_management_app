@@ -185,7 +185,7 @@ export default function WarrantDetails({stateData}) {
             <>
                 <div className='w-full flex justify-between items-center gap-4'>
                     {itemsToRemove.length > 0 &&
-                    <div className='w-36'>
+                    <div className='w-40'>
                         <MainBtn 
                             onClick={()=>showActionModal(itemsToRemove, 'delete_many')}
                             disabled={false} 
@@ -294,8 +294,8 @@ export default function WarrantDetails({stateData}) {
                                                         <div className='w-full flex items-center gap-2 whitespace-nowrap'>
                                                             {/* <img className="w-8 h-8 rounded-md" src={localImgLoader(`loan_icons/provide_loan.png`)} alt="Icon" /> */}
                                                             <div className="text-left">
-                                                                <div className="text-sm font-semibold print:font-normal line-clamp-1">{item?.economic_code}</div>
-                                                                <div title={item?.economic_description} className="font-normal">{item?.economic_description}</div>
+                                                                <div className="text-sm font-semibold print:font-normal line-clamp-1">{item?.economic_uid?.economic_code}</div>
+                                                                <div title={item?.economic_uid?.economic_description} className="font-normal">{item?.economic_uid?.economic_description}</div>
                                                             </div>  
                                                         </div>
                                                     </td>
@@ -394,7 +394,10 @@ export default function WarrantDetails({stateData}) {
             />
         }
 
-        {(actionModal.name == 'delete_warrant' || actionModal.name == 'delete_many') && 
+        {(
+            actionModal.name == 'delete_warrant' 
+            // || actionModal.name == 'delete_many'
+        ) && 
             <VerifyModal 
                 text='Are you sure you want to delete this warrant?' 
                 proceedFunc={proceedDelWarrant} 

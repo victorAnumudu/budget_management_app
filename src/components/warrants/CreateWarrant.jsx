@@ -263,7 +263,7 @@ const CreateWarrant = memo(({budget_type}) =>{
                                                         <div className='w-full flex items-center gap-2 whitespace-nowra'>
                                                             <img className="w-8 h-8 rounded-md" src={localImgLoader(`loan_icons/provide_loan.png`)} alt="Icon" />
                                                             <div className="text-left">
-                                                                <div title={item?.beneficiary_mda} className="text-sm font-semibold line-clamp-1">{item?.beneficiary_mda}</div>
+                                                                <div title={item?.mda_info?.mda_name} className="text-sm font-semibold line-clamp-1">{item?.beneficiary_mda}</div>
                                                                 <div className="text-sm font-semibold">{item?.pv_number}</div>
                                                                 <div className="font-normal text-slate-higher">{getDateFromDateString(item?.date_captured)}</div>
                                                             </div>  
@@ -271,8 +271,8 @@ const CreateWarrant = memo(({budget_type}) =>{
                                                     </td>
                                                     <td className="p-2">
                                                         <div className="text-left">
-                                                            <div title={item?.economic_description} className="text-sm font-semibold line-clamp-1">{item?.economic_description}</div>
-                                                            <div className="font-normal text-slate-higher">{item?.economic_code}</div>
+                                                            <div title={item?.economicitem_info?.economic_description} className="text-sm font-semibold line-clamp-1">{item?.economicitem_info?.economic_description}</div>
+                                                            <div className="font-normal text-slate-higher">{item?.economicitem_info?.economic_code}</div>
                                                             {/* <div className="font-normal text-slate-higher">{item?.org_code}/{item?.economic_code}</div> */}
                                                         </div> 
                                                     </td>
