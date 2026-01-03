@@ -185,7 +185,7 @@ export default function WarrantDetails({stateData}) {
             <>
                 <div className='w-full flex justify-between items-center gap-4'>
                     {itemsToRemove.length > 0 &&
-                    <div className='w-36'>
+                    <div className='w-48'>
                         <MainBtn 
                             onClick={()=>showActionModal(itemsToRemove, 'delete_many')}
                             disabled={false} 
@@ -394,7 +394,7 @@ export default function WarrantDetails({stateData}) {
             />
         }
 
-        {(actionModal.name == 'delete_warrant' || actionModal.name == 'delete_many') && 
+        {actionModal.name == 'delete_warrant' && 
             <VerifyModal 
                 text='Are you sure you want to delete this warrant?' 
                 proceedFunc={proceedDelWarrant} 

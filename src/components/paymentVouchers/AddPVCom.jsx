@@ -58,6 +58,8 @@ const AddPVCom = memo(() => {
         return {...addPVFields, 
             org_code:itemValues?.mda_info?.org_code,
             economic_description: itemValues?.economic_description,
+            mda_uid: itemValues?.mda_uid,
+            economic_uid: itemValues?.ei_uid,
             budget_type: itemValues?.budget_type,
             economic_code:itemValues?.economic_code, beneficiary_mda:itemValues?.mda_info?.mda_name,
             captured_by: email
