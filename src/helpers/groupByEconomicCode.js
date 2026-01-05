@@ -48,7 +48,7 @@ const groupByEconomicCode = (data=[]) => {
         if(newData[objectKey]){
             newData[objectKey] = {...newData[objectKey], pvs:[...newData[objectKey].pvs, data[i]]}
         }else{
-            newData[objectKey] = {org_code:data[i].org_code, beneficiary_mda:data[i].beneficiary_mda, pvs:[data[i]]}
+            newData[objectKey] = {org_code:data[i].org_code, mda_name:data[i].mda_name, pvs:[data[i]]}
         }
     }
     return [...Object.values(newData)]

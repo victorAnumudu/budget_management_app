@@ -256,7 +256,7 @@ export default function WarrantDetails({stateData}) {
                         },0)
                         return(
                             <div key={data?.org_code || index} className='w-full print:text-sm print:font-medium'>
-                                <p className='text-base font-bold dark:text-slate-high'>{data?.org_code} - {data?.beneficiary_mda}</p>
+                                <p className='text-base font-bold dark:text-slate-high'>{data?.org_code} - {data?.mda_name}</p>
                                 <div className='overflow-x-auto'>
                                     <table className="table-auto py-2 w-full text-sm">
                                         <thead className="text-sm text-black dark:text-slate-high font-semibold text-left">

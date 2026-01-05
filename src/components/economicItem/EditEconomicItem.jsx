@@ -14,11 +14,24 @@ const validationSchema = addEconomicItemFieldsValidation
 
 
 const EditEconomicItem = memo(({data, closeModal}) => {
-    const initialValues = {...data?.data}
+    const currentYear = new Date().getFullYear()
+    const economicCode = data?.data?.economic_code.split('/').slice(1).join('/')
+
+    const initialValues = {...data?.data, economic_code:economicCode}
     
     //FUNCTION TO HANDLE ADD PV
     const handleSubmit = (values, helper) => {
-        console.log('values', values)
+        const reqData = {
+            economic_code: `${values?.org_code}/${values?.economic_code}`,
+            economic_description: values?.economic_description,
+            year: values?.year,
+            vired_frm: values?.vired_frm,
+            vired_to: values?.vired_to,
+            supplementary_budget: values?.supplementary_budget,
+            budget_type: values?.budget_type,
+            initial_budget: values?.initial_budget,
+        }
+        console.log('values', reqData)
         // login.mutate(values)
         // setVerifyModal(true)
     };
@@ -59,6 +72,7 @@ const EditEconomicItem = memo(({data, closeModal}) => {
                                             name='org_code' 
                                             value={props.values.org_code}
                                             handleChange={props.handleChange}
+                                            disabled={true}
                                         />
                                     </div>
                                     <div className='relative text-input flex flex-col gap-1'>
@@ -77,13 +91,15 @@ const EditEconomicItem = memo(({data, closeModal}) => {
                                         <p className='text-sm font-semibold dark:text-slate-high'>
                                             Year <span className='text-red-500 text-10'>{(props.errors.year && props.touched.year) ? props.errors.year : ''}</span>
                                         </p>
-                                        <InputText 
+                                        <SelectDropdown
                                             id='year' 
-                                            type='date' 
                                             name='year' 
                                             value={props.values.year}
-                                            handleChange={props.handleChange}
-                                        />
+                                            onChange={props.handleChange}
+                                        >
+                                            <option value=''>Select</option>
+                                            <option value={currentYear}>{currentYear}</option>
+                                        </SelectDropdown>
                                     </div>
                                     <div className='relative text-input flex flex-col gap-1'>
                                         <p className='text-sm font-semibold dark:text-slate-high'>
@@ -154,13 +170,14 @@ const EditEconomicItem = memo(({data, closeModal}) => {
                                 <div className='grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-8'>
                                     <div className='relative text-input flex flex-col gap-1'>
                                         <p className='text-sm font-semibold dark:text-slate-high'>
-                                            MDA Name <span className='text-red-500 text-10'>{(props.errors.mda && props.touched.mda) ? props.errors.mda : ''}</span>
+                                            MDA Name <span className='text-red-500 text-10'>{(props.errors.mda_name && props.touched.mda_name) ? props.errors.mda_name : ''}</span>
                                         </p>
                                         <TextareaCom 
-                                            id='mda' 
-                                            name='mda' 
-                                            value={props.values.mda}
+                                            id='mda_name' 
+                                            name='mda_name' 
+                                            value={props.values.mda_name}
                                             handleChange={props.handleChange}
+                                            disabled={true}
                                         />
                                     </div>
                                     <div className='relative text-input flex flex-col gap-1'>

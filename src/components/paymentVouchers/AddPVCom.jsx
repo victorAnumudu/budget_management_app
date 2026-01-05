@@ -61,7 +61,7 @@ const AddPVCom = memo(() => {
             mda_uid: itemValues?.mda_uid,
             economic_uid: itemValues?.ei_uid,
             budget_type: itemValues?.budget_type,
-            economic_code:itemValues?.economic_code, beneficiary_mda:itemValues?.mda_info?.mda_name,
+            economic_code:itemValues?.economic_code, mda_name:itemValues?.mda_info?.mda_name,
             captured_by: email
         }
     },[getDetails.isSuccess])
@@ -255,12 +255,12 @@ const AddPVCom = memo(() => {
                                                     </div>
                                                     <div className='w-full relative text-input flex flex-col gap-1'>
                                                         <p className='text-sm font-semibold dark:text-slate-high'>
-                                                            Beneficiary MDA <span className='text-red-500 text-10'>{(props.errors.beneficiary_mda && props.touched.beneficiary_mda) ? props.errors.beneficiary_mda : ''}</span>
+                                                            Beneficiary MDA <span className='text-red-500 text-10'>{(props.errors.mda_name && props.touched.mda_name) ? props.errors.mda_name : ''}</span>
                                                         </p>
                                                         <InputText 
-                                                            id='beneficiary_mda' 
-                                                            name='beneficiary_mda' 
-                                                            value={props.values.beneficiary_mda}
+                                                            id='mda_name' 
+                                                            name='mda_name' 
+                                                            value={props.values.mda_name}
                                                             handleChange={props.handleChange}
                                                             disabled={true}
                                                         />

@@ -2,27 +2,23 @@ import React, { memo } from 'react'
 import {Formik, Form} from 'formik'
 import * as Yup from "yup";
 
-import { addEconomicItemFields, addEconomicItemFieldsValidation } from '../../helpers/formikValues'; // FORMIK INITIAL VALUES AND VALIDATION 
+import { addEconomicItemFieldsValidation } from '../../helpers/formikValues'; // FORMIK INITIAL VALUES AND VALIDATION 
 import ModalWrapper from '../modals/ModalWrapper';
 import InputText from '../inputs/InputText';
 import SelectDropdown from '../inputs/SelectDropdown';
 import TextareaCom from '../inputs/TextareaCom';
 import MainBtn from '../btn/MainBtn';
-import formatNumber from '../../helpers/formatNumber';
-import CustomCounter from '../CustomCounter';
+import CustomCounter from '../CustomCounter'
 
 const validationSchema = addEconomicItemFieldsValidation
 
 
 
-const ViewEconomicItem = memo(({data, closeModal}) =>{
-    const initialValues = {...data?.data}
-    
-    //FUNCTION TO HANDLE ADD PV
-    const handleSubmit = (values, helper) => {
-        // login.mutate(values)
-        // setVerifyModal(true)
-    };
+const ViewEconomicItem = memo(({data, closeModal}) => {
+    const currentYear = new Date().getFullYear()
+    const economicCode = data?.data?.economic_code.split('/').slice(1).join('/')
+
+    const initialValues = {...data?.data, economic_code:economicCode}
 
     return (
         <>
@@ -43,8 +39,8 @@ const ViewEconomicItem = memo(({data, closeModal}) =>{
                 {/* <!-- Modal body --> */}
                 <Formik
                     initialValues={initialValues}
-                    validationSchema={validationSchema}
-                    onSubmit={handleSubmit}
+                    // validationSchema={validationSchema}
+                    // onSubmit={handleSubmit}
                 >
                     {(props)=>(
                         <Form>                
@@ -57,7 +53,7 @@ const ViewEconomicItem = memo(({data, closeModal}) =>{
                                             <span className='text-lg sm:text-xl'>
                                                 N
                                             </span>
-                                                <CustomCounter targetNumber={1000000} timeInSeconds='1' />
+                                                <CustomCounter targetNumber={data?.data?.revised_budget} timeInSeconds='1' />
                                             </p>
                                         </div>
                                     </div>
@@ -68,7 +64,7 @@ const ViewEconomicItem = memo(({data, closeModal}) =>{
                                             <span className='text-lg sm:text-xl'>
                                                 N
                                             </span>
-                                                <CustomCounter targetNumber={1000000} timeInSeconds='1' />
+                                                <CustomCounter targetNumber={data?.data?.total_expenses} timeInSeconds='1' />
                                             </p>
                                         </div>
                                     </div>
@@ -79,7 +75,7 @@ const ViewEconomicItem = memo(({data, closeModal}) =>{
                                             <span className='text-lg sm:text-xl'>
                                                 N
                                             </span>
-                                                <CustomCounter targetNumber={1000000} timeInSeconds='1' />
+                                                <CustomCounter targetNumber={data?.data?.current_balance} timeInSeconds='1' />
                                             </p>
                                         </div>
                                     </div>
@@ -95,6 +91,7 @@ const ViewEconomicItem = memo(({data, closeModal}) =>{
                                             name='org_code' 
                                             value={props.values.org_code}
                                             handleChange={props.handleChange}
+                                            disabled={true}
                                         />
                                     </div>
                                     <div className='relative text-input flex flex-col gap-1'>
@@ -107,19 +104,23 @@ const ViewEconomicItem = memo(({data, closeModal}) =>{
                                             name='economic_code' 
                                             value={props.values.economic_code}
                                             handleChange={props.handleChange}
+                                            disabled={true}
                                         />
                                     </div>
                                     <div className='relative text-input flex flex-col gap-1'>
                                         <p className='text-sm font-semibold dark:text-slate-high'>
                                             Year <span className='text-red-500 text-10'>{(props.errors.year && props.touched.year) ? props.errors.year : ''}</span>
                                         </p>
-                                        <InputText 
+                                        <SelectDropdown
                                             id='year' 
-                                            type='date' 
                                             name='year' 
                                             value={props.values.year}
-                                            handleChange={props.handleChange}
-                                        />
+                                            onChange={props.handleChange}
+                                            disabled={true}
+                                        >
+                                            <option value=''>Select</option>
+                                            <option value={currentYear}>{currentYear}</option>
+                                        </SelectDropdown>
                                     </div>
                                     <div className='relative text-input flex flex-col gap-1'>
                                         <p className='text-sm font-semibold dark:text-slate-high'>
@@ -130,6 +131,7 @@ const ViewEconomicItem = memo(({data, closeModal}) =>{
                                             name='budget_type' 
                                             value={props.values.budget_type}
                                             onChange={props.handleChange}
+                                            disabled={true}
                                         >
                                             <option value=''>Select</option>
                                             <option value='capital'>Capital</option>
@@ -148,6 +150,7 @@ const ViewEconomicItem = memo(({data, closeModal}) =>{
                                             name='initial_budget' 
                                             value={props.values.initial_budget}
                                             handleChange={props.handleChange}
+                                            disabled={true}
                                         />
                                     </div>
                                     <div className='relative text-input flex flex-col gap-1'>
@@ -160,6 +163,7 @@ const ViewEconomicItem = memo(({data, closeModal}) =>{
                                             name='vired_frm' 
                                             value={props.values.vired_frm}
                                             handleChange={props.handleChange}
+                                            disabled={true}
                                         />
                                     </div>
                                     <div className='relative text-input flex flex-col gap-1'>
@@ -172,6 +176,7 @@ const ViewEconomicItem = memo(({data, closeModal}) =>{
                                             name='vired_to' 
                                             value={props.values.vired_to}
                                             handleChange={props.handleChange}
+                                            disabled={true}
                                         />
                                     </div>
                                     <div className='relative text-input flex flex-col gap-1'>
@@ -184,19 +189,21 @@ const ViewEconomicItem = memo(({data, closeModal}) =>{
                                             name='supplementary_budget' 
                                             value={props.values.supplementary_budget}
                                             handleChange={props.handleChange}
+                                            disabled={true}
                                         />
                                     </div>
                                 </div>
                                 <div className='grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-8'>
                                     <div className='relative text-input flex flex-col gap-1'>
                                         <p className='text-sm font-semibold dark:text-slate-high'>
-                                            MDA Name <span className='text-red-500 text-10'>{(props.errors.mda && props.touched.mda) ? props.errors.mda : ''}</span>
+                                            MDA Name <span className='text-red-500 text-10'>{(props.errors.mda_name && props.touched.mda_name) ? props.errors.mda_name : ''}</span>
                                         </p>
                                         <TextareaCom 
-                                            id='mda' 
-                                            name='mda' 
-                                            value={props.values.mda}
+                                            id='mda_name' 
+                                            name='mda_name' 
+                                            value={props.values.mda_name}
                                             handleChange={props.handleChange}
+                                            disabled={true}
                                         />
                                     </div>
                                     <div className='relative text-input flex flex-col gap-1'>
@@ -208,6 +215,7 @@ const ViewEconomicItem = memo(({data, closeModal}) =>{
                                             name='economic_description' 
                                             value={props.values.economic_description}
                                             handleChange={props.handleChange}
+                                            disabled={true}
                                         />
                                     </div>
                                 </div>

@@ -84,7 +84,7 @@ const CreateWarrant = memo(({budget_type}) =>{
         },
         staleTime: 0 //0 mins
     })
-    const allPVs = allPVsData?.data?.data?.pvs.filter(item => !item?.warrant_status) // PVS LIST
+    const allPVs = allPVsData?.data?.data?.pvs?.filter(item => !item?.warrant_status) // PVS LIST
     const pagination = allPVsData?.data?.data?.pagination
 
 
@@ -181,7 +181,6 @@ const CreateWarrant = memo(({budget_type}) =>{
 
                     <>
                         {/* filter section */}
-                        {allPVs?.length > 0 &&
                         <div className='px-2 py-2 mb-4 flex flex-col sm:flex-row flex-wrap sm:items-center gap-2'>
                             <Icons name='filter' className='text-3xl text-slate-600' />
                             <div className='w-full sm:max-w-48'>
@@ -194,6 +193,7 @@ const CreateWarrant = memo(({budget_type}) =>{
                                     <option value='economic_code'>Economic Code</option>
                                     <option value='beneficiary_name'>Beneficiary Name</option>
                                     <option value='beneficiary_bank'>Beneficiary Bank</option>
+                                    <option value='org_code'>Org Code</option>
                                 </SelectDropdown>
                             </div>
                             <div className='w-full sm:max-w-48'>
@@ -216,7 +216,8 @@ const CreateWarrant = memo(({budget_type}) =>{
                                 />
                             </div>
                         </div>
-                        }
+                        {/* {allPVs?.length > 0 &&
+                        } */}
                         {/* end of filter section */}
 
                         <TablePaginatedWrapper data={allPVs} isFetching={isFetching} setPage={setPage} itemsPerPage={pagination?.limit} pagination={pagination}>

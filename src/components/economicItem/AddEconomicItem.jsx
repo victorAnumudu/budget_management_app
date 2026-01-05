@@ -29,6 +29,8 @@ const validationSchema = addEconomicItemFieldsValidation
 
 const addEconomicItem = memo(() =>{
 
+    const currentYear = new Date().getFullYear()
+
     const [reqData, setReqData] = useState({})
 
     const {state} = useLocation()
@@ -51,7 +53,7 @@ const addEconomicItem = memo(() =>{
     const [verifyModal, setVerifyModal] = useState(false)
 
     const initialValues = useMemo(()=>{
-        return {...addEconomicItemFields, mda: state?.mda_name, org_code: state?.org_code, mda_uid: state?.mda_uid }
+        return {...addEconomicItemFields, ...state }
     },[])
 
     const addEconomicItemFunc = useMutation({
@@ -74,7 +76,6 @@ const addEconomicItem = memo(() =>{
     //FUNCTION TO HANDLE ADD PV
     const handleSubmit = (values, helper) => {
         setVerifyModal(true)
-        delete values.mda
         setReqData(values)
     };
 
@@ -170,7 +171,7 @@ const addEconomicItem = memo(() =>{
                                                 onChange={props.handleChange}
                                             >
                                                 <option value=''>Select</option>
-                                                <option value='2025'>2025</option>
+                                                <option value={currentYear}>{currentYear}</option>
                                             </SelectDropdown>
                                         </div>
                                         <div className='relative text-input flex flex-col gap-1'>
@@ -242,12 +243,12 @@ const addEconomicItem = memo(() =>{
                                     <div className='grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-8'>
                                         <div className='relative text-input flex flex-col gap-1'>
                                             <p className='text-sm font-semibold dark:text-slate-high'>
-                                                MDA Name <span className='text-red-500 text-10'>{(props.errors.mda && props.touched.mda) ? props.errors.mda : ''}</span>
+                                                MDA Name <span className='text-red-500 text-10'>{(props.errors.mda_name && props.touched.mda_name) ? props.errors.mda_name : ''}</span>
                                             </p>
                                             <TextareaCom 
-                                                id='mda' 
-                                                name='mda' 
-                                                value={props.values.mda}
+                                                id='mda_name' 
+                                                name='mda_name' 
+                                                value={props.values.mda_name}
                                                 handleChange={props.handleChange}
                                                 disabled={true}
                                             />

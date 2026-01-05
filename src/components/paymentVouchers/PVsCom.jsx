@@ -117,6 +117,7 @@ const PVsCom = memo(() =>{
                                     <option value='beneficiary_name'>Beneficiary Name</option>
                                     <option value='beneficiary_bank'>Beneficiary Bank</option>
                                     <option value='budget_type'>Budget Type</option>
+                                    <option value='org_code'>Org Code</option>
                                 </SelectDropdown>
                             </div>
                             <div className='w-full sm:max-w-48'>

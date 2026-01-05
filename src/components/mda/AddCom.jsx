@@ -30,6 +30,8 @@ const validationSchema = addMDAFieldsValidation
 
 const AddCom = memo(() =>{
 
+    const currentYear = new Date().getFullYear()
+
     const queryClient = useQueryClient()
     const navigate = useNavigate()
 
@@ -188,7 +190,7 @@ const AddCom = memo(() =>{
                                                 onChange={props.handleChange}
                                             >
                                                 <option value=''>Select</option>
-                                                <option value='2025'>2025</option>
+                                                <option value={currentYear}>{currentYear}</option>
                                             </SelectDropdown>
                                         </div>
                                     </div>

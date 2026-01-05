@@ -6,7 +6,7 @@ export let addPVFields = {
   budget_type: '',
   approval_authority: '',
   economic_code: '',
-  beneficiary_mda: '',
+  mda_name: '',
   economic_description: '',
   pv_description: '',
   beneficiary_name: '',
@@ -22,7 +22,7 @@ export let addPVFieldsValidation = Yup.object().shape({
   budget_type: Yup.string().required("Required"),
   approval_authority: Yup.string().required("Required"),
   economic_code: Yup.string().required("Required"),
-  beneficiary_mda: Yup.string().required("Required"),
+  mda_name: Yup.string().required("Required"),
   economic_description: Yup.string().required("Required"),
   pv_description: Yup.string().required("Required"),
   beneficiary_name: Yup.string().required("Required"),
@@ -70,7 +70,7 @@ export let addUserFieldsValidation = Yup.object().shape({
 export let addEconomicItemFields = {
   org_code: '', 
   economic_code: '',
-  mda: '', 
+  mda_name: '', 
   budget_type: '', 
   economic_description: '', 
   initial_budget: '', 
@@ -85,8 +85,8 @@ export let addEconomicItemFields = {
 
 export let addEconomicItemFieldsValidation = Yup.object().shape({
   org_code: Yup.string().required("Required"), 
-  economic_code: Yup.string().required("Required"),
-  mda: Yup.string().required("Required"), 
+  economic_code: Yup.string().required("Required").min(8, 'invalid code').max(17, 'invalid code'),
+  mda_name: Yup.string().required("Required"), 
   budget_type: Yup.string().required("Required"), 
   economic_description: Yup.string().required("Required"), 
   initial_budget: Yup.string().required("Required").test('is-decimal', 'Invalid Number', value => (value + "").match(/^\d+(\.\d{0,5})?$/)), 

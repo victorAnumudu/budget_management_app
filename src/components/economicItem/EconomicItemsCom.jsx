@@ -94,6 +94,7 @@ const EconomicItemsCom = memo(() =>{
                                 >
                                     <option value=''>All</option>
                                     <option value='economic_code'>Economic Code</option>
+                                    <option value='org_code'>Org Code</option>
                                 </SelectDropdown>
                             </div>
                             <div className='w-full sm:max-w-48'>
