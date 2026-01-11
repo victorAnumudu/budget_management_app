@@ -183,7 +183,7 @@ const PVsCom = memo(() =>{
                                                     <div className='w-full flex items-center gap-2 whitespace-nowra'>
                                                         {/* <img className="w-8 h-8 rounded-md" src={localImgLoader(`loan_icons/provide_loan.png`)} alt="Icon" /> */}
                                                         <div className="text-left">
-                                                            <div title={item?.beneficiary_mda} className="text-sm font-semibold line-clamp-1">{item?.beneficiary_mda}</div>
+                                                            <div title={item?.mda_name} className="text-sm font-semibold line-clamp-1">{item?.mda_name}</div>
                                                             <div className="text-sm font-semibold">{item?.pv_number}</div>
                                                             <div className="font-normal text-slate-higher">{getDateFromDateString(item?.date_captured)}</div>
                                                         </div>  
