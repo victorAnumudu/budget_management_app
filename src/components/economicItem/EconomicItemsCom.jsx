@@ -1,5 +1,5 @@
 import { memo, useEffect, useState } from 'react'
-import {Link, useNavigate} from 'react-router-dom'
+import {Link, useLocation, useNavigate} from 'react-router-dom'
 
 import BreadcrumbCom from '../breadcrumb/BreadcrumbCom'
 import TablePaginatedWrapper from '../tableWrapper/TablePaginatedWrapper'
@@ -24,10 +24,12 @@ import { useQuery } from '@tanstack/react-query'
 
 const EconomicItemsCom = memo(() =>{
 
+    const {state} = useLocation()
+
     const navigate = useNavigate()
 
     const [page, setPage] = useState(1)
-    const [filter, setFilter] = useState({type: '', value: ''})
+    const [filter, setFilter] = useState({type: state?.org_code ? Object.keys(state)[0] : '', value: state?.org_code ? state.org_code : ''})
     const [willFilter, setWillFilter] = useState(false)
 
     const handleFilter = ({target:{name, value}}) => {
@@ -155,6 +157,9 @@ const EconomicItemsCom = memo(() =>{
                                         {(data && data.length > 0) ? data?.map((item, index) => (
                                             <tr key={item.id || index} className="border-t border-dashed border-slate-high">
                                                 <td className="p-2">
+                                                    <Link
+                                                        to={RouteLinks.paymentVouchers} state={{economic_code: item?.economic_code}}
+                                                    >
                                                     <div className='w-full flex items-center gap-2 whitespace-nowra'>
                                                         {/* <img className="w-8 h-8 rounded-md" src={localImgLoader(`loan_icons/provide_loan.png`)} alt="Icon" /> */}
                                                         <div className="text-left">
@@ -162,6 +167,7 @@ const EconomicItemsCom = memo(() =>{
                                                             <div className="font-normal text-slate-higher">{item?.economic_code}</div>
                                                         </div>  
                                                     </div>
+                                                    </Link>
                                                 </td>
                                                 <td className="p-2">
                                                     <div className="text-left">

@@ -10,7 +10,7 @@ export default function WarrantHeaderCom({ amt, status, warrantNumber, warrant_t
   return (
     <>
       {status ? (
-        <div className="w-full text-justify text-black dark:text-slate-high text-base print:text-sm font-medium flex flex-col gap-4">
+        <div className="w-full text-justify text-black dark:text-slate-high text-base print:text-sm flex flex-col gap-4">
           <div className="hidden print:flex font-extrabold text-2xl flex-col items-center gap-0">
             <img className="w-[150px] h-auto" src={localImgLoader('logos/Abia_logo.png')} />
             <div className="w-full text-center -mt-5">
@@ -33,17 +33,20 @@ export default function WarrantHeaderCom({ amt, status, warrantNumber, warrant_t
           </div>
           <div className="w-full flex flex-col gap-3 border border-slate-300 p-2 rounded-sm">
             <p className="">
-              {`YOU are hereby authorized and required to expend out of the Capital
-                  Development Fund during the Financial Year ${currentYear} a sum not exceeding
-                  ${numberToWords(amt)} (₦${formatNumber(amt)}) being part of the funds appropriated
-                  as Capital Expenditure for the Provision services in Abia State for
-                  the financial year, ${currentYear}.`}
+              YOU are hereby authorized and required to expend out of the 
+              {warrant_type == 'recurrent' ? ' RECURRENT ' : ' CAPITAL '}
+              Development Fund during the Financial Year 
+              {` ${currentYear} `} a sum not exceeding
+              <span className='font-semibold'> {numberToWords(amt)} (₦{formatNumber(amt)}) </span> 
+              being part of the funds appropriated as Capital Expenditure for the Provision services in Abia State for
+              the financial year,
+              {` ${currentYear}`}.
             </p>
             <p className="">
-              {`PROVIDED that the amount so expended on any one sub-organizational/code shall not exceed the amount entered against that sub-organizational code in the schedule subjoined hereto.`}
+              <span className='font-semibold'>PROVIDED</span> that the amount so expended on any one sub-organizational/code shall not exceed the amount entered against that sub-organizational code in the schedule subjoined hereto.
             </p>
             <p className="">
-              {`AND for so doing, this together with the Accounts, Certificates and Acquaintances prescribed in the Laws and Instruments of Abia State of Nigeria shall be your sufficient warrant and discharge.`}
+              <span className='font-semibold'>AND</span> for so doing, this together with the Accounts, Certificates and Acquaintances prescribed in the Laws and Instruments of Abia State of Nigeria shall be your sufficient warrant and discharge.
             </p>
           </div>
         </div>

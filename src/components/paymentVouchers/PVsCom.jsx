@@ -1,5 +1,5 @@
 import { memo, useEffect, useState } from 'react'
-import {Link, useNavigate} from 'react-router-dom'
+import {Link, useLocation, useNavigate} from 'react-router-dom'
 
 import BreadcrumbCom from '../breadcrumb/BreadcrumbCom'
 import TablePaginatedWrapper from '../tableWrapper/TablePaginatedWrapper'
@@ -22,11 +22,13 @@ import queryKeys from '../../services/queryKeys'
 
 const PVsCom = memo(() =>{
 
+    const {state} = useLocation()
+
     const navigate = useNavigate()
     const queryClient = useQueryClient()
 
     const [page, setPage] = useState(1)
-    const [filter, setFilter] = useState({type: '', value: ''})
+    const [filter, setFilter] = useState({type: state?.economic_code ? Object.keys(state)[0] : '', value: state?.economic_code ? state.economic_code : ''})
     const [willFilter, setWillFilter] = useState(false)
 
     const handleFilter = ({target:{name, value}}) => {
@@ -179,7 +181,7 @@ const PVsCom = memo(() =>{
                                             <tr key={item.id || index} className="border-t border-dashed border-slate-high">
                                                 <td className="p-2">
                                                     <div className='w-full flex items-center gap-2 whitespace-nowra'>
-                                                        <img className="w-8 h-8 rounded-md" src={localImgLoader(`loan_icons/provide_loan.png`)} alt="Icon" />
+                                                        {/* <img className="w-8 h-8 rounded-md" src={localImgLoader(`loan_icons/provide_loan.png`)} alt="Icon" /> */}
                                                         <div className="text-left">
                                                             <div title={item?.beneficiary_mda} className="text-sm font-semibold line-clamp-1">{item?.beneficiary_mda}</div>
                                                             <div className="text-sm font-semibold">{item?.pv_number}</div>

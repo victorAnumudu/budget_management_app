@@ -158,12 +158,20 @@ const [page, setPage] = useState(1)
                                                 <td className="p-2">
                                                     <div className="text-left">
                                                         <div className="text-sm font-semibold line-clamp-1">{item?.mda_name}</div>
-                                                        <Link 
-                                                            to={RouteLinks.addEconomicLine} state={{org_code: item?.org_code, mda_name: item?.mda_name, mda_uid: item?.mda_uid}} 
-                                                            className='rounded-sm p-1 bg-primary text-white-aside'
-                                                        >
-                                                            Add Econonic Line
-                                                        </Link>
+                                                        <div className='flex gap-2'>
+                                                            <Link 
+                                                                to={RouteLinks.addEconomicLine} state={{org_code: item?.org_code, mda_name: item?.mda_name, mda_uid: item?.mda_uid}} 
+                                                                className='rounded-sm p-1 bg-primary text-white-aside'
+                                                            >
+                                                                Add Econonic Line
+                                                            </Link>
+                                                            <Link 
+                                                                to={RouteLinks.economicLines} state={{org_code: item?.org_code}} 
+                                                                className='rounded-sm p-1 bg-sky-600 text-white-aside'
+                                                            >
+                                                                View Econonic Lines
+                                                            </Link>
+                                                        </div>
                                                     </div> 
                                                 </td>
                                                 <td className="p-2">
