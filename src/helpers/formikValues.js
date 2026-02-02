@@ -1,12 +1,12 @@
 import * as Yup from "yup";
 
 export let addPVFields = {
-  date: "",
+  date_captured: "",
   pv_number: "",
   budget_type: '',
   approval_authority: '',
   economic_code: '',
-  beneficiary_mda: '',
+  mda_name: '',
   economic_description: '',
   pv_description: '',
   beneficiary_name: '',
@@ -17,19 +17,23 @@ export let addPVFields = {
 };
 
 export let addPVFieldsValidation = Yup.object().shape({
-  date: Yup.date().required("Select Date"),
+  date_captured: Yup.date().required("Select Date"),
   pv_number: Yup.string().required("Required"),
   budget_type: Yup.string().required("Required"),
   approval_authority: Yup.string().required("Required"),
   economic_code: Yup.string().required("Required"),
-  beneficiary_mda: Yup.string().required("Required"),
+  mda_name: Yup.string().required("Required"),
   economic_description: Yup.string().required("Required"),
   pv_description: Yup.string().required("Required"),
   beneficiary_name: Yup.string().required("Required"),
   beneficiary_bank: Yup.string().required("Required"),
   beneficiary_account: Yup.string().required("Required"),
   gross_amount: Yup.string().required("Required").test('is-decimal', 'Invalid Number', value => (value + "").match(/^\d+(\.\d{0,5})?$/)),
-  net_amount: Yup.string().required("Required").test('is-decimal', 'Invalid Number', value => (value + "").match(/^\d+(\.\d{0,5})?$/))
+  // net_amount: Yup.string().required("Required").test('is-decimal', 'Invalid Number', value => (value + "").match(/^\d+(\.\d{0,5})?$/)),
+  net_amount: Yup.number().required('Required').typeError('not a number').min(0, "Net amount cannot be negative").max(
+      Yup.ref("gross_amount"),
+      "Net amount cannot be greater than gross amount"
+    )
 });
 
 export let addMDAFields = {
@@ -55,9 +59,9 @@ export let addUserFields = {
 export let addUserFieldsValidation = Yup.object().shape({
   firstname: Yup.string().required("Required"),
   lastname: Yup.string().required("Required"),
-  role: Yup.string().required("Required"),
-  status: Yup.string().required("Required"),
   email: Yup.string().required("Required"),
+  // role: Yup.string().required("Required"),
+  // status: Yup.string().required("Required"),
 });
 
 
@@ -66,7 +70,7 @@ export let addUserFieldsValidation = Yup.object().shape({
 export let addEconomicItemFields = {
   org_code: '', 
   economic_code: '',
-  mda: '', 
+  mda_name: '', 
   budget_type: '', 
   economic_description: '', 
   initial_budget: '', 
@@ -81,8 +85,8 @@ export let addEconomicItemFields = {
 
 export let addEconomicItemFieldsValidation = Yup.object().shape({
   org_code: Yup.string().required("Required"), 
-  economic_code: Yup.string().required("Required"),
-  mda: Yup.string().required("Required"), 
+  economic_code: Yup.string().required("Required").min(8, 'invalid code').max(17, 'invalid code'),
+  mda_name: Yup.string().required("Required"), 
   budget_type: Yup.string().required("Required"), 
   economic_description: Yup.string().required("Required"), 
   initial_budget: Yup.string().required("Required").test('is-decimal', 'Invalid Number', value => (value + "").match(/^\d+(\.\d{0,5})?$/)), 

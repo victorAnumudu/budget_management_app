@@ -1,16 +1,15 @@
 import { memo, useEffect, useState } from 'react'
-import {Link, useNavigate} from 'react-router-dom'
+import {Link, useLocation, useNavigate} from 'react-router-dom'
 
 import BreadcrumbCom from '../breadcrumb/BreadcrumbCom'
 import TablePaginatedWrapper from '../tableWrapper/TablePaginatedWrapper'
 import Icons from '../Icons'
-import { getTransactions } from '../../services/siteServices'
+import { getAllPVData, deletePV } from '../../services/siteServices'
 import getDateFromDateString from '../../helpers/GetDateFromDateString';
 import getTimeFromDateString from '../../helpers/GetTimeFromDateString';
 import localImgLoader from '../../helpers/localImageLoader';
 import RouteLinks from '../../RouteLinks';
 
-import { PVrecords } from '../../data/PVData' // REMOVE LATER
 import InputText from '../inputs/InputText'
 import SelectDropdown from '../inputs/SelectDropdown'
 import MainBtn from '../btn/MainBtn'
@@ -18,52 +17,36 @@ import EditAddedPV from './EditAddedPV'
 import ViewAddedPV from './ViewAddedPV'
 import VerifyModal from '../modals/VerifyModal'
 import StatusModal from '../modals/StatusModal'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import queryKeys from '../../services/queryKeys'
 
 const PVsCom = memo(() =>{
 
+    const {state} = useLocation()
+
     const navigate = useNavigate()
+    const queryClient = useQueryClient()
 
     const [page, setPage] = useState(1)
-    const [pvRecords, setPVRecords] = useState({loading:true, error:'', data:{}})
-    // const [willFilter, setWillFilter] = useState(false)
+    const [filter, setFilter] = useState({type: state?.economic_code ? Object.keys(state)[0] : '', value: state?.economic_code ? state.economic_code : ''})
+    const [willFilter, setWillFilter] = useState(false)
 
-    const [filter, setFilter] = useState({type: '', id: ''})
     const handleFilter = ({target:{name, value}}) => {
         setFilter(prev => ({...prev, [name]:value}))
     }
 
     const handleFilterByParams = () => {
-        // if(filter.type && !filter.id){
-        //     return
-        // }else if(!filter.type){
-        //     setPage(1)
-        //     setWillFilter(prev => !prev)
-        //     setFilter({type: '', id: ''})
-        // }else{
-        //     setPage(1)
-        //     setWillFilter(prev => !prev)
-        // }
+        if(filter.type && !filter.value){
+            return
+        }else if(!filter.type){
+            setPage(1)
+            setWillFilter(prev => !prev)
+            setFilter({type: '', value: ''})
+        }else{
+            setPage(1)
+            setWillFilter(prev => !prev)
+        }
     }
-
-    // const transactions = allTransactions?.data?.transactions // TRANSACTIONS LIST
-    // const pagination = allTransactions?.data?.pagination
-    // const isFetching = allTransactions?.loading
-    // const isError = allTransactions?.error
-
-    // useEffect(()=>{
-    //     setAllTransaction(prev => ({...prev, loading:true}))
-    //     const payload = filter?.type ? {[filter?.type]: filter.id} : {}
-    //     getTransactions({...payload, page}).then(res => {
-    //         if(res?.status != 200){
-    //             setAllTransaction(prev => ({...prev, loading:false}))
-    //             return
-    //         }
-    //         setAllTransaction({loading:false, error:'', data:res?.data})
-    //     }).catch(err => {
-    //         setAllTransaction({loading:false, error:'error occurred', data:{}})
-    //         console.log('ERR', err)
-    //     })
-    // },[page, willFilter])
 
     //FUNCTION TO OPEN EDIT MODAL
     const [actionModal, setActionModal] = useState({data:{}, name:''})
@@ -71,11 +54,41 @@ const PVsCom = memo(() =>{
     const closeActionModal = () => setActionModal({data:{}, name:''})
 
 
-    useEffect(()=>{
-        setTimeout(()=>{
-            setPVRecords({loading:false, error:'', data:PVrecords})
-        }, 1000)
-    },[])
+    const {data:allPVsData, isFetching, isError, error} = useQuery({
+        queryKey: [...queryKeys.getAllPVs, page, willFilter],
+        queryFn: () => {
+            const filterData = filter?.type ? {[filter?.type]: filter.value} : {}
+            const reqData = {
+                page,
+                ...filterData
+            }
+            return getAllPVData(reqData)
+        },
+        staleTime: 0 //0 mins
+    })
+    const allPVs = allPVsData?.data?.data?.pvs // PVS LIST
+    const pagination = allPVsData?.data?.data?.pagination
+
+
+    const delPV = useMutation({
+        mutationFn: (fields) => {
+            if(!fields?.expense_uid){
+                throw new Error('No payment voucher selected')
+            }
+            return deletePV(fields)
+        },
+        onSuccess: (res) => {
+            if(res?.data?.status != 1){
+                throw new Error(res?.data?.message)
+            }
+            queryClient.invalidateQueries({ queryKey: [...queryKeys.getAllPVs] })
+        },
+        onSettled: () => {
+            setTimeout(()=>{
+                delPV.reset()
+            }, import.meta.env.VITE_APP_SETTIMEOUT_TIME)
+        }
+    })
 
     return (
         <>
@@ -102,14 +115,18 @@ const PVsCom = memo(() =>{
                                     onChange={handleFilter}
                                 >
                                     <option value=''>All</option>
-                                    <option value='economic_line'>Economic Line</option>
+                                    <option value='economic_code'>Economic Code</option>
+                                    <option value='beneficiary_name'>Beneficiary Name</option>
+                                    <option value='beneficiary_bank'>Beneficiary Bank</option>
+                                    <option value='budget_type'>Budget Type</option>
+                                    <option value='org_code'>Org Code</option>
                                 </SelectDropdown>
                             </div>
                             <div className='w-full sm:max-w-48'>
                                 <InputText 
                                     id='id' 
-                                    name='id' 
-                                    value={filter?.id}
+                                    name='value' 
+                                    value={filter?.value}
                                     disabled={!filter.type}
                                     placeholder={filter.type && `enter ${filter.type}`} 
                                     className={`h-10 w-full p-2 rounded-md text-black-aside dark:text-slate-high outline-none border border-black-aside dark:border-slate-high ${!filter.type && 'opacity-30'}`} 
@@ -119,15 +136,15 @@ const PVsCom = memo(() =>{
                             <div className='w-20'>
                                 <MainBtn 
                                     onClick={handleFilterByParams} 
-                                    disabled={filter.type && !filter.id} 
-                                    className={`bg-primary dark:bg-primary-dark px-2 py-1 rounded-md text-white font-medium sm:self-end ${(filter.type && !filter.id) && 'opacity-50'}`}
+                                    disabled={filter.type && !filter.value} 
+                                    className={`bg-primary dark:bg-primary-dark px-2 py-1 rounded-md text-white font-medium sm:self-end ${(filter.type && !filter.value) && 'opacity-50'}`}
                                     text='Submit'
                                 />
                             </div>
                         </div>
                         {/* end of filter section */}
 
-                        <TablePaginatedWrapper data={pvRecords?.data?.data} isFetching={pvRecords?.loading} setPage={setPage} itemsPerPage={pvRecords?.data?.pagination?.limit} pagination={pvRecords?.data?.pagination}>
+                        <TablePaginatedWrapper data={allPVs} isFetching={isFetching} setPage={setPage} itemsPerPage={pagination?.limit} pagination={pagination}>
                         {({ data }) => (
                             <>
                                 <table className="table-auto py-2 w-full text-sm">
@@ -164,9 +181,9 @@ const PVsCom = memo(() =>{
                                             <tr key={item.id || index} className="border-t border-dashed border-slate-high">
                                                 <td className="p-2">
                                                     <div className='w-full flex items-center gap-2 whitespace-nowra'>
-                                                        <img className="w-8 h-8 rounded-md" src={localImgLoader(`loan_icons/provide_loan.png`)} alt="Icon" />
+                                                        {/* <img className="w-8 h-8 rounded-md" src={localImgLoader(`loan_icons/provide_loan.png`)} alt="Icon" /> */}
                                                         <div className="text-left">
-                                                            <div title={item?.beneficiary_mda} className="text-sm font-semibold line-clamp-1">{item?.beneficiary_mda}</div>
+                                                            <div title={item?.mda_name} className="text-sm font-semibold line-clamp-1">{item?.mda_name}</div>
                                                             <div className="text-sm font-semibold">{item?.pv_number}</div>
                                                             <div className="font-normal text-slate-higher">{getDateFromDateString(item?.date_captured)}</div>
                                                         </div>  
@@ -175,7 +192,8 @@ const PVsCom = memo(() =>{
                                                 <td className="p-2">
                                                     <div className="text-left">
                                                         <div title={item?.economic_description} className="text-sm font-semibold line-clamp-1">{item?.economic_description}</div>
-                                                        <div className="font-normal text-slate-higher">{item?.org_code}/{item?.economic_code}</div>
+                                                        <div className="font-normal text-slate-higher">{item?.economic_code}</div>
+                                                        {/* <div className="font-normal text-slate-higher">{item?.org_code}/{item?.economic_code}</div> */}
                                                     </div> 
                                                 </td>
                                                 <td className="p-2">
@@ -204,10 +222,12 @@ const PVsCom = memo(() =>{
                                                 </td>
                                                 
                                                 <td className="p-2">
-                                                    <div className="text-left">
-                                                        <div className="font-normal text-slate-higher">50%</div>
+                                                    <div className="text-left flex flex-col items-center">
+                                                        <div className="font-normal text-slate-higher">
+                                                            {item.warrant_number ? 1 : 0}
+                                                        </div>
                                                         <div className="relative h-[6px] w-full bg-white-body dark:bg-black-body rounded-full overflow-hidden">
-                                                        <div className={`absolute left-0 h-full w-1/2 bg-emerald-600`}></div>
+                                                            <div className={`absolute left-0 h-full w-full ${item.warrant_number ? 'bg-emerald-600' : 'bg-red-500'}`}></div>
                                                         </div>
                                                     </div> 
                                                 </td>
@@ -220,9 +240,11 @@ const PVsCom = memo(() =>{
                                                             <button onClick={()=>showActionModal(item, 'view')}>
                                                                 <Icons name='eye' />
                                                             </button>
-                                                            <button onClick={()=>showActionModal(item, 'delete')}>
-                                                                <Icons name='trash' className='text-red-500' />
-                                                            </button>
+                                                            {!item.warrant_number &&
+                                                                <button onClick={()=>showActionModal(item, 'delete')}>
+                                                                    <Icons name='trash' className='text-red-500' />
+                                                                </button>
+                                                            }
                                                             <button onClick={()=>showActionModal(item, 'edit')}>
                                                                 <Icons name='edit' className='text-primary ' />
                                                             </button>
@@ -257,14 +279,17 @@ const PVsCom = memo(() =>{
                     text='Are you sure you want to delete this Payment Voucher?' 
                     proceedFunc={()=>{
                         showActionModal(actionModal.data, 'status')
+                        const expense_uid = actionModal?.data?.expense_uid
+                        delPV.mutate({expense_uid})
                     }} 
                     cLoseModal={closeActionModal}
                 />
             }
             { actionModal.name == 'status' &&
                 <StatusModal 
-                    text='Payment Voucher deleted successfully' 
-                    isSuccess={true}
+                    isPending={delPV.isPending}
+                    text={delPV.isSuccess ? 'PV deleted succeefully' : delPV?.error?.message} 
+                    isSuccess={delPV.isSuccess}
                     cLoseModal={()=>{closeActionModal()}}
                 />
             }

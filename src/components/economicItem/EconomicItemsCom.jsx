@@ -1,10 +1,10 @@
 import { memo, useEffect, useState } from 'react'
-import {Link, useNavigate} from 'react-router-dom'
+import {Link, useLocation, useNavigate} from 'react-router-dom'
 
 import BreadcrumbCom from '../breadcrumb/BreadcrumbCom'
 import TablePaginatedWrapper from '../tableWrapper/TablePaginatedWrapper'
 import Icons from '../Icons'
-import { getTransactions } from '../../services/siteServices'
+import { getAllEconomicItems } from '../../services/siteServices'
 import getDateFromDateString from '../../helpers/GetDateFromDateString';
 import getTimeFromDateString from '../../helpers/GetTimeFromDateString';
 import formatNumber from '../../helpers/formatNumber';
@@ -19,52 +19,35 @@ import VerifyModal from '../modals/VerifyModal'
 import StatusModal from '../modals/StatusModal'
 import ViewEconomicItem from './ViewEconomicItem'
 import EditEconomicItem from './EditEconomicItem'
+import queryKeys from '../../services/queryKeys'
+import { useQuery } from '@tanstack/react-query'
 
 const EconomicItemsCom = memo(() =>{
+
+    const {state} = useLocation()
 
     const navigate = useNavigate()
 
     const [page, setPage] = useState(1)
-    const [itemRecords, setItemsRecords] = useState({loading:true, error:'', data:{}})
-    // const [willFilter, setWillFilter] = useState(false)
+    const [filter, setFilter] = useState({type: state?.org_code ? Object.keys(state)[0] : '', value: state?.org_code ? state.org_code : ''})
+    const [willFilter, setWillFilter] = useState(false)
 
-    const [filter, setFilter] = useState({type: '', id: ''})
     const handleFilter = ({target:{name, value}}) => {
         setFilter(prev => ({...prev, [name]:value}))
     }
 
     const handleFilterByParams = () => {
-        // if(filter.type && !filter.id){
-        //     return
-        // }else if(!filter.type){
-        //     setPage(1)
-        //     setWillFilter(prev => !prev)
-        //     setFilter({type: '', id: ''})
-        // }else{
-        //     setPage(1)
-        //     setWillFilter(prev => !prev)
-        // }
+        if(filter.type && !filter.value){
+            return
+        }else if(!filter.type){
+            setPage(1)
+            setWillFilter(prev => !prev)
+            setFilter({type: '', value: ''})
+        }else{
+            setPage(1)
+            setWillFilter(prev => !prev)
+        }
     }
-
-    // const transactions = allTransactions?.data?.transactions // TRANSACTIONS LIST
-    // const pagination = allTransactions?.data?.pagination
-    // const isFetching = allTransactions?.loading
-    // const isError = allTransactions?.error
-
-    // useEffect(()=>{
-    //     setAllTransaction(prev => ({...prev, loading:true}))
-    //     const payload = filter?.type ? {[filter?.type]: filter.id} : {}
-    //     getTransactions({...payload, page}).then(res => {
-    //         if(res?.status != 200){
-    //             setAllTransaction(prev => ({...prev, loading:false}))
-    //             return
-    //         }
-    //         setAllTransaction({loading:false, error:'', data:res?.data})
-    //     }).catch(err => {
-    //         setAllTransaction({loading:false, error:'error occurred', data:{}})
-    //         console.log('ERR', err)
-    //     })
-    // },[page, willFilter])
 
     //FUNCTION TO OPEN EDIT MODAL
     const [actionModal, setActionModal] = useState({data:{}, name:''})
@@ -72,24 +55,33 @@ const EconomicItemsCom = memo(() =>{
     const closeActionModal = () => setActionModal({data:{}, name:''})
 
 
-    useEffect(()=>{
-        setTimeout(()=>{
-            setItemsRecords({loading:false, error:'', data:EconomicItemsRecords})
-        }, 1000)
-    },[])
+    const {data, isFetching, isError, error} = useQuery({
+        queryKey: [...queryKeys.getAllPVs, page, willFilter],
+        queryFn: () => {
+            const filterData = filter?.type ? {[filter?.type]: filter.value} : {}
+            const reqData = {
+                page,
+                ...filterData
+            }
+            return getAllEconomicItems(reqData)
+        },
+        staleTime: 0 //0 mins
+    })
+    const allEconomicItems = data?.data?.data?.economic_items // ECONOMIC ITEMS LIST
+    const pagination = data?.data?.data?.pagination
 
     return (
         <>
             <div className='w-full flex flex-col gap-4'>
                 <BreadcrumbCom title='Economic Items' paths={['Dashboard', 'Economic Items']} />
-                <div className='w-48 ml-auto'>
+                {/* <div className='w-48 ml-auto'>
                     <MainBtn 
                         onClick={() => navigate(RouteLinks.addEconomicLine)} 
                         disabled={false} 
                         className={`bg-primary dark:bg-primary-dark px-2 py-1 rounded-md text-white font-medium sm:self-end ${(false) && 'opacity-50'}`}
                         text='Add Economic Line'
                     />
-                </div>
+                </div> */}
                 <div className='box bg-white dark:bg-black-box text-black-body dark:text-white-body'>
 
                     <>
@@ -103,14 +95,15 @@ const EconomicItemsCom = memo(() =>{
                                     onChange={handleFilter}
                                 >
                                     <option value=''>All</option>
-                                    <option value='economic_line'>Economic Line</option>
+                                    <option value='economic_code'>Economic Code</option>
+                                    <option value='org_code'>Org Code</option>
                                 </SelectDropdown>
                             </div>
                             <div className='w-full sm:max-w-48'>
                                 <InputText 
-                                    id='id' 
-                                    name='id' 
-                                    value={filter?.id}
+                                    id='value' 
+                                    name='value' 
+                                    value={filter?.value}
                                     disabled={!filter.type}
                                     placeholder={filter.type && `enter ${filter.type}`} 
                                     className={`h-10 w-full p-2 rounded-md text-black-aside dark:text-slate-high outline-none border border-black-aside dark:border-slate-high ${!filter.type && 'opacity-30'}`} 
@@ -120,15 +113,15 @@ const EconomicItemsCom = memo(() =>{
                             <div className='w-20'>
                                 <MainBtn 
                                     onClick={handleFilterByParams} 
-                                    disabled={filter.type && !filter.id} 
-                                    className={`bg-primary dark:bg-primary-dark px-2 py-1 rounded-md text-white font-medium sm:self-end ${(filter.type && !filter.id) && 'opacity-50'}`}
+                                    disabled={filter.type && !filter.value} 
+                                    className={`bg-primary dark:bg-primary-dark px-2 py-1 rounded-md text-white font-medium sm:self-end ${(filter.type && !filter.value) && 'opacity-50'}`}
                                     text='Submit'
                                 />
                             </div>
                         </div>
                         {/* end of filter section */}
 
-                        <TablePaginatedWrapper data={itemRecords?.data?.data} isFetching={itemRecords?.loading} setPage={setPage} itemsPerPage={itemRecords?.data?.pagination?.limit} pagination={itemRecords?.data?.pagination}>
+                        <TablePaginatedWrapper data={allEconomicItems} isFetching={isFetching} setPage={setPage} itemsPerPage={pagination?.limit} pagination={pagination}>
                         {({ data }) => (
                             <>
                                 <table className="table-auto py-2 w-full text-sm">
@@ -144,13 +137,13 @@ const EconomicItemsCom = memo(() =>{
                                                 Year/Budget Type
                                             </th>
                                             <th scope="col" className="p-2">
-                                                Initial Budget/Total Budget
-                                            </th>
-                                            <th scope="col" className="p-2">
                                                 Vired To/Vired From
                                             </th>
                                             <th scope="col" className="p-2">
                                                 Supplementary Amt
+                                            </th>
+                                            <th scope="col" className="p-2">
+                                                Initial Budget/Total Budget
                                             </th>
                                             <th scope="col" className="p-2">
                                                 Expenses/Balance
@@ -164,13 +157,17 @@ const EconomicItemsCom = memo(() =>{
                                         {(data && data.length > 0) ? data?.map((item, index) => (
                                             <tr key={item.id || index} className="border-t border-dashed border-slate-high">
                                                 <td className="p-2">
+                                                    <Link
+                                                        to={RouteLinks.paymentVouchers} state={{economic_code: item?.economic_code}}
+                                                    >
                                                     <div className='w-full flex items-center gap-2 whitespace-nowra'>
-                                                        <img className="w-8 h-8 rounded-md" src={localImgLoader(`loan_icons/provide_loan.png`)} alt="Icon" />
+                                                        {/* <img className="w-8 h-8 rounded-md" src={localImgLoader(`loan_icons/provide_loan.png`)} alt="Icon" /> */}
                                                         <div className="text-left">
-                                                            <div title={item?.mda} className="text-sm font-semibold line-clamp-1">{item?.mda}</div>
-                                                            <div className="font-normal text-slate-higher">{item?.org_code}/{item?.economic_code}</div>
+                                                            <div title={item?.mda_info?.mda_name} className="text-sm font-semibold line-clamp-1">{item?.mda_info?.mda_name}</div>
+                                                            <div className="font-normal text-slate-higher">{item?.economic_code}</div>
                                                         </div>  
                                                     </div>
+                                                    </Link>
                                                 </td>
                                                 <td className="p-2">
                                                     <div className="text-left">
@@ -185,14 +182,8 @@ const EconomicItemsCom = memo(() =>{
                                                 </td>
                                                 <td className="p-2">
                                                     <div className="text-left">
-                                                        <div className="text-sm font-semibold">{formatNumber(item?.initial_budget)}</div>
-                                                        <div className="font-normal text-slate-higher">{formatNumber(item?.total_budget)}</div>
-                                                    </div> 
-                                                </td>
-                                                <td className="p-2">
-                                                    <div className="text-left">
-                                                        <div className="text-sm font-semibold">{formatNumber(item?.vired_frm)}</div>
-                                                        <div className="font-normal text-slate-higher">{formatNumber(item?.vired_to)}</div>
+                                                        <div className="text-sm font-semibold">{formatNumber(item?.vired_to)}</div>
+                                                        <div className="font-normal text-slate-higher">{formatNumber(item?.vired_frm)}</div>
                                                     </div> 
                                                 </td>
                                                 <td className="p-2">
@@ -200,10 +191,16 @@ const EconomicItemsCom = memo(() =>{
                                                         <div className="text-sm font-semibold">{formatNumber(item?.supplementary_budget)}</div>
                                                     </div> 
                                                 </td>
+                                                 <td className="p-2">
+                                                    <div className="text-left">
+                                                        <div className="text-sm font-semibold">{formatNumber(item?.initial_budget)}</div>
+                                                        <div className="font-normal text-slate-higher">{formatNumber(item?.revised_budget)}</div>
+                                                    </div> 
+                                                </td>
                                                 <td className="p-2">
                                                     <div className="text-left">
-                                                        <div className="text-sm font-semibold">{formatNumber(item?.actual_expenses)}</div>
-                                                        <div className="font-normal text-slate-higher">{formatNumber(item?.balance)}</div>
+                                                        <div className="text-sm font-semibold">{formatNumber(item?.total_expenses)}</div>
+                                                        <div className="font-normal text-slate-higher">{formatNumber(item?.current_balance)}</div>
                                                     </div> 
                                                 </td>
                                                 <td className="group relative p-2 text-right">

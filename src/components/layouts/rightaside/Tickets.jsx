@@ -1,5 +1,5 @@
 import React from 'react'
-import Img from '../../../assets/user_avatar.jpg'
+import Img from '/assets/user_avatar.jpg'
 import CustomCounter from '../../CustomCounter'
 
 export default function Tickets() {

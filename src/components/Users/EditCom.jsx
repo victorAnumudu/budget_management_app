@@ -117,7 +117,7 @@ const EditCom = memo(({data, closeModal}) => {
                                     type='submit'
                                     // disabled={props.errors} 
                                     className={`bg-secondary px-2 py-1 mt-4 rounded-md text-white font-medium sm:self-end`}
-                                    text='ADD USER'
+                                    text='UPDATE USER'
                                 />
                             </div>
                         </Form>

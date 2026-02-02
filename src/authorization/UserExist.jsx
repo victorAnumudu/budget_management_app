@@ -63,11 +63,14 @@ const UserExist = memo(() => {
           const getUserProfile = async () =>{ // GET USER PROFILE, IF USER IS LOGGED IN WITH A VALID TOKEN
             try {
               const userInfo = await userProfile()
+              if(userInfo?.data?.status != 1){
+                return logoutUser()
+              }
               const userData = userInfo?.data?.user
               dispatch(updateUserDetails({...userData}))
               setPageIsLoading(false)
             } catch (error) {
-              navigate(RouteLinks.login, {replace:true}) 
+              logoutUser()
             }
           }
           if(isLoggedIn){

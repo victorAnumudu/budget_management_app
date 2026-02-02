@@ -1,5 +1,8 @@
 const RouteLinks = {
     loginPage: '/auth/login',
+    userVerifyPage: '/auth/verify/:token',
+
+
     homePage: '/',
     paymentVouchers: '/payment-vouchers',
     addPV: '/add-payment-vouchers',
@@ -9,6 +12,11 @@ const RouteLinks = {
     addUser: '/add-user',
     economicLines: '/economic-lines',
     addEconomicLine: '/add-economic-line',
+    profile: '/profile',
+    warrants: '/warrants',
+    createRecurrentWarrant: '/create-recurrent-warrant',
+    createCapWarrant: '/create-capital-warrant',
+    warrantDetails: '/warrant-details',
 
 
     offers: '/offers',

@@ -1,10 +1,12 @@
 import { memo, useEffect, useState } from 'react'
 import {useNavigate} from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
+import { useSelector } from 'react-redux'
 
 import BreadcrumbCom from '../breadcrumb/BreadcrumbCom'
 import TablePaginatedWrapper from '../tableWrapper/TablePaginatedWrapper'
 import Icons from '../Icons'
-import { getTransactions } from '../../services/siteServices'
+import { getAllUsersData } from '../../services/siteServices'
 import formatNumber from '../../helpers/formatNumber'
 import localImgLoader from '../../helpers/localImageLoader';
 import RouteLinks from '../../RouteLinks';
@@ -17,65 +19,56 @@ import EditCom from './EditCom'
 import VerifyModal from '../modals/VerifyModal'
 import StatusModal from '../modals/StatusModal'
 import AddUserCom from './AddUserCom'
+import queryKeys from '../../services/queryKeys'
+import DeleteUser from './DeleteUser'
 
 
 const UsersListCom = memo(() => {
 
+    const {userDetails:{email, role}} = useSelector((state) => state.userDetails)
+
     const navigate = useNavigate()
 
     const [page, setPage] = useState(1)
-    const [usersDB, setUsersDB] = useState({loading:true, error:'', data:{}})
-    // const [willFilter, setWillFilter] = useState(false)
+    const [filter, setFilter] = useState({type: '', value: ''})
+    const [willFilter, setWillFilter] = useState(false)
 
-    const [filter, setFilter] = useState({type: '', id: ''})
     const handleFilter = ({target:{name, value}}) => {
         setFilter(prev => ({...prev, [name]:value}))
     }
 
     const handleFilterByParams = () => {
-        // if(filter.type && !filter.id){
-        //     return
-        // }else if(!filter.type){
-        //     setPage(1)
-        //     setWillFilter(prev => !prev)
-        //     setFilter({type: '', id: ''})
-        // }else{
-        //     setPage(1)
-        //     setWillFilter(prev => !prev)
-        // }
+        if(filter.type && !filter.value){
+            return
+        }else if(!filter.type){
+            setPage(1)
+            setWillFilter(prev => !prev)
+            setFilter({type: '', value: ''})
+        }else{
+            setPage(1)
+            setWillFilter(prev => !prev)
+        }
     }
-
-    // const transactions = allTransactions?.data?.transactions // TRANSACTIONS LIST
-    // const pagination = allTransactions?.data?.pagination
-    // const isFetching = allTransactions?.loading
-    // const isError = allTransactions?.error
-
-    // useEffect(()=>{
-    //     setAllTransaction(prev => ({...prev, loading:true}))
-    //     const payload = filter?.type ? {[filter?.type]: filter.id} : {}
-    //     getTransactions({...payload, page}).then(res => {
-    //         if(res?.status != 200){
-    //             setAllTransaction(prev => ({...prev, loading:false}))
-    //             return
-    //         }
-    //         setAllTransaction({loading:false, error:'', data:res?.data})
-    //     }).catch(err => {
-    //         setAllTransaction({loading:false, error:'error occurred', data:{}})
-    //         console.log('ERR', err)
-    //     })
-    // },[page, willFilter])
 
     //FUNCTION TO OPEN EDIT MODAL
     const [actionModal, setActionModal] = useState({data:{}, name:''})
     const showActionModal = (data, name) => setActionModal({data, name})
     const closeActionModal = () => setActionModal({data:{}, name:''})
 
-
-    useEffect(()=>{
-        setTimeout(()=>{
-            setUsersDB({loading:false, error:'', data:UsersDB})
-        }, 1000)
-    },[])
+    const {data:allUsersData, isFetching, isError, error} = useQuery({
+        queryKey: [...queryKeys.getAllUsers, page, willFilter],
+        queryFn: () => {
+            const filterData = filter?.type ? {[filter?.type]: filter.value} : {}
+            const reqData = {
+                page,
+                ...filterData
+            }
+            return getAllUsersData(reqData)
+        },
+        staleTime: 0 //0 mins
+    })
+    const allUsers = allUsersData?.data?.data?.users // USERS LIST
+    const pagination = allUsersData?.data?.data?.pagination
 
     return (
         <>
@@ -90,7 +83,9 @@ const UsersListCom = memo(() => {
                     />
                 </div>
                 <div className='box bg-white dark:bg-black-box text-black-body dark:text-white-body'>
-
+                    {isError ?
+                    <p>{error?.message}</p>
+                    :
                     <>
                         {/* filter section */}
                         <div className='px-2 py-2 mb-4 flex flex-col sm:flex-row flex-wrap sm:items-center gap-2'>
@@ -102,15 +97,18 @@ const UsersListCom = memo(() => {
                                     onChange={handleFilter}
                                 >
                                     <option value=''>All</option>
+                                    <option value='lastname'>Lastname</option>
+                                    <option value='firstname'>Firstname</option>
                                     <option value='email'>Email</option>
+                                    <option value='role'>Role</option>
                                     <option value='status'>Status</option>
                                 </SelectDropdown>
                             </div>
                             <div className='w-full sm:max-w-48'>
                                 <InputText 
                                     id='id' 
-                                    name='id' 
-                                    value={filter?.id}
+                                    name='value' 
+                                    value={filter?.value}
                                     disabled={!filter.type}
                                     placeholder={filter.type && `enter ${filter.type}`} 
                                     className={`h-10 w-full p-2 rounded-md text-black-aside dark:text-slate-high outline-none border border-black-aside dark:border-slate-high ${!filter.type && 'opacity-30'}`} 
@@ -120,15 +118,15 @@ const UsersListCom = memo(() => {
                             <div className='w-20'>
                                 <MainBtn 
                                     onClick={handleFilterByParams} 
-                                    disabled={filter.type && !filter.id} 
-                                    className={`bg-primary dark:bg-primary-dark px-2 py-1 rounded-md text-white font-medium sm:self-end ${(filter.type && !filter.id) && 'opacity-50'}`}
+                                    disabled={filter.type && !filter.value} 
+                                    className={`bg-primary dark:bg-primary-dark px-2 py-1 rounded-md text-white font-medium sm:self-end ${(filter.type && !filter.value) && 'opacity-50'}`}
                                     text='Submit'
                                 />
                             </div>
                         </div>
                         {/* end of filter section */}
 
-                        <TablePaginatedWrapper data={usersDB?.data?.data} isFetching={usersDB?.loading} setPage={setPage} itemsPerPage={usersDB?.data?.pagination?.limit} pagination={usersDB?.data?.pagination}>
+                        <TablePaginatedWrapper data={allUsers} isFetching={isFetching} setPage={setPage} itemsPerPage={pagination?.limit} pagination={pagination}>
                         {({ data }) => (
                             <>
                                 <table className="table-auto py-2 w-full text-sm">
@@ -167,9 +165,10 @@ const UsersListCom = memo(() => {
                                                 </td>
                                                 <td className="p-2">
                                                     <div className="text-left">
-                                                        <div className={`text-sm font-semibold line-clamp-2 ${item?.status == 'pending' ? 'text-red-500': 'text-emerald-800'}`}>{formatNumber(item?.status)}</div>
+                                                        <div className={`text-sm font-semibold line-clamp-2 ${item?.status == 'active' ? 'text-emerald-500': 'text-red-800'}`}>{item?.status ? item?.status : 'null'}</div>
                                                     </div> 
                                                 </td>
+                                                {item.email != email && (
                                                 <td className="group relative p-2 text-right">
                                                     <div className='flex items-center justify-end gap-3 md:gap-4'>
                                                         <div className='p-2 flex cursor-pointer justify-center items-center text-slate-500 bg-white-body dark:text-white-body dark:bg-black-body rounded-md'>
@@ -185,6 +184,7 @@ const UsersListCom = memo(() => {
                                                         </div>
                                                     </div>
                                                 </td>
+                                                )}
                                             </tr>
                                         ))
                                         :
@@ -202,6 +202,7 @@ const UsersListCom = memo(() => {
                         )}
                         </TablePaginatedWrapper>
                     </>
+                    }
                     
                 </div>
             </div>
@@ -209,11 +210,9 @@ const UsersListCom = memo(() => {
             {actionModal.name == 'edit' && <EditCom data={actionModal} closeModal={closeActionModal} />}
             {actionModal.name == 'add' && <AddUserCom data={actionModal} closeModal={closeActionModal} />}
             {actionModal.name == 'delete' && 
-                <VerifyModal 
-                    text='Are you sure you want to delete this User?' 
-                    proceedFunc={()=>{
-                        showActionModal(actionModal.data, 'status')
-                    }} 
+                <DeleteUser 
+                    text={ `Are you sure you want to delete`} 
+                    data={actionModal.data}
                     cLoseModal={closeActionModal}
                 />
             }

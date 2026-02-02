@@ -1,16 +1,17 @@
 import { memo, useEffect, useMemo, useState } from 'react'
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {Link} from 'react-router-dom'
 import {Formik, Form} from 'formik'
 import * as Yup from "yup";
 
 import BreadcrumbCom from '../breadcrumb/BreadcrumbCom'
-import { getTransactions } from '../../services/siteServices'
 import getDateFromDateString from '../../helpers/GetDateFromDateString';
 import localImgLoader from '../../helpers/localImageLoader';
 import RouteLinks from '../../RouteLinks';
 import InputText from '../inputs/InputText'
 import SelectDropdown from '../inputs/SelectDropdown'
 import MainBtn from '../btn/MainBtn'
+import { addUserByAdmin } from '../../services/siteServices'
 import Icons from '../Icons'
 import TextareaCom from '../inputs/TextareaCom';
 import VerifyModal from '../modals/VerifyModal';
@@ -18,21 +19,50 @@ import StatusModal from '../modals/StatusModal';
 
 import { addUserFields, addUserFieldsValidation } from '../../helpers/formikValues'; // FORMIK INITIAL VALUES AND VALIDATION 
 import ModalWrapper from '../modals/ModalWrapper';
+import queryKeys from '../../services/queryKeys';
+import AlertStatus from '../alert/AlertStatus';
 
 
 // To get the validation schema
 const validationSchema = addUserFieldsValidation
 
+
 const AddUserCom = memo(({closeModal}) =>{
+    
+    const queryClient = useQueryClient()
 
     const initialValues = useMemo(()=>{
         return {...addUserFields }
     },[])
 
-    //FUNCTION TO HANDLE ADD PV
+      const registerUser = useMutation({
+        mutationFn: (fields) => {
+            if(!fields.email){
+                throw new Error('Please provide all required fields')
+            }
+            return addUserByAdmin(fields)
+        },
+        onError: (error) => {
+            setTimeout(()=>{registerUser.reset()}, import.meta.env.VITE_APP_SETTIMEOUT_TIME)
+        },
+        onSuccess: (res) => {
+            if(res?.data?.status != 1){
+                throw new Error(res?.data?.message)
+            }
+            queryClient.refetchQueries({
+                queryKey: [...queryKeys.getAllUsers],
+                // type: 'active',
+                // exact: true,
+            })
+            setTimeout(()=>{
+                closeModal()
+            }, import.meta.env.VITE_APP_SETTIMEOUT_TIME)
+        },
+    })
+
+    //FUNCTION TO HANDLE ADD USER
     const handleSubmit = (values, helper) => {
-        // login.mutate(values)
-        // setVerifyModal(true)
+        registerUser.mutate(values)
     };
 
     return (
@@ -95,6 +125,7 @@ const AddUserCom = memo(({closeModal}) =>{
                                                 onChange={props.handleChange}
                                             >
                                                 <option value=''>select</option>
+                                                <option value='disabled'>Disabled</option>
                                                 <option value='pending'>Pending</option>
                                                 <option value='active'>Active</option>
                                             </SelectDropdown>
@@ -110,6 +141,7 @@ const AddUserCom = memo(({closeModal}) =>{
                                             >
                                                 <option value=''>select</option>
                                                 <option value='user'>User</option>
+                                                <option value='tpo'>TPO</option>
                                                 <option value='admin'>Admin</option>
                                             </SelectDropdown>
                                         </div>
@@ -126,9 +158,23 @@ const AddUserCom = memo(({closeModal}) =>{
                                             handleChange={props.handleChange}
                                         />
                                     </div>
+                                    {(registerUser.isSuccess || registerUser.isError || registerUser.isPending) &&
+                                    // <div className="px-6 flex flex-col gap-6 justify-center items-center">
+                                    //     <p className={`${!registerUser.isSuccess ? 'text-red-500' : 'text-emerald-800'} text-base leading-relaxed text-black-aside dark:text-slate-high`}>
+                                    //         {registerUser.isSuccess ? 'User added successfully' : registerUser.error.message}
+                                    //     </p>
+                                    // </div>
+                                    <AlertStatus 
+                                        isSuccess={registerUser.isSuccess}
+                                        isPending={registerUser.isPending}
+                                        text= {registerUser.isSuccess ? 'User added successfully' : registerUser?.error?.message} 
+                                        cLoseAlert={() => registerUser.reset()}
+                                    />
+                                    }
                                     <MainBtn 
                                         type='submit'
-                                        // disabled={props.errors} 
+                                        loading={registerUser.isPending}
+                                        disabled={props.errors.length || registerUser.isPending || registerUser.isSuccess} 
                                         className={`bg-secondary px-2 py-1 mt-4 rounded-md text-white font-medium sm:self-end`}
                                         text='ADD USER'
                                     />

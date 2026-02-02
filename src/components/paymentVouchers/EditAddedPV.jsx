@@ -14,9 +14,10 @@ const validationSchema = addPVFieldsValidation
 
 
 const EditAddedPV = memo(({data, closeModal}) => {
-    const code = data.data.org_code+'/'+data.data.economic_code
-    const initialValues = {...data?.data, economic_code:code}
-    
+    const capturedDate = new Date(data?.data?.date_captured) 
+    const dateCaptured = `${capturedDate.getFullYear()}-${capturedDate.getMonth() > 9 ? capturedDate.getMonth() : '0'+capturedDate.getMonth()}-${capturedDate.getDate() > 9 ? capturedDate.getDate() : '0'+capturedDate.getDate()}`
+    const initialValues = {...data?.data, date_captured: dateCaptured}
+
     //FUNCTION TO HANDLE ADD PV
     const handleSubmit = (values, helper) => {
         // login.mutate(values)
@@ -51,13 +52,13 @@ const EditAddedPV = memo(({data, closeModal}) => {
                                 <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-8'>
                                     <div className='relative text-input flex flex-col gap-1'>
                                         <p className='text-sm font-semibold dark:text-slate-high'>
-                                            Date <span className='text-red-500 text-10'>{(props.errors.date && props.touched.date) ? props.errors.date : ''}</span>
+                                            Date <span className='text-red-500 text-10'>{(props.errors.date_captured && props.touched.date_captured) ? props.errors.date_captured : ''}</span>
                                         </p>
                                         <InputText 
-                                            id='date' 
+                                            id='date_captured' 
                                             type='date' 
-                                            name='date' 
-                                            value={props.values.date}
+                                            name='date_captured' 
+                                            value={props.values.date_captured}
                                             handleChange={props.handleChange}
                                         />
                                     </div>
@@ -81,6 +82,7 @@ const EditAddedPV = memo(({data, closeModal}) => {
                                             name='budget_type' 
                                             value={props.values.budget_type}
                                             onChange={props.handleChange}
+                                            disabled={true}
                                         >
                                             <option value=''>Select</option>
                                             <option value='capital'>Capital</option>
@@ -124,6 +126,7 @@ const EditAddedPV = memo(({data, closeModal}) => {
                                             name='economic_code' 
                                             value={props.values.economic_code}
                                             handleChange={props.handleChange}
+                                            disabled={true}
                                         />
                                     </div>
                                     <div className='w-full relative text-input flex flex-col gap-1'>

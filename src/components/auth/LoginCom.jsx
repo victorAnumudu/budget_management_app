@@ -14,7 +14,6 @@ import RouteLinks from '../../RouteLinks'
 import localImgLoader from '../../helpers/localImageLoader';
 import MainBtn from '../btn/MainBtn'
 
-
 const initialValues = {
   email: "",
   password: "",
@@ -41,10 +40,13 @@ const LoginCom = memo(() => {
     },
     onError: (error) => {
         // console.log(error)
+        setTimeout(()=>{
+          login.reset()
+        }, import.meta.env.VITE_APP_SETTIMEOUT_TIME)
     },
       onSuccess: (res) => {
-        if(!res?.data?.status){
-          throw new Error('Error logging user in, try again *')
+        if(res?.data?.status != 1){
+          throw new Error(res?.data?.message)
         }
         const {token, user} = res?.data?.data
         if(token){
@@ -65,7 +67,7 @@ const LoginCom = memo(() => {
 
   return (
     <>
-      <div className={`h-screen bg-sky-300 flex flex-col items-center justify-center bg-[url('./assets/auth_logo.jpeg')] bg-cover bg-center bg-no-repeat overflow-y-auto`}>
+      <div className={`h-screen bg-sky-300 flex flex-col items-center justify-center bg-[url('/assets/auth_logo.jpeg')] bg-cover bg-center bg-no-repeat overflow-y-auto`}>
         <div className='p-4 sm:p-8 w-full max-w-7xl mx-auto grid gap-8 grid-cols-1 md:grid-cols-3 lg:grid-cols-2'>
           <div className='col-span-1 md:col-span-2 lg:col-span-1 h-full'>
             <Formik
@@ -75,7 +77,7 @@ const LoginCom = memo(() => {
             >
               {(props)=>(
                 <Form>
-                  <div className='flex flex-col gap-8 w-full bg-white rounded-xl p-8 xs:p-12 sm:px-20 sm:py-16 shadow'>
+                  <div data-aos="fade-right" className='flex flex-col gap-8 w-full bg-white rounded-xl p-8 xs:p-12 sm:px-20 sm:py-16 shadow'>
                     <div className='w-full flex justify-center items-center'>
                       <img src={localImgLoader('logos/Abia_logo.png')} className='w-28' alt='logo'/>
                     </div>
@@ -103,8 +105,8 @@ const LoginCom = memo(() => {
 
                     <div className='flex flex-col gap-8'>
                       <div className='relative text-input flex flex-col gap-2'>
-                        <p className='absolute left-0 -top-4 text-red-500 text-10'>
-                          {(props.errors.email && props.touched.email) ? props.errors.email : ''}
+                        <p className='absolute left-0 -top-4 text-10'>
+                          Email <span className='text-red-500'>{(props.errors.email && props.touched.email) ? props.errors.email : ''}</span>
                         </p>
                         <InputText 
                           id='email' 
@@ -115,8 +117,8 @@ const LoginCom = memo(() => {
                         />
                       </div>
                       <div className='relative text-input flex flex-col gap-2'>
-                        <p className='absolute left-0 -top-4 text-red-500 text-10'>
-                          {(props.errors.password && props.touched.password) ? props.errors.password : ''}
+                        <p className='absolute left-0 -top-4 text-10'>
+                          Password <span className='text-red-500'>{(props.errors.password && props.touched.password) ? props.errors.password : ''}</span>
                         </p>
                         <InputText 
                           id='password' 

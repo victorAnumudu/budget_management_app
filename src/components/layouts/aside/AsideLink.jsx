@@ -10,7 +10,7 @@ export default function AsideLink({name, to, icon}) {
 
   return (
     <Link 
-        className={`w-full flex items-center gap-2 px-4 py-1 my-1 text-[13px] sm:text-sm font-semibold rounded-md hover:bg-white dark:hover:bg-black-box text-slate-higher dark:text-slate-high ${pathname == to ? 'bg-white-body dark:bg-black-box' : ''}`} 
+        className={`w-full flex items-center gap-2 px-4 py-1 my-1 text-[13px] sm:text-sm font-semibold rounded-md hover:bg-white dark:hover:bg-black text-slate-higher dark:text-slate-high ${pathname == to ? 'bg-white-body dark:bg-black' : ''}`} 
         to={to}
         onClick={()=>setShowAsideDrawer(false)}
     >   

@@ -6,7 +6,7 @@ import BreadcrumbCom from '../breadcrumb/BreadcrumbCom'
 import TablePaginatedWrapper from '../tableWrapper/TablePaginatedWrapper'
 import Icons from '../Icons'
 
-import Avatar from '../../assets/user_avatar.jpg'
+// import Avatar from '../../assets/user_avatar.jpg'
 import queryKeys from '../../services/queryKeys'
 import { getTransactions } from '../../services/siteServices'
 import getDateFromDateString from '../../helpers/GetDateFromDateString';

@@ -1,10 +1,11 @@
 import { memo, useEffect, useMemo, useState } from 'react'
-import {Link} from 'react-router-dom'
+import {Link, replace, useNavigate} from 'react-router-dom'
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {Formik, Form} from 'formik'
 import * as Yup from "yup";
 
 import BreadcrumbCom from '../breadcrumb/BreadcrumbCom'
-import { getTransactions } from '../../services/siteServices'
+import { addMDA, uploadMDA } from '../../services/siteServices'
 import getDateFromDateString from '../../helpers/GetDateFromDateString';
 import localImgLoader from '../../helpers/localImageLoader';
 import RouteLinks from '../../RouteLinks';
@@ -21,6 +22,7 @@ import { addMDAFields, addMDAFieldsValidation } from '../../helpers/formikValues
 import formatNumber from '../../helpers/formatNumber';
 import RecentlyAdded from '../recentlyAdded/RecentlyAdded';
 import InputFile from '../inputs/InputFile';
+import queryKeys from '../../services/queryKeys';
 
 
 // To get the validation schema
@@ -28,32 +30,96 @@ const validationSchema = addMDAFieldsValidation
 
 const AddCom = memo(() =>{
 
+    const currentYear = new Date().getFullYear()
+
+    const queryClient = useQueryClient()
+    const navigate = useNavigate()
+
+    const [reqData, setReqData] = useState({})
+
     const [isFile, setIsFile] = useState(false)
     const [selectedFile, setSelectedFile] = useState('')
     const handleSelectedFile = ({target}) => {
         const fileToRead = target.files[0]
-        console.log('Target', fileToRead)
-            const reader = new FileReader();
-            // reader.onload = function(e) {
-            //     const data = e.target.result; // The file content
-            //     // Pass data to an Excel parsing library
-            // };
-            const main = reader.readAsBinaryString(fileToRead); // Or reader.readAsArrayBuffer(file);
-            console.log('main', main)
+        setSelectedFile(fileToRead)
+        // console.log('Target', fileToRead)
+        // const reader = new FileReader();
+        // reader.onload = function(e) {
+        //     const data = e.target.result; // The file content
+        //     // Pass data to an Excel parsing library
+        // };
+        // const main = reader.readAsArrayBuffer(fileToRead); // Or reader.readAsBinaryString(fileToRead)
     }
 
     const [verifyModal, setVerifyModal] = useState(false)
-    const [status, setStatus] = useState(false)
 
     const initialValues = useMemo(()=>{
         return {...addMDAFields }
     },[])
 
+    //MUTATION FUNCTION TO ADD MDA
+    const addMDAFunc = useMutation({
+        mutationFn: (fields) => {
+            return addMDA(fields)
+        },
+        onError: (error) => {
+            // console.log(error)
+            setTimeout(()=>{
+            addMDAFunc.reset()
+            }, import.meta.env.VITE_APP_SETTIMEOUT_TIME)
+        },
+        onSuccess: (res) => {
+            if(res?.data?.status != 1){
+            throw new Error(res?.data?.message)
+            }
+        }
+    })
+
+    //MUTATION FUNCTION TO UPLOAD MDA FILE
+    const uploadMDAFunc = useMutation({
+        mutationFn: (fields) => {
+            if(!fields.file){
+                throw new Error('No File Selected')
+            }
+            return uploadMDA(fields)
+        },
+        onError: (error) => {
+            // console.log(error)
+            setTimeout(()=>{
+            uploadMDAFunc.reset()
+            }, import.meta.env.VITE_APP_SETTIMEOUT_TIME)
+        },
+        onSuccess: (res) => {
+            if(res?.data?.status != 1){
+            throw new Error(res?.data?.message)
+            }
+            setSelectedFile('')
+            queryClient.refetchQueries({queryKey: [...queryKeys.allMDA]})
+            navigate(RouteLinks.mdaList, {replace: true})
+        },
+        onSettled: () => {
+            setTimeout(()=>{
+                uploadMDAFunc.reset()
+            }, import.meta.env.VITE_APP_SETTIMEOUT_TIME)
+        }
+    })
+
     //FUNCTION TO HANDLE ADD PV
     const handleSubmit = (values, helper) => {
-        // login.mutate(values)
         setVerifyModal(true)
+        setReqData(values)
     };
+
+    // function to preceed with adding an mda or uploading mda file
+    const proceedFunc = ()=>{
+        setVerifyModal(false)
+        if(isFile){
+            uploadMDAFunc.mutate({file: selectedFile}) // function to upload mda
+        }else{
+            addMDAFunc.mutate(reqData)  // function to add an mda
+        }
+    }
+
 
     return (
         <>
@@ -76,19 +142,20 @@ const AddCom = memo(() =>{
                                 id='name'
                                 type='file'
                                 accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                                value={selectedFile}
                                 onChange={handleSelectedFile}
                             />
                         </div>
-                        {isFile && 
+                        
                         <div className='w-28'>
                             <MainBtn 
-                                // onClick={} 
+                                onClick={()=>handleSubmit()} 
                                 disabled={false} 
                                 className={`bg-secondary px-2 py-1 rounded-md text-white font-medium sm:self-end ${(false) && 'opacity-50'}`}
                                 text='Upload File'
                             />
                         </div>
-                        }
+                        
                     </div>
                     :
                     <Formik
@@ -116,13 +183,15 @@ const AddCom = memo(() =>{
                                             <p className='text-sm font-semibold dark:text-slate-high'>
                                                 Year <span className='text-red-500 text-10'>{(props.errors.year && props.touched.year) ? props.errors.year : ''}</span>
                                             </p>
-                                            <InputText 
+                                            <SelectDropdown
                                                 id='year' 
-                                                type='date' 
                                                 name='year' 
                                                 value={props.values.year}
-                                                handleChange={props.handleChange}
-                                            />
+                                                onChange={props.handleChange}
+                                            >
+                                                <option value=''>Select</option>
+                                                <option value={currentYear}>{currentYear}</option>
+                                            </SelectDropdown>
                                         </div>
                                     </div>
                                     <div className='relative text-input flex flex-col gap-1'>
@@ -153,19 +222,17 @@ const AddCom = memo(() =>{
 
             {verifyModal && 
                 <VerifyModal 
-                    text='Are you sure you want to add this MDA?' 
-                    proceedFunc={()=>{
-                        setVerifyModal(false)
-                        setStatus(true)
-                    }} 
+                    text={isFile ? 'Are you sure you want to upload this file?' : 'Are you sure you want to add this MDA?'} 
+                    proceedFunc={proceedFunc} 
                     cLoseModal={()=>setVerifyModal(false)}
                 />
             }
-            { status &&
+            { (addMDAFunc?.isPending || addMDAFunc?.isSuccess || addMDAFunc?.isError || uploadMDAFunc?.isPending || uploadMDAFunc?.isSuccess || uploadMDAFunc?.isError) &&
                 <StatusModal 
-                    text='MDA added successfully' 
-                    isSuccess={true}
-                    cLoseModal={()=>{setSearchCode({loading: false, status:null, data:{}});setStatus(false)}}
+                    text= {addMDAFunc?.isSuccess ? 'MDA added successfully' : uploadMDAFunc?.isSuccess ? 'File uploaded successfully' : uploadMDAFunc?.error ? uploadMDAFunc?.error?.message : addMDAFunc?.error?.message}
+                    isSuccess={addMDAFunc?.isSuccess || uploadMDAFunc?.isSuccess}
+                    isPending={addMDAFunc?.isPending || uploadMDAFunc?.isPending}
+                    cLoseModal={()=>{isFile ? uploadMDAFunc.reset() : addMDAFunc.reset()}}
                 />
             }
         </>

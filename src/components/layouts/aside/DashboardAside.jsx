@@ -9,6 +9,9 @@ import { generalLayoutContext } from "../../../context/GeneralLayoutContext";
 import Icons from "../../Icons";
 import ImgCom from '../../img/ImgCom';
 import localImgLoader from '../../../helpers/localImageLoader';
+import notAuthorizeUser from '../../../helpers/notAuthorizeUser';
+
+
 
 export default function DashboardAside() {
 
@@ -16,9 +19,9 @@ export default function DashboardAside() {
 
     const {setLogoutModal, activeMenu, handleActiveMenu} = generalLayoutContext()
 
-    const {userDetails:{firstname, lastname, email}} = useSelector((state) => state.userDetails) // GETS LOGGED IN USER ROLE DETAILS
+    const {userDetails:{firstname, lastname, email, role}} = useSelector((state) => state.userDetails) // GETS LOGGED IN USER ROLE DETAILS
 
-  return (
+    return (
     <div className='w-full h-full flex flex-col'>
         <div className="mb-3 w-full h-24 logo flex items-center">
             <DummyLogo />
@@ -27,7 +30,7 @@ export default function DashboardAside() {
 
         <div className="aside-scroll-design w-full h-full overflow-y-auto">
             {asideNavLinks.map((link, index) => {
-                let active = link.status == 1 ? true : false
+                let active = notAuthorizeUser(role, link.notAllowedUsers) == 1 ? true : false
                 let hasSubLinks = (link.subLinks && link.subLinks.length > 0) ? true : false
                 if(active && !hasSubLinks){
                     return (
@@ -55,7 +58,7 @@ export default function DashboardAside() {
                         <AsideLinkWithSubLinks name={link.name} icon={link.icon} isOpen={subLinkList.includes(pathname) || index==1} >
                             <>
                             {link.subLinks.map((subItem, index)=>{
-                                let active = subItem.status == 1 ? true : false
+                                let active = notAuthorizeUser(role, subItem.notAllowedUsers) == 1 ? true : false
                                 let hasSubLinks = (subItem.subLinks && subItem.subLinks.length > 0) ? true : false
                                 if(active && !hasSubLinks){
                                     return (
@@ -73,7 +76,7 @@ export default function DashboardAside() {
                                         <AsideLinkWithSubLinks key={subItem.name} name={subItem.name} icon={subItem.icon} isOpen={subLinkList.includes(pathname)}>
                                             <>
                                             {subItem.subLinks.map((item, index)=>{
-                                                let active = item.status == 1 ? true : false
+                                                let active = isAuthorizeUser(role, item.notAllowedUsers) == 1 ? true : false
                                                 if(active){
                                                     return (
                                                     <div key={index}>
@@ -133,29 +136,39 @@ export default function DashboardAside() {
 }
 
 const asideNavLinks = [
-    {name:'Dashboard', status:1, icon: 'dashboard', to: RouteLinks.homePage},
-    {name:'Payment Vouchers', title:'', status:1, icon: 'sales', subLinks: [
-        {name: 'PVs', status:1, icon: 'dot', to: RouteLinks.paymentVouchers},
-        {name: 'Add PV', status:1, icon: 'dot', to: RouteLinks.addPV},
+    {name:'Dashboard', status:1, icon: 'dashboard', to: RouteLinks.homePage, notAllowedUsers: []},
+    {name:'Payment Vouchers', title:'', status:1, icon: 'sales', notAllowedUsers: ['user'], subLinks: [
+        {name: 'PVs', status:1, icon: 'dot', to: RouteLinks.paymentVouchers, notAllowedUsers: []},
+        {name: 'Add PV', status:1, icon: 'dot', to: RouteLinks.addPV, notAllowedUsers: []},
         // {name: 'Configurations', status:1, icon: 'arrow-right', subLinks: [
         //     {name: 'Loan Offers', status:1, icon: 'dot', to: RouteLinks.offers },
         //     ]
         // },
         ],
     },
-    {name:'MDAs', title:'', status:1, icon: 'product', subLinks: [
-        {name: 'View MDA', status:1, icon: 'dot', to: RouteLinks.mdaList },
-        {name: 'Add MDA', status:1, icon: 'dot', to: RouteLinks.addMDA },
+    {name:'Warrants', title:'', status:1, icon: 'product', notAllowedUsers: ['user', 'tpo'], subLinks: [
+        {name: 'View All Warrants', status:1, icon: 'dot', to: RouteLinks.warrants, notAllowedUsers: [] },
+        {name: 'Add Recur. Warrant', status:1, icon: 'dot', to: RouteLinks.createRecurrentWarrant, notAllowedUsers: [] },
+        {name: 'Add Cap. Warrant', status:1, icon: 'dot', to: RouteLinks.createCapWarrant, notAllowedUsers: [] },
         ]
     },
-    {name:'Economic Line', title:'', status:1, icon: 'economy', subLinks: [
-        {name: 'Economic Lines', status:1, icon: 'dot', to: RouteLinks.economicLines },
-        {name: 'Add Economic Item', status:1, icon: 'dot', to: RouteLinks.addEconomicLine },
+    {name:'MDAs', title:'', status:1, icon: 'product', notAllowedUsers: ['user', 'tpo'], subLinks: [
+        {name: 'View MDA', status:1, icon: 'dot', to: RouteLinks.mdaList, notAllowedUsers: [] },
+        {name: 'Add MDA', status:1, icon: 'dot', to: RouteLinks.addMDA, notAllowedUsers: [] },
         ]
     },
-     {name:'Users', title:'', status:1, icon: 'people', subLinks: [
-        {name: 'View Users', status:1, icon: 'dot', to: RouteLinks.users },
+    {name:'Economic Line', title:'', status:1, icon: 'economy', notAllowedUsers: ['user', 'tpo'], subLinks: [
+        {name: 'Economic Lines', status:1, icon: 'dot', to: RouteLinks.economicLines, notAllowedUsers: [] },
+        // {name: 'Add Economic Item', status:1, icon: 'dot', to: RouteLinks.addEconomicLine, notAllowedUsers: [] },
+        ]
+    },
+     {name:'Users', title:'', status:1, icon: 'people', notAllowedUsers: ['user', 'tpo'], subLinks: [
+        {name: 'View Users', status:1, icon: 'dot', to: RouteLinks.users, notAllowedUsers: [] },
         // {name: 'Add User', status:1, icon: 'dot', to: RouteLinks.addUser },
         ]
+    },
+    {name:'Settings', title:'', status:1, icon: 'sales', notAllowedUsers: [], subLinks: [
+        {name: 'Profile', status:1, icon: 'dot', to: RouteLinks.profile, notAllowedUsers: []},
+        ],
     },
 ]
